@@ -430,6 +430,10 @@ async function logout() {
   document.getElementById('auth-page').style.display = 'flex';
   document.getElementById('auth-error').style.display = 'none';
   document.getElementById('auth-success').style.display = 'none';
+  document.getElementById('teacher-nav').style.display = 'none';
+  document.getElementById('add-session-btn').style.display = 'none';
+  document.getElementById('home-subtitle').textContent = 'Your maths learning hub.';
+  showPage('home');
 }
 
 function showPage(id) {
