@@ -667,16 +667,17 @@ async function loadExplorer() {
   const grid = document.getElementById('sessions-explorer-grid');
   grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
 
-  let query = sb.from('explorer_nodes').select('*').eq('section', 'sessions').order('type').order('name');
+  let query = sb.from('explorer_nodes').select('*').eq('section', 'sessions').order('type', { ascending: true }).order('name', { ascending: true });
   if (parentId === null) {
-    query = query.is('parent_id', null);
+    query = query.filter('parent_id', 'is', 'null');
   } else {
     query = query.eq('parent_id', parentId);
   }
   const { data, error } = await query;
 
   if (error) {
-    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load content.</div>`;
+    console.error('Explorer load error:', error);
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load content.<br><small style="font-size:11px">${error.message}</small></div>`;
     return;
   }
   explorerCache[parentId || 'root'] = data || [];
