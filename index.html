@@ -39,11 +39,9 @@
   /* PENDING */
   #pending-page{display:none;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--blue-light) 0%,var(--green-light) 100%);}
   .pending-card{background:var(--white);border-radius:16px;padding:40px;width:100%;max-width:420px;box-shadow:0 4px 24px rgba(0,0,0,0.08);text-align:center;}
-  .pending-card img{width:90px;margin-bottom:12px;}
-  .pending-icon{font-size:56px;margin-bottom:16px;}
+  .pending-badge{display:inline-block;background:var(--orange-light);color:var(--orange);font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;margin-bottom:20px;border:1px solid #fcd34d;}
   .pending-card h2{font-size:22px;font-weight:800;margin-bottom:10px;}
   .pending-card p{font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:20px;}
-  .pending-badge{display:inline-block;background:var(--orange-light);color:var(--orange);font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;margin-bottom:20px;border:1px solid #fcd34d;}
 
   /* APP LAYOUT */
   #app{display:none;min-height:100vh;}
@@ -82,18 +80,43 @@
   .year-AS{background:#fef3c7;color:#92400e;}
   .year-A2{background:#dcfce7;color:#166534;}
 
-  /* FOLDERS */
-  .folders-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap;}
-  .btn-add-folder{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
-  .btn-add-folder:hover{opacity:0.9;}
-  .folders-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
-  .folder-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;transition:all 0.15s;position:relative;}
-  .folder-card:hover{border-color:var(--blue);box-shadow:0 2px 12px rgba(24,95,165,0.1);}
-  .folder-icon{font-size:32px;margin-bottom:10px;}
-  .folder-name{font-size:14px;font-weight:700;margin-bottom:4px;}
-  .folder-meta{font-size:11px;color:var(--text-muted);}
-  .folder-delete{position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;font-size:14px;opacity:0;transition:opacity 0.15s;}
-  .folder-card:hover .folder-delete{opacity:1;}
+  /* ── EXPLORER TOOLBAR ── */
+  .explorer-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap;}
+  .explorer-toolbar-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0;}
+  .explorer-toolbar-right{display:flex;gap:8px;flex-shrink:0;}
+
+  /* BREADCRUMB */
+  .breadcrumb{display:flex;align-items:center;gap:4px;font-size:13px;flex-wrap:wrap;}
+  .breadcrumb-item{color:var(--blue);font-weight:600;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background 0.12s;white-space:nowrap;}
+  .breadcrumb-item:hover{background:var(--blue-light);}
+  .breadcrumb-item.current{color:var(--text);font-weight:700;cursor:default;}
+  .breadcrumb-item.current:hover{background:none;}
+  .breadcrumb-sep{color:var(--text-muted);font-size:12px;user-select:none;}
+
+  /* FOLDER / FILE GRID */
+  .explorer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;}
+  .explorer-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px 16px;cursor:pointer;transition:all 0.15s;position:relative;user-select:none;}
+  .explorer-card:hover{border-color:var(--blue);box-shadow:0 2px 12px rgba(24,95,165,0.10);}
+  .explorer-card-icon{font-size:28px;margin-bottom:10px;line-height:1;}
+  .explorer-card-name{font-size:13px;font-weight:700;margin-bottom:3px;word-break:break-word;line-height:1.35;}
+  .explorer-card-meta{font-size:11px;color:var(--text-muted);line-height:1.4;}
+  .explorer-card-delete{position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;font-size:13px;opacity:0;padding:3px 5px;border-radius:5px;transition:all 0.12s;}
+  .explorer-card:hover .explorer-card-delete{opacity:1;}
+  .explorer-card-delete:hover{background:var(--red-light);color:var(--red);}
+
+  /* FILE CARD specific */
+  .explorer-card.file-card{cursor:default;}
+  .file-watch-btn{display:inline-block;background:var(--blue);color:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;margin-top:10px;transition:opacity 0.15s;}
+  .file-watch-btn:hover{opacity:0.88;}
+
+  /* VIS BADGE on card */
+  .vis-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--blue-light);color:var(--blue);margin-top:5px;}
+
+  /* ADD BUTTONS */
+  .btn-add{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+  .btn-add:hover{opacity:0.9;}
+  .btn-add-outline{background:var(--white);color:var(--blue);border:1px solid var(--blue);border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+  .btn-add-outline:hover{background:var(--blue-light);}
 
   /* MODAL */
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:none;align-items:center;justify-content:center;}
@@ -113,6 +136,21 @@
   .student-picker-row:hover{background:var(--bg);}
   .student-picker-row.selected{background:var(--blue-light);color:var(--blue);font-weight:600;}
   .student-picker-empty{padding:14px;font-size:13px;color:var(--text-muted);text-align:center;}
+
+  /* SESSIONS (Home tab) */
+  .sessions-toolbar-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:28px;margin-bottom:14px;flex-wrap:wrap;}
+  .sessions-toolbar-row h2{font-size:16px;font-weight:800;}
+  .session-list{display:flex;flex-direction:column;gap:10px;}
+  .session-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;transition:all 0.15s;}
+  .session-card:hover{border-color:var(--blue);box-shadow:0 2px 12px rgba(24,95,165,0.08);}
+  .session-card-main{flex:1;min-width:0;}
+  .session-card-name{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .session-card-meta{font-size:12px;color:var(--text-muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .session-card-meta a{color:var(--blue);text-decoration:none;font-weight:600;}
+  .session-card-meta a:hover{text-decoration:underline;}
+  .session-vis-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--blue-light);color:var(--blue);white-space:nowrap;}
+  .session-delete{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;color:var(--text-muted);font-family:inherit;flex-shrink:0;transition:all 0.15s;}
+  .session-delete:hover{border-color:var(--red);color:var(--red);background:var(--red-light);}
 
   /* STUDENTS TABLE */
   .teacher-panel{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:24px;}
@@ -136,55 +174,6 @@
   @keyframes spin{to{transform:rotate(360deg);}}
   .empty-state{text-align:center;padding:48px 20px;color:var(--text-muted);font-size:14px;}
   .empty-state .empty-icon{font-size:40px;margin-bottom:12px;}
-
-  /* SESSION BLOCKS (Home tab) */
-  .sessions-toolbar-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:28px;margin-bottom:14px;flex-wrap:wrap;}
-  .sessions-toolbar-row h2{font-size:16px;font-weight:800;}
-  .session-search-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
-  .session-search-row .search-bar{margin-bottom:0;flex:1;min-width:200px;}
-  .session-list{display:flex;flex-direction:column;gap:10px;}
-  .session-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;transition:all 0.15s;}
-  .session-card:hover{border-color:var(--blue);box-shadow:0 2px 12px rgba(24,95,165,0.08);}
-  .session-card-main{flex:1;min-width:0;}
-  .session-card-name{font-size:14px;font-weight:700;margin-bottom:4px;}
-  .session-card-meta{font-size:12px;color:var(--text-muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-  .session-card-meta a{color:var(--blue);text-decoration:none;font-weight:600;}
-  .session-card-meta a:hover{text-decoration:underline;}
-  .session-card-time{display:inline-flex;align-items:center;gap:4px;}
-  .session-vis-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--blue-light);color:var(--blue);white-space:nowrap;}
-  .session-delete{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;color:var(--text-muted);font-family:inherit;flex-shrink:0;transition:all 0.15s;}
-  .session-delete:hover{border-color:var(--red);color:var(--red);background:var(--red-light);}
-
-  /* SESSIONS TAB — "Chapters" binder UI */
-  .chapters-rail{display:flex;align-items:flex-end;gap:6px;margin-bottom:0;overflow-x:auto;padding:0 2px;scrollbar-width:thin;}
-  .chapter-tab{position:relative;flex-shrink:0;background:var(--white);border:1px solid var(--border);border-bottom:none;border-radius:10px 10px 0 0;padding:12px 18px 14px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-muted);transition:all 0.15s;white-space:nowrap;top:1px;}
-  .chapter-tab:hover{color:var(--text);background:var(--bg);}
-  .chapter-tab.active{color:var(--text);background:var(--white);border-color:var(--border);z-index:2;box-shadow:0 -2px 8px rgba(0,0,0,0.03);}
-  .chapter-tab .chapter-tab-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle;}
-  .dot-all{background:var(--blue);}
-  .dot-OL{background:#7c3aed;}
-  .dot-AS{background:#d97706;}
-  .dot-A2{background:#16a34a;}
-  .dot-student{background:#64748b;}
-  .chapter-tab-delete{background:none;border:none;cursor:pointer;font-size:11px;margin-left:8px;opacity:0;color:var(--text-muted);transition:opacity 0.15s;}
-  .chapter-tab:hover .chapter-tab-delete{opacity:1;}
-  .chapter-tab-delete:hover{color:var(--red);}
-  .add-chapter-tab{flex-shrink:0;background:var(--bg);border:1px dashed var(--border);border-radius:10px 10px 0 0;padding:12px 16px 14px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-muted);transition:all 0.15s;top:1px;}
-  .add-chapter-tab:hover{color:var(--blue);border-color:var(--blue);}
-  .chapter-panel{background:var(--white);border:1px solid var(--border);border-radius:0 12px 12px 12px;padding:24px;min-height:220px;}
-  .chapter-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
-  .chapter-panel-title{font-size:15px;font-weight:800;}
-  .chapter-panel-vis{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--blue-light);color:var(--blue);margin-left:8px;vertical-align:middle;}
-  .lessons-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
-  .lesson-card{background:linear-gradient(150deg,var(--blue-light) 0%,var(--white) 55%);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;transition:all 0.15s;}
-  .lesson-card:hover{border-color:var(--blue);box-shadow:0 3px 14px rgba(24,95,165,0.12);transform:translateY(-1px);}
-  .lesson-card-reel{font-size:22px;margin-bottom:8px;}
-  .lesson-card-name{font-size:14px;font-weight:700;margin-bottom:14px;line-height:1.35;word-break:break-word;}
-  .lesson-card-actions{display:flex;align-items:center;gap:8px;}
-  .btn-watch{flex:1;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;display:inline-block;transition:opacity 0.15s;}
-  .btn-watch:hover{opacity:0.88;}
-  .lesson-delete{background:none;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;cursor:pointer;color:var(--text-muted);font-family:inherit;flex-shrink:0;transition:all 0.15s;}
-  .lesson-delete:hover{border-color:var(--red);color:var(--red);background:var(--red-light);}
 </style>
 </head>
 <body>
@@ -263,25 +252,37 @@
   </aside>
 
   <main class="main-content">
+
     <!-- HOME -->
     <div id="home" class="page active">
       <div class="page-header">
         <h1>Welcome back 👋</h1>
         <p id="home-subtitle">Your maths learning hub.</p>
       </div>
-
       <div class="sessions-toolbar-row">
         <h2>📅 Upcoming Sessions</h2>
-        <button class="btn-add-folder" id="add-session-btn" style="display:none" onclick="openSessionModal()">+ New session</button>
+        <button class="btn-add" id="add-session-btn" style="display:none" onclick="openSessionModal()">+ New session</button>
       </div>
       <div class="session-list" id="session-list"></div>
     </div>
 
-    <!-- SESSIONS -->
+    <!-- SESSIONS / RECORDINGS EXPLORER -->
     <div id="sessions" class="page">
-      <div class="page-header"><h1>📅 Sessions</h1><p>Recorded lessons, organized by chapter.</p></div>
-      <div class="chapters-rail" id="chapters-rail"></div>
-      <div class="chapter-panel" id="chapter-panel"></div>
+      <div class="page-header">
+        <h1>📅 Sessions</h1>
+        <p>Recorded lessons, organized by chapter.</p>
+      </div>
+
+      <!-- Breadcrumb + toolbar -->
+      <div class="explorer-toolbar">
+        <div class="explorer-toolbar-left">
+          <div class="breadcrumb" id="sessions-breadcrumb"></div>
+        </div>
+        <div class="explorer-toolbar-right" id="sessions-toolbar-btns"></div>
+      </div>
+
+      <!-- Grid -->
+      <div class="explorer-grid" id="sessions-explorer-grid"></div>
     </div>
 
     <!-- PDFs -->
@@ -309,25 +310,17 @@
         </table>
       </div>
     </div>
+
   </main>
 </div>
 
-<!-- SESSION MODAL -->
+<!-- SESSION MODAL (Home tab) -->
 <div class="modal-overlay" id="session-modal">
   <div class="modal">
     <h3>📅 New session</h3>
-    <div class="form-group">
-      <label>Session name</label>
-      <input type="text" id="session-name" placeholder=""/>
-    </div>
-    <div class="form-group">
-      <label>Link</label>
-      <input type="text" id="session-link" placeholder=""/>
-    </div>
-    <div class="form-group">
-      <label>Time</label>
-      <input type="text" id="session-time" placeholder=""/>
-    </div>
+    <div class="form-group"><label>Session name</label><input type="text" id="session-name" placeholder=""/></div>
+    <div class="form-group"><label>Link</label><input type="text" id="session-link" placeholder=""/></div>
+    <div class="form-group"><label>Time</label><input type="text" id="session-time" placeholder="e.g. Friday 5pm"/></div>
     <div class="form-group">
       <label>Visible to</label>
       <div class="visibility-options">
@@ -351,52 +344,44 @@
   </div>
 </div>
 
-<!-- CHAPTER MODAL (Sessions tab) -->
-<div class="modal-overlay" id="chapter-modal">
+<!-- EXPLORER: NEW FOLDER MODAL -->
+<div class="modal-overlay" id="explorer-folder-modal">
   <div class="modal">
-    <h3>📖 New chapter</h3>
-    <div class="form-group">
-      <label>Lesson / chapter name</label>
-      <input type="text" id="chapter-name" placeholder=""/>
-    </div>
-    <div class="form-group">
+    <h3 id="explorer-folder-modal-title">📁 New folder</h3>
+    <div class="form-group"><label>Folder name</label><input type="text" id="explorer-folder-name" placeholder="e.g. Chapter 1 — Algebra"/></div>
+    <div class="form-group" id="explorer-folder-vis-group">
       <label>Visible to</label>
       <div class="visibility-options">
-        <button class="vis-btn selected" data-vis="all" onclick="selectChapterVisibility('all')">Everyone</button>
-        <button class="vis-btn" data-vis="OL" onclick="selectChapterVisibility('OL')">OL only</button>
-        <button class="vis-btn" data-vis="AS" onclick="selectChapterVisibility('AS')">AS only</button>
-        <button class="vis-btn" data-vis="A2" onclick="selectChapterVisibility('A2')">A2 only</button>
-        <button class="vis-btn" data-vis="student" onclick="selectChapterVisibility('student')">Specific student</button>
+        <button class="vis-btn selected" data-vis="all" onclick="selectExplorerFolderVis('all')">Everyone</button>
+        <button class="vis-btn" data-vis="OL" onclick="selectExplorerFolderVis('OL')">OL only</button>
+        <button class="vis-btn" data-vis="AS" onclick="selectExplorerFolderVis('AS')">AS only</button>
+        <button class="vis-btn" data-vis="A2" onclick="selectExplorerFolderVis('A2')">A2 only</button>
+        <button class="vis-btn" data-vis="student" onclick="selectExplorerFolderVis('student')">Specific student</button>
       </div>
     </div>
-    <div class="form-group" id="chapter-student-picker" style="display:none">
+    <div class="form-group" id="explorer-folder-student-picker" style="display:none">
       <label>Choose student</label>
-      <input type="text" class="search-bar" id="chapter-student-search" placeholder="🔍 Search students..." style="margin-bottom:8px" oninput="filterChapterStudentPicker(this.value)"/>
-      <div id="chapter-student-list" class="student-picker-list"></div>
-      <input type="hidden" id="chapter-student-id" value=""/>
+      <input type="text" class="search-bar" id="ef-student-search" placeholder="🔍 Search..." style="margin-bottom:8px" oninput="filterEFStudentPicker(this.value)"/>
+      <div id="ef-student-list" class="student-picker-list"></div>
+      <input type="hidden" id="ef-student-id" value=""/>
     </div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeChapterModal()">Cancel</button>
-      <button class="btn-save" onclick="saveChapter()">Create chapter</button>
+      <button class="btn-cancel" onclick="closeExplorerFolderModal()">Cancel</button>
+      <button class="btn-save" onclick="saveExplorerFolder()">Create folder</button>
     </div>
   </div>
 </div>
 
-<!-- LESSON MODAL (Sessions tab) -->
-<div class="modal-overlay" id="lesson-modal">
+<!-- EXPLORER: NEW FILE MODAL -->
+<div class="modal-overlay" id="explorer-file-modal">
   <div class="modal">
-    <h3>🎬 New recording</h3>
-    <div class="form-group">
-      <label>Lesson name</label>
-      <input type="text" id="lesson-name" placeholder=""/>
-    </div>
-    <div class="form-group">
-      <label>Drive link</label>
-      <input type="text" id="lesson-link" placeholder=""/>
-    </div>
+    <h3>🎬 Add recording</h3>
+    <div class="form-group"><label>Lesson name</label><input type="text" id="explorer-file-name" placeholder="e.g. Introduction to Differentiation"/></div>
+    <div class="form-group"><label>Description <span style="font-weight:400;text-transform:none;font-size:11px">(optional)</span></label><input type="text" id="explorer-file-desc" placeholder="A short note about this lesson"/></div>
+    <div class="form-group"><label>Google Drive link</label><input type="text" id="explorer-file-link" placeholder="https://drive.google.com/..."/></div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeLessonModal()">Cancel</button>
-      <button class="btn-save" onclick="saveLesson()">Add recording</button>
+      <button class="btn-cancel" onclick="closeExplorerFileModal()">Cancel</button>
+      <button class="btn-save" onclick="saveExplorerFile()">Add recording</button>
     </div>
   </div>
 </div>
@@ -449,11 +434,11 @@ function showApp(profile) {
   document.getElementById('nav-role').textContent = profile.role + yearLabel;
   if (profile.role === 'teacher') {
     document.getElementById('teacher-nav').style.display = 'flex';
-    document.getElementById('add-session-btn').style.display = 'inline-block';
+    document.getElementById('add-session-btn').style.display = 'inline-flex';
     document.getElementById('home-subtitle').textContent = 'Manage sessions, upload materials, and approve students.';
   }
   loadSessions();
-  loadChapters();
+  loadExplorer();
 }
 
 function showError(msg) { const el = document.getElementById('auth-error'); el.textContent = msg; el.style.display = 'block'; }
@@ -508,7 +493,7 @@ async function signup() {
 async function logout() {
   await sb.auth.signOut();
   currentUser = null; currentRole = null; currentYearGroup = null;
-  activeChapterId = null; allChapters = [];
+  explorerPath = []; explorerCache = {};
   document.getElementById('app').style.display = 'none';
   document.getElementById('app').classList.remove('visible');
   document.getElementById('pending-page').style.display = 'none';
@@ -531,22 +516,21 @@ function showPage(id) {
   if (navItems[idx]) navItems[idx].classList.add('active');
   if (id === 'students') loadStudents();
   if (id === 'home') loadSessions();
-  if (id === 'sessions') loadChapters();
+  if (id === 'sessions') loadExplorer();
 }
 
-// ── SESSIONS (Home tab) ───────────────────────────────────
+/* ══════════════════════════════════════════════════════════
+   SESSIONS (Home tab)
+══════════════════════════════════════════════════════════ */
 let allSessionsRows = [];
 let selectedSessionVisibility = 'all';
 
 async function loadSessions() {
   const list = document.getElementById('session-list');
   list.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
-  const { data: sessionsData, error } = await sb.from('sessions').select('*').order('created_at', { ascending: false });
-  if (error) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load sessions.</div>';
-    return;
-  }
-  allSessionsRows = sessionsData || [];
+  const { data, error } = await sb.from('sessions').select('*').order('created_at', { ascending: false });
+  if (error) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load sessions.</div>'; return; }
+  allSessionsRows = data || [];
   renderSessions(allSessionsRows);
 }
 
@@ -559,16 +543,12 @@ function renderSessions(rows) {
   list.innerHTML = rows.map(s => {
     const visLabel = s.visibility === 'all' ? 'Everyone' : s.visibility === 'student' ? 'Specific student' : s.visibility;
     const linkHtml = s.link ? `<a href="${s.link}" target="_blank" rel="noopener">🔗 Join link</a>` : '';
-    const timeHtml = s.time_text ? `<span class="session-card-time">🕒 ${s.time_text}</span>` : '';
+    const timeHtml = s.time_text ? `<span>🕒 ${s.time_text}</span>` : '';
     const deleteBtn = currentRole === 'teacher' ? `<button class="session-delete" onclick="deleteSession('${s.id}')">🗑 Delete</button>` : '';
-    return `<div class="session-card" data-name="${(s.name || '').toLowerCase()}">
+    return `<div class="session-card">
       <div class="session-card-main">
         <div class="session-card-name">${s.name}</div>
-        <div class="session-card-meta">
-          ${timeHtml}
-          ${linkHtml}
-          <span class="session-vis-tag">${visLabel}</span>
-        </div>
+        <div class="session-card-meta">${timeHtml}${linkHtml}<span class="session-vis-tag">${visLabel}</span></div>
       </div>
       ${deleteBtn}
     </div>`;
@@ -583,7 +563,6 @@ async function deleteSession(id) {
   loadSessions();
 }
 
-// ── SESSION MODAL ──────────────────────────────────────────
 let sessionPickerStudents = [];
 let selectedSessionStudentId = '';
 
@@ -600,7 +579,6 @@ function openSessionModal() {
   loadStudentsForSessionPicker();
   document.getElementById('session-modal').classList.add('open');
 }
-
 function closeSessionModal() { document.getElementById('session-modal').classList.remove('open'); }
 
 function selectSessionVisibility(vis) {
@@ -617,49 +595,35 @@ async function loadStudentsForSessionPicker() {
 
 function renderSessionStudentPicker(students) {
   const list = document.getElementById('session-student-list');
-  if (!students || students.length === 0) {
-    list.innerHTML = '<div class="student-picker-empty">No approved students found</div>';
-    return;
-  }
+  if (!students || students.length === 0) { list.innerHTML = '<div class="student-picker-empty">No approved students found</div>'; return; }
   list.innerHTML = students.map(s => {
     const label = `${s.full_name || s.email}${s.year_group ? ' (' + s.year_group + ')' : ''}`;
-    const isSelected = s.id === selectedSessionStudentId;
-    return `<div class="student-picker-row${isSelected ? ' selected' : ''}" onclick="pickSessionStudent('${s.id}')">${label}</div>`;
+    return `<div class="student-picker-row${s.id === selectedSessionStudentId ? ' selected' : ''}" onclick="pickSessionStudent('${s.id}')">${label}</div>`;
   }).join('');
 }
 
 function filterSessionStudentPicker(query) {
   const q = query.toLowerCase();
-  const filtered = sessionPickerStudents.filter(s =>
-    (s.full_name || '').toLowerCase().includes(q) ||
-    (s.email || '').toLowerCase().includes(q) ||
-    (s.year_group || '').toLowerCase().includes(q)
-  );
-  renderSessionStudentPicker(filtered);
+  renderSessionStudentPicker(sessionPickerStudents.filter(s =>
+    (s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q)));
 }
 
 function pickSessionStudent(id) {
   selectedSessionStudentId = id;
   document.getElementById('session-student-id').value = id;
-  renderSessionStudentPicker(sessionPickerStudents.filter(s => {
-    const q = document.getElementById('session-student-search').value.toLowerCase();
-    return (s.full_name || '').toLowerCase().includes(q) ||
-           (s.email || '').toLowerCase().includes(q) ||
-           (s.year_group || '').toLowerCase().includes(q);
-  }));
+  renderSessionStudentPicker(sessionPickerStudents);
 }
 
 async function saveSession() {
   const name = document.getElementById('session-name').value.trim();
   let link = document.getElementById('session-link').value.trim();
-  if (link && !/^https?:\/\//i.test(link)) { link = 'https://' + link; }
+  if (link && !/^https?:\/\//i.test(link)) link = 'https://' + link;
   const timeText = document.getElementById('session-time').value.trim();
   if (!name) { toast('Please enter a session name.'); return; }
   if (selectedSessionVisibility === 'student' && !selectedSessionStudentId) { toast('Please choose a student.'); return; }
-  const studentId = selectedSessionVisibility === 'student' ? selectedSessionStudentId : null;
   const { error } = await sb.from('sessions').insert({
-    name, link: link || null, time_text: timeText || null, created_by: currentUser.id,
-    visibility: selectedSessionVisibility, student_id: studentId || null
+    name, link: link||null, time_text: timeText||null, created_by: currentUser.id,
+    visibility: selectedSessionVisibility, student_id: selectedSessionVisibility==='student' ? selectedSessionStudentId : null
   });
   if (error) { toast('Error: ' + error.message); return; }
   closeSessionModal();
@@ -667,215 +631,271 @@ async function saveSession() {
   loadSessions();
 }
 
-// ── SESSIONS TAB: CHAPTERS ─────────────────────────────────
-let allChapters = [];
-let activeChapterId = null;
-let selectedChapterVisibility = 'all';
-let chapterPickerStudents = [];
-let selectedChapterStudentId = '';
+/* ══════════════════════════════════════════════════════════
+   EXPLORER — infinite folder / file tree (Sessions tab)
+   
+   DB tables needed:
+     explorer_nodes (
+       id uuid pk,
+       section text not null default 'sessions',  -- 'sessions','pdfs','assignments'
+       parent_id uuid references explorer_nodes(id) on delete cascade,
+       type text not null check (type in ('folder','file')),
+       name text not null,
+       description text,
+       drive_link text,
+       visibility text default 'all',             -- only used on root folders
+       student_id uuid references profiles(id),
+       created_by uuid references profiles(id),
+       created_at timestamptz default now()
+     )
+══════════════════════════════════════════════════════════ */
 
-async function loadChapters() {
-  const rail = document.getElementById('chapters-rail');
-  rail.innerHTML = '<div class="empty-state" style="padding:20px"><div class="empty-icon">⏳</div>Loading...</div>';
-  const { data, error } = await sb.from('session_chapters').select('*').order('created_at', { ascending: true });
+// explorerPath: array of {id, name} — null id = root
+let explorerPath = [];
+let explorerCache = {};  // parentId -> [{node}]
+let efPickerStudents = [];
+let selectedEFStudentId = '';
+let selectedExplorerFolderVis = 'all';
+
+/* ── LOAD & RENDER ── */
+
+async function loadExplorer() {
+  const parentId = explorerPath.length === 0 ? null : explorerPath[explorerPath.length - 1].id;
+  renderExplorerBreadcrumb();
+  renderExplorerToolbar(parentId);
+
+  const grid = document.getElementById('sessions-explorer-grid');
+  grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
+
+  let query = sb.from('explorer_nodes').select('*').eq('section', 'sessions').order('type').order('name');
+  if (parentId === null) {
+    query = query.is('parent_id', null);
+  } else {
+    query = query.eq('parent_id', parentId);
+  }
+  const { data, error } = await query;
+
   if (error) {
-    rail.innerHTML = '';
-    document.getElementById('chapter-panel').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load chapters.</div>';
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load content.</div>`;
     return;
   }
-  allChapters = data || [];
-  if (!activeChapterId && allChapters.length > 0) activeChapterId = allChapters[0].id;
-  if (activeChapterId && !allChapters.find(c => c.id === activeChapterId)) {
-    activeChapterId = allChapters.length > 0 ? allChapters[0].id : null;
-  }
-  renderChaptersRail();
-  renderChapterPanel();
+  explorerCache[parentId || 'root'] = data || [];
+  renderExplorerGrid(data || []);
 }
 
-function renderChaptersRail() {
-  const rail = document.getElementById('chapters-rail');
-  const addBtn = currentRole === 'teacher' ? `<button class="add-chapter-tab" onclick="openChapterModal()">+ Add chapter</button>` : '';
-  if (allChapters.length === 0) {
-    rail.innerHTML = addBtn;
-    return;
-  }
-  rail.innerHTML = allChapters.map(c => {
-    const dotClass = c.visibility === 'student' ? 'dot-student' : `dot-${c.visibility}`;
-    const isActive = c.id === activeChapterId;
-    const deleteBtn = currentRole === 'teacher' ? `<button class="chapter-tab-delete" onclick="deleteChapter(event,'${c.id}')">✕</button>` : '';
-    return `<button class="chapter-tab${isActive ? ' active' : ''}" onclick="selectChapter('${c.id}')">
-      <span class="chapter-tab-dot ${dotClass}"></span>${c.name}${deleteBtn}
-    </button>`;
-  }).join('') + addBtn;
-}
-
-function selectChapter(id) {
-  activeChapterId = id;
-  renderChaptersRail();
-  renderChapterPanel();
-}
-
-async function renderChapterPanel() {
-  const panel = document.getElementById('chapter-panel');
-  if (!activeChapterId) {
-    panel.innerHTML = '<div class="empty-state"><div class="empty-icon">📖</div>No chapters yet.<br>There is nothing here right now.</div>';
-    return;
-  }
-  const chapter = allChapters.find(c => c.id === activeChapterId);
-  if (!chapter) { panel.innerHTML = ''; return; }
-  const visLabel = chapter.visibility === 'all' ? 'Everyone' : chapter.visibility === 'student' ? 'Specific student' : chapter.visibility;
-  const addLessonBtn = currentRole === 'teacher' ? `<button class="btn-add-folder" onclick="openLessonModal()">+ Add recording</button>` : '';
-  panel.innerHTML = `
-    <div class="chapter-panel-header">
-      <div><span class="chapter-panel-title">${chapter.name}</span><span class="chapter-panel-vis">${visLabel}</span></div>
-      ${addLessonBtn}
-    </div>
-    <div class="lessons-grid" id="lessons-grid"><div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div></div>
-  `;
-  loadLessons(chapter.id);
-}
-
-async function loadLessons(chapterId) {
-  const { data, error } = await sb.from('session_lessons').select('*').eq('chapter_id', chapterId).order('created_at', { ascending: false });
-  const grid = document.getElementById('lessons-grid');
-  if (!grid) return;
-  if (error || !data || data.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">🎬</div>This chapter is empty — no recordings yet.</div>';
-    return;
-  }
-  grid.innerHTML = data.map(l => {
-    const deleteBtn = currentRole === 'teacher' ? `<button class="lesson-delete" onclick="deleteLesson('${l.id}')">🗑</button>` : '';
-    return `<div class="lesson-card">
-      <div class="lesson-card-reel">🎞️</div>
-      <div class="lesson-card-name">${l.name}</div>
-      <div class="lesson-card-actions">
-        <a href="${l.drive_link}" target="_blank" rel="noopener" class="btn-watch">▶ Watch</a>
-        ${deleteBtn}
-      </div>
-    </div>`;
+function renderExplorerBreadcrumb() {
+  const bc = document.getElementById('sessions-breadcrumb');
+  const items = [{ id: null, name: '📅 Sessions' }, ...explorerPath];
+  bc.innerHTML = items.map((item, idx) => {
+    const isLast = idx === items.length - 1;
+    const sep = idx < items.length - 1 ? `<span class="breadcrumb-sep">›</span>` : '';
+    return `<span class="breadcrumb-item${isLast ? ' current' : ''}" onclick="${isLast ? '' : `navToDepth(${idx})`}">${item.name}</span>${sep}`;
   }).join('');
 }
 
-async function deleteChapter(e, id) {
-  e.stopPropagation();
-  if (!confirm('Delete this chapter and all its recordings?')) return;
-  const { error } = await sb.from('session_chapters').delete().eq('id', id);
-  if (error) { toast('Error: ' + error.message); return; }
-  toast('Chapter deleted.');
-  if (activeChapterId === id) activeChapterId = null;
-  loadChapters();
+function renderExplorerToolbar(parentId) {
+  const btns = document.getElementById('sessions-toolbar-btns');
+  if (currentRole !== 'teacher') { btns.innerHTML = ''; return; }
+  // Inside a folder: show "+ Add folder" and "+ Add recording"
+  // At root: show "+ Add folder" only (can't add files at root)
+  if (explorerPath.length > 0) {
+    btns.innerHTML = `
+      <button class="btn-add-outline" onclick="openExplorerFolderModal()">📁 Add folder</button>
+      <button class="btn-add" onclick="openExplorerFileModal()">🎬 Add recording</button>`;
+  } else {
+    btns.innerHTML = `<button class="btn-add" onclick="openExplorerFolderModal()">📁 Add folder</button>`;
+  }
 }
 
-async function deleteLesson(id) {
-  if (!confirm('Delete this recording?')) return;
-  const { error } = await sb.from('session_lessons').delete().eq('id', id);
-  if (error) { toast('Error: ' + error.message); return; }
-  toast('Recording deleted.');
-  loadLessons(activeChapterId);
-}
-
-// ── CHAPTER MODAL ──────────────────────────────────────────
-function openChapterModal() {
-  selectedChapterVisibility = 'all';
-  selectedChapterStudentId = '';
-  document.getElementById('chapter-name').value = '';
-  document.getElementById('chapter-student-search').value = '';
-  document.getElementById('chapter-student-id').value = '';
-  document.getElementById('chapter-student-picker').style.display = 'none';
-  document.querySelectorAll('#chapter-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === 'all'));
-  loadStudentsForChapterPicker();
-  document.getElementById('chapter-modal').classList.add('open');
-}
-
-function closeChapterModal() { document.getElementById('chapter-modal').classList.remove('open'); }
-
-function selectChapterVisibility(vis) {
-  selectedChapterVisibility = vis;
-  document.querySelectorAll('#chapter-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === vis));
-  document.getElementById('chapter-student-picker').style.display = vis === 'student' ? 'block' : 'none';
-}
-
-async function loadStudentsForChapterPicker() {
-  const { data } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name');
-  chapterPickerStudents = data || [];
-  renderChapterStudentPicker(chapterPickerStudents);
-}
-
-function renderChapterStudentPicker(students) {
-  const list = document.getElementById('chapter-student-list');
-  if (!students || students.length === 0) {
-    list.innerHTML = '<div class="student-picker-empty">No approved students found</div>';
+function renderExplorerGrid(nodes) {
+  const grid = document.getElementById('sessions-explorer-grid');
+  if (!nodes || nodes.length === 0) {
+    const isRoot = explorerPath.length === 0;
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">${isRoot ? '📁' : '🎬'}</div>${isRoot ? 'No folders yet. Create one to get started.' : 'This folder is empty.'}</div>`;
     return;
   }
+  grid.innerHTML = nodes.map(node => {
+    if (node.type === 'folder') return renderFolderCard(node);
+    return renderFileCard(node);
+  }).join('');
+}
+
+function visLabel(vis) {
+  if (vis === 'all') return 'Everyone';
+  if (vis === 'student') return 'Specific student';
+  return vis;
+}
+
+function renderFolderCard(node) {
+  const isRoot = node.parent_id === null;
+  const badge = isRoot ? `<div class="vis-badge">${visLabel(node.visibility)}</div>` : '';
+  const delBtn = currentRole === 'teacher'
+    ? `<button class="explorer-card-delete" onclick="event.stopPropagation();deleteExplorerNode('${node.id}')" title="Delete">🗑</button>`
+    : '';
+  return `<div class="explorer-card" onclick="openFolder('${node.id}','${escHtml(node.name)}')">
+    ${delBtn}
+    <div class="explorer-card-icon">📁</div>
+    <div class="explorer-card-name">${node.name}</div>
+    ${badge}
+  </div>`;
+}
+
+function renderFileCard(node) {
+  const delBtn = currentRole === 'teacher'
+    ? `<button class="explorer-card-delete" onclick="deleteExplorerNode('${node.id}')" title="Delete">🗑</button>`
+    : '';
+  const desc = node.description ? `<div class="explorer-card-meta">${node.description}</div>` : '';
+  const link = node.drive_link
+    ? `<a class="file-watch-btn" href="${node.drive_link}" target="_blank" rel="noopener">▶ Watch</a>`
+    : '';
+  return `<div class="explorer-card file-card">
+    ${delBtn}
+    <div class="explorer-card-icon">🎞️</div>
+    <div class="explorer-card-name">${node.name}</div>
+    ${desc}
+    ${link}
+  </div>`;
+}
+
+function escHtml(str) { return (str||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;'); }
+
+/* ── NAVIGATION ── */
+
+function openFolder(id, name) {
+  explorerPath.push({ id, name });
+  loadExplorer();
+}
+
+function navToDepth(idx) {
+  if (idx === 0) {
+    explorerPath = [];
+  } else {
+    explorerPath = explorerPath.slice(0, idx);
+  }
+  loadExplorer();
+}
+
+/* ── DELETE ── */
+
+async function deleteExplorerNode(id) {
+  if (!confirm('Delete this item and everything inside it?')) return;
+  const { error } = await sb.from('explorer_nodes').delete().eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('Deleted.');
+  loadExplorer();
+}
+
+/* ── FOLDER MODAL ── */
+
+function openExplorerFolderModal() {
+  selectedExplorerFolderVis = 'all';
+  selectedEFStudentId = '';
+  document.getElementById('explorer-folder-name').value = '';
+  document.getElementById('ef-student-search').value = '';
+  document.getElementById('ef-student-id').value = '';
+  document.getElementById('explorer-folder-student-picker').style.display = 'none';
+  // Only show visibility picker at root level
+  const isRoot = explorerPath.length === 0;
+  document.getElementById('explorer-folder-vis-group').style.display = isRoot ? 'block' : 'none';
+  document.getElementById('explorer-folder-modal-title').textContent = isRoot ? '📁 New folder' : '📁 New subfolder';
+  document.querySelectorAll('#explorer-folder-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === 'all'));
+  if (isRoot) loadStudentsForEFPicker();
+  document.getElementById('explorer-folder-modal').classList.add('open');
+}
+function closeExplorerFolderModal() { document.getElementById('explorer-folder-modal').classList.remove('open'); }
+
+function selectExplorerFolderVis(vis) {
+  selectedExplorerFolderVis = vis;
+  document.querySelectorAll('#explorer-folder-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === vis));
+  document.getElementById('explorer-folder-student-picker').style.display = vis === 'student' ? 'block' : 'none';
+}
+
+async function loadStudentsForEFPicker() {
+  const { data } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name');
+  efPickerStudents = data || [];
+  renderEFStudentPicker(efPickerStudents);
+}
+
+function renderEFStudentPicker(students) {
+  const list = document.getElementById('ef-student-list');
+  if (!students || students.length === 0) { list.innerHTML = '<div class="student-picker-empty">No approved students found</div>'; return; }
   list.innerHTML = students.map(s => {
     const label = `${s.full_name || s.email}${s.year_group ? ' (' + s.year_group + ')' : ''}`;
-    const isSelected = s.id === selectedChapterStudentId;
-    return `<div class="student-picker-row${isSelected ? ' selected' : ''}" onclick="pickChapterStudent('${s.id}')">${label}</div>`;
+    return `<div class="student-picker-row${s.id === selectedEFStudentId ? ' selected' : ''}" onclick="pickEFStudent('${s.id}')">${label}</div>`;
   }).join('');
 }
 
-function filterChapterStudentPicker(query) {
+function filterEFStudentPicker(query) {
   const q = query.toLowerCase();
-  const filtered = chapterPickerStudents.filter(s =>
-    (s.full_name || '').toLowerCase().includes(q) ||
-    (s.email || '').toLowerCase().includes(q) ||
-    (s.year_group || '').toLowerCase().includes(q)
-  );
-  renderChapterStudentPicker(filtered);
+  renderEFStudentPicker(efPickerStudents.filter(s =>
+    (s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q)));
 }
 
-function pickChapterStudent(id) {
-  selectedChapterStudentId = id;
-  document.getElementById('chapter-student-id').value = id;
-  const q = document.getElementById('chapter-student-search').value.toLowerCase();
-  renderChapterStudentPicker(chapterPickerStudents.filter(s =>
-    (s.full_name || '').toLowerCase().includes(q) ||
-    (s.email || '').toLowerCase().includes(q) ||
-    (s.year_group || '').toLowerCase().includes(q)
-  ));
+function pickEFStudent(id) {
+  selectedEFStudentId = id;
+  document.getElementById('ef-student-id').value = id;
+  renderEFStudentPicker(efPickerStudents);
 }
 
-async function saveChapter() {
-  const name = document.getElementById('chapter-name').value.trim();
-  if (!name) { toast('Please enter a chapter name.'); return; }
-  if (selectedChapterVisibility === 'student' && !selectedChapterStudentId) { toast('Please choose a student.'); return; }
-  const studentId = selectedChapterVisibility === 'student' ? selectedChapterStudentId : null;
-  const { error } = await sb.from('session_chapters').insert({
-    name, created_by: currentUser.id,
-    visibility: selectedChapterVisibility, student_id: studentId || null
+async function saveExplorerFolder() {
+  const name = document.getElementById('explorer-folder-name').value.trim();
+  if (!name) { toast('Please enter a folder name.'); return; }
+  const isRoot = explorerPath.length === 0;
+  if (isRoot && selectedExplorerFolderVis === 'student' && !selectedEFStudentId) { toast('Please choose a student.'); return; }
+  const parentId = isRoot ? null : explorerPath[explorerPath.length - 1].id;
+  const { error } = await sb.from('explorer_nodes').insert({
+    section: 'sessions',
+    parent_id: parentId,
+    type: 'folder',
+    name,
+    visibility: isRoot ? selectedExplorerFolderVis : null,
+    student_id: (isRoot && selectedExplorerFolderVis === 'student') ? selectedEFStudentId : null,
+    created_by: currentUser.id
   });
   if (error) { toast('Error: ' + error.message); return; }
-  closeChapterModal();
-  toast('Chapter created! 📖');
-  loadChapters();
+  closeExplorerFolderModal();
+  toast('Folder created! 📁');
+  loadExplorer(); // real-time refresh — no reload needed
 }
 
-// ── LESSON MODAL ───────────────────────────────────────────
-function openLessonModal() {
-  document.getElementById('lesson-name').value = '';
-  document.getElementById('lesson-link').value = '';
-  document.getElementById('lesson-modal').classList.add('open');
+/* ── FILE MODAL ── */
+
+function openExplorerFileModal() {
+  document.getElementById('explorer-file-name').value = '';
+  document.getElementById('explorer-file-desc').value = '';
+  document.getElementById('explorer-file-link').value = '';
+  document.getElementById('explorer-file-modal').classList.add('open');
 }
+function closeExplorerFileModal() { document.getElementById('explorer-file-modal').classList.remove('open'); }
 
-function closeLessonModal() { document.getElementById('lesson-modal').classList.remove('open'); }
-
-async function saveLesson() {
-  const name = document.getElementById('lesson-name').value.trim();
-  let link = document.getElementById('lesson-link').value.trim();
-  if (link && !/^https?:\/\//i.test(link)) { link = 'https://' + link; }
+async function saveExplorerFile() {
+  const name = document.getElementById('explorer-file-name').value.trim();
+  const desc = document.getElementById('explorer-file-desc').value.trim();
+  let link = document.getElementById('explorer-file-link').value.trim();
   if (!name) { toast('Please enter a lesson name.'); return; }
-  if (!link) { toast('Please enter a drive link.'); return; }
-  if (!activeChapterId) { toast('No chapter selected.'); return; }
-  const { error } = await sb.from('session_lessons').insert({
-    chapter_id: activeChapterId, name, drive_link: link, created_by: currentUser.id
+  if (!link) { toast('Please enter a Google Drive link.'); return; }
+  if (!/^https?:\/\//i.test(link)) link = 'https://' + link;
+  if (explorerPath.length === 0) { toast('Please open a folder first.'); return; }
+  const parentId = explorerPath[explorerPath.length - 1].id;
+  const { error } = await sb.from('explorer_nodes').insert({
+    section: 'sessions',
+    parent_id: parentId,
+    type: 'file',
+    name,
+    description: desc || null,
+    drive_link: link,
+    created_by: currentUser.id
   });
   if (error) { toast('Error: ' + error.message); return; }
-  closeLessonModal();
+  closeExplorerFileModal();
   toast('Recording added! 🎬');
-  loadLessons(activeChapterId);
+  loadExplorer(); // real-time refresh — no reload needed
 }
 
-// ── STUDENTS ──────────────────────────────────────────────
+/* ══════════════════════════════════════════════════════════
+   STUDENTS
+══════════════════════════════════════════════════════════ */
+
 function switchStudentTab(tab, event) {
   currentStudentTab = tab;
   document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
@@ -885,8 +905,8 @@ function switchStudentTab(tab, event) {
 
 async function loadStudents() {
   if (currentRole !== 'teacher') return;
-  const { data: students } = await sb.from('profiles').select('*').eq('role','student').eq('status', currentStudentTab).order('full_name');
-  allStudentsRows = students || [];
+  const { data } = await sb.from('profiles').select('*').eq('role','student').eq('status', currentStudentTab).order('full_name');
+  allStudentsRows = data || [];
   renderStudents(allStudentsRows);
 }
 
@@ -899,7 +919,7 @@ function renderStudents(students) {
   }
   tbody.innerHTML = students.map(s => {
     const yearBadge = s.year_group ? `<span class="year-badge year-${s.year_group}">${s.year_group}</span>` : '—';
-    return `<tr id="row-${s.id}">
+    return `<tr>
       <td><strong>${s.full_name || '—'}</strong></td>
       <td>${s.email}</td>
       <td>${yearBadge}</td>
@@ -916,12 +936,8 @@ function renderStudents(students) {
 
 function filterStudents(query) {
   const q = query.toLowerCase();
-  const filtered = allStudentsRows.filter(s =>
-    (s.full_name || '').toLowerCase().includes(q) ||
-    (s.email || '').toLowerCase().includes(q) ||
-    (s.year_group || '').toLowerCase().includes(q)
-  );
-  renderStudents(filtered);
+  renderStudents(allStudentsRows.filter(s =>
+    (s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q)));
 }
 
 async function approveStudent(id) {
@@ -938,6 +954,7 @@ async function rejectStudent(id) {
   loadStudents();
 }
 
+/* ── TOAST ── */
 function toast(msg) {
   const t = document.getElementById('toast');
   document.getElementById('toast-msg').textContent = msg;
