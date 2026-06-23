@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>A* Journey — Maths Learning Hub</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --blue:#185FA5;--blue-light:#E6F1FB;--blue-dark:#0C447C;
+    --green:#1D9E75;--green-light:#E1F5EE;
+    --text:#1a1a1a;--text-muted:#6b7280;--border:#e5e7eb;
+    --bg:#f9fafb;--white:#ffffff;--red:#dc2626;--red-light:#fef2f2;
+  }
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+  /* NAV */
+  nav{background:var(--white);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .nav-logo{font-size:20px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+  .nav-logo span{color:var(--blue);}
+  .nav-links{display:flex;gap:6px;align-items:center;}
+  .nav-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:7px 16px;cursor:pointer;font-size:13px;color:var(--text-muted);transition:all 0.15s;font-family:inherit;}
+  .nav-btn:hover{background:var(--bg);color:var(--text);}
+  .nav-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+  .nav-user{font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:10px;}
+  .logout-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:12px;color:var(--text-muted);font-family:inherit;}
+  .logout-btn:hover{border-color:var(--red);color:var(--red);}
+  .role-badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px;}
+  .role-badge.teacher{background:var(--green-light);color:#085041;}
+  .role-badge.student{background:var(--blue-light);color:var(--blue-dark);}
+  /* PAGES */
+  .page{display:none;padding:32px 28px;max-width:960px;margin:0 auto;}
+  .page.active{display:block;}
+  /* AUTH PAGE */
+  #auth-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--blue-light) 0%,var(--green-light) 100%);}
+  .auth-card{background:var(--white);border-radius:16px;padding:40px;width:100%;max-width:400px;box-shadow:0 4px 24px rgba(0,0,0,0.08);}
+  .auth-logo{text-align:center;margin-bottom:28px;}
+  .auth-logo h1{font-size:26px;font-weight:800;color:var(--text);}
+  .auth-logo h1 span{color:var(--blue);}
+  .auth-logo p{font-size:13px;color:var(--text-muted);margin-top:4px;}
+  .auth-tabs{display:flex;gap:0;margin-bottom:24px;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .auth-tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-muted);background:var(--bg);border:none;font-family:inherit;transition:all 0.15s;}
+  .auth-tab.active{background:var(--blue);color:#fff;}
+  .form-group{margin-bottom:16px;}
+  .form-group label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}
+  .form-group input,.form-group select{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;color:var(--text);font-family:inherit;background:var(--white);transition:border-color 0.15s;}
+  .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--blue);}
+  .btn-primary{width:100%;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity 0.15s;}
+  .btn-primary:hover{opacity:0.9;}
+  .auth-error{background:var(--red-light);color:var(--red);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:16px;display:none;}
+  .auth-success{background:var(--green-light);color:#085041;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:16px;display:none;}
+  /* HERO */
+  .hero{background:var(--blue-light);border-radius:14px;padding:36px 32px;margin-bottom:28px;display:flex;align-items:center;gap:28px;}
+  .hero-icon{width:80px;height:80px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;}
+  .hero h1{font-size:26px;font-weight:800;margin-bottom:6px;}
+  .hero h1 span{color:var(--blue);}
+  .hero p{color:var(--text-muted);font-size:15px;line-height:1.6;}
+  /* CARDS GRID */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:28px;}
+  .card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all 0.15s;}
+  .card:hover{border-color:var(--blue);box-shadow:0 2px 12px rgba(24,95,165,0.1);}
+  .card-icon{font-size:24px;margin-bottom:10px;}
+  .card h3{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .card p{font-size:12px;color:var(--text-muted);line-height:1.5;}
+  /* SECTION */
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+  .section-title{font-size:17px;font-weight:700;}
+  /* SESSIONS */
+  .session-list{display:flex;flex-direction:column;gap:10px;}
+  .session-item{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:16px;}
+  .session-date{background:var(--blue-light);color:var(--blue);border-radius:10px;padding:8px 12px;text-align:center;min-width:52px;flex-shrink:0;}
+  .session-date .day{font-size:22px;font-weight:800;display:block;line-height:1;}
+  .session-date .mon{font-size:11px;font-weight:600;}
+  .session-info{flex:1;}
+  .session-info h4{font-size:14px;font-weight:600;margin-bottom:3px;}
+  .session-info p{font-size:12px;color:var(--text-muted);}
+  .zoom-btn{background:#2D8CFF;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;font-family:inherit;}
+  .tag{font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;display:inline-block;}
+  .tag-online{background:#dbeafe;color:#1e40af;}
+  .tag-class{background:var(--green-light);color:#085041;}
+  .tag-hybrid{background:#fef3c7;color:#92400e;}
+  /* FILES */
+  .files-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+  .file-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px;}
+  .file-card .file-icon{font-size:28px;}
+  .file-card h4{font-size:13px;font-weight:700;}
+  .file-card p{font-size:12px;color:var(--text-muted);flex:1;}
+  .btn-outline{background:none;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:inherit;width:100%;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .btn-outline:hover{border-color:var(--blue);color:var(--blue);}
+  /* UPLOAD */
+  .upload-zone{border:2px dashed var(--border);border-radius:12px;padding:36px;text-align:center;margin-bottom:24px;cursor:pointer;transition:all 0.15s;background:var(--white);}
+  .upload-zone:hover{border-color:var(--blue);background:var(--blue-light);}
+  .upload-zone .upload-icon{font-size:36px;margin-bottom:10px;}
+  .upload-zone p{font-size:14px;color:var(--text-muted);}
+  .upload-zone span{color:var(--blue);font-weight:600;}
+  .upload-zone input[type=file]{display:none;}
+  /* HW */
+  .hw-list{display:flex;flex-direction:column;gap:10px;}
+  .hw-item{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:14px;}
+  .hw-info{flex:1;}
+  .hw-info h4{font-size:14px;font-weight:600;margin-bottom:3px;}
+  .hw-info p{font-size:12px;color:var(--text-muted);}
+  .due-badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;background:var(--red-light);color:var(--red);white-space:nowrap;}
+  /* TEACHER PANEL */
+  .teacher-panel{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px;}
+  .teacher-panel h3{font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  .students-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .students-table th{text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text-muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;}
+  .students-table td{padding:12px 14px;border-bottom:1px solid var(--border);}
+  .students-table tr:last-child td{border-bottom:none;}
+  /* CONTACT */
+  .contact-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:28px;max-width:500px;}
+  /* TOAST */
+  .toast{position:fixed;bottom:24px;right:24px;background:#1a1a1a;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;display:none;align-items:center;gap:8px;z-index:1000;box-shadow:0 4px 16px rgba(0,0,0,0.2);}
+  /* STAT CARDS */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
+  .stat{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;}
+  .stat .num{font-size:28px;font-weight:800;color:var(--blue);}
+  .stat .lbl{font-size:12px;color:var(--text-muted);margin-top:2px;}
+  .add-session-form{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px;display:none;}
+  .add-session-form.open{display:block;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .btn-green{background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+  .btn-green:hover{opacity:0.9;}
+  .btn-small{background:none;border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;color:var(--text-muted);}
+  .btn-small:hover{border-color:var(--blue);color:var(--blue);}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<!-- AUTH PAGE -->
+<div id="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <h1>A<span>*</span> Journey</h1>
+      <p>Maths learning hub for middle &amp; high school</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuth('login',event)">Log in</button>
+      <button class="auth-tab" onclick="switchAuth('signup',event)">Sign up</button>
+    </div>
+    <div id="auth-error" class="auth-error"></div>
+    <div id="auth-success" class="auth-success"></div>
+    <!-- LOGIN -->
+    <div id="login-form">
+      <div class="form-group"><label>Email</label><input type="email" id="login-email" placeholder="your@email.com"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••"/></div>
+      <button class="btn-primary" id="login-btn" onclick="login()">Log in</button>
+    </div>
+    <!-- SIGNUP -->
+    <div id="signup-form" style="display:none">
+      <div class="form-group"><label>Full name</label><input type="text" id="signup-name" placeholder="Your full name"/></div>
+      <div class="form-group"><label>Email</label><input type="email" id="signup-email" placeholder="your@email.com"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="signup-pass" placeholder="Min 6 characters"/></div>
+      <div class="form-group"><label>I am a...</label>
+        <select id="signup-role">
+          <option value="student">Student</option>
+          <option value="teacher">Teacher</option>
+        </select>
+      </div>
+      <button class="btn-primary" id="signup-btn" onclick="signup()">Create account</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none">
+  <nav>
+    <div class="nav-logo">⭐ A<span>*</span> Journey</div>
+    <div class="nav-links">
+      <button class="nav-btn active" onclick="showPage('home')">Home</button>
+      <button class="nav-btn" onclick="showPage('sessions')">Sessions</button>
+      <button class="nav-btn" onclick="showPage('books')">Books</button>
+      <button class="nav-btn" onclick="showPage('homework')">Homework</button>
+      <button class="nav-btn" id="teacher-nav" style="display:none" onclick="showPage('students')">Students</button>
+      <button class="nav-btn" onclick="showPage('contact')">Contact</button>
+    </div>
+    <div class="nav-user">
+      <span id="nav-name"></span>
+      <span id="nav-role" class="role-badge"></span>
+      <button class="logout-btn" onclick="logout()">Log out</button>
+    </div>
+  </nav>
+
+  <!-- HOME -->
+  <div id="home" class="page active">
+    <div class="hero">
+      <div class="hero-icon">📐</div>
+      <div>
+        <h1>Welcome to <span>A* Journey</span></h1>
+        <p id="home-subtitle">Your dedicated maths learning hub. Access sessions, books, homework and live classes — all in one place.</p>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="num">24</div><div class="lbl">Sessions this term</div></div>
+      <div class="stat"><div class="num">12</div><div class="lbl">Books &amp; resources</div></div>
+      <div class="stat"><div class="num">98%</div><div class="lbl">Student satisfaction</div></div>
+    </div>
+    <div class="grid">
+      <div class="card" onclick="showPage('sessions')"><div class="card-icon">📅</div><h3>Upcoming sessions</h3><p>View live and recorded class schedule with Zoom links</p></div>
+      <div class="card" onclick="showPage('books')"><div class="card-icon">📚</div><h3>Books &amp; PDFs</h3><p>Download textbooks, worksheets, and revision guides</p></div>
+      <div class="card" onclick="showPage('homework')"><div class="card-icon">📝</div><h3>Homework</h3><p>Submit assignments and check upcoming deadlines</p></div>
+      <div class="card" onclick="showPage('contact')"><div class="card-icon">✉️</div><h3>Get in touch</h3><p>Ask questions or book a private session</p></div>
+    </div>
+  </div>
+
+  <!-- SESSIONS -->
+  <div id="sessions" class="page">
+    <div class="section-header">
+      <div class="section-title">📅 Upcoming sessions</div>
+      <button id="add-session-btn" class="btn-green" style="display:none" onclick="toggleAddSession()">+ Add session</button>
+    </div>
+    <div class="add-session-form" id="add-session-form">
+      <div class="form-row">
+        <div class="form-group"><label>Topic</label><input type="text" id="s-topic" placeholder="e.g. Quadratic Equations"/></div>
+        <div class="form-group"><label>Date</label><input type="date" id="s-date"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Time</label><input type="time" id="s-time"/></div>
+        <div class="form-group"><label>Type</label>
+          <select id="s-type"><option value="online">Online</option><option value="in-person">In-person</option><option value="hybrid">Hybrid</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>Zoom link (if online)</label><input type="url" id="s-zoom" placeholder="https://zoom.us/j/..."/></div>
+      <button class="btn-green" onclick="addSession()">Save session</button>
+    </div>
+    <div class="session-list" id="session-list">
+      <div class="session-item">
+        <div class="session-date"><span class="day">24</span><span class="mon">Jun</span></div>
+        <div class="session-info"><h4>Algebra — Quadratic Equations</h4><p>⏱ 4:00 PM · 90 min &nbsp; <span class="tag tag-online">Online</span></p></div>
+        <button class="zoom-btn" onclick="toast('Opening Zoom...')">🎥 Join</button>
+      </div>
+      <div class="session-item">
+        <div class="session-date"><span class="day">26</span><span class="mon">Jun</span></div>
+        <div class="session-info"><h4>Geometry — Circle Theorems</h4><p>⏱ 5:00 PM · 60 min &nbsp; <span class="tag tag-class">In-person</span></p></div>
+      </div>
+      <div class="session-item">
+        <div class="session-date"><span class="day">29</span><span class="mon">Jun</span></div>
+        <div class="session-info"><h4>Statistics — Probability &amp; Venn Diagrams</h4><p>⏱ 4:30 PM · 90 min &nbsp; <span class="tag tag-online">Online</span></p></div>
+        <button class="zoom-btn" onclick="toast('Opening Zoom...')">🎥 Join</button>
+      </div>
+      <div class="session-item">
+        <div class="session-date"><span class="day">02</span><span class="mon">Jul</span></div>
+        <div class="session-info"><h4>Trigonometry — SOHCAHTOA Revision</h4><p>⏱ 3:00 PM · 60 min &nbsp; <span class="tag tag-hybrid">Hybrid</span></p></div>
+        <button class="zoom-btn" onclick="toast('Opening Zoom...')">🎥 Join</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOKS -->
+  <div id="books" class="page">
+    <div class="section-header">
+      <div class="section-title">📚 Books &amp; resources</div>
+    </div>
+    <div id="teacher-book-upload" style="display:none">
+      <label class="upload-zone">
+        <input type="file" accept=".pdf" onchange="uploadFile(this,'book')"/>
+        <div class="upload-icon">📤</div>
+        <p><span>Click to upload</span> a book or PDF resource</p>
+        <p style="font-size:12px;margin-top:4px">PDF files up to 50MB</p>
+      </label>
+    </div>
+    <div class="files-grid" id="books-grid">
+      <div class="file-card"><div class="file-icon">📕</div><h4>GCSE Maths Complete Guide</h4><p>Full revision guide covering all topics for the GCSE exam board</p><button class="btn-outline">⬇ Download</button></div>
+      <div class="file-card"><div class="file-icon">📗</div><h4>Algebra Worksheet Pack</h4><p>50+ practice questions on linear and quadratic equations with answers</p><button class="btn-outline">⬇ Download</button></div>
+      <div class="file-card"><div class="file-icon">📘</div><h4>Past Papers 2022–2024</h4><p>Edexcel and AQA past papers with mark schemes for exam practice</p><button class="btn-outline">⬇ Download</button></div>
+      <div class="file-card"><div class="file-icon">📙</div><h4>Statistics &amp; Probability</h4><p>Topic booklet covering data handling, probability trees, and diagrams</p><button class="btn-outline">⬇ Download</button></div>
+    </div>
+  </div>
+
+  <!-- HOMEWORK -->
+  <div id="homework" class="page">
+    <div class="section-header">
+      <div class="section-title">📝 Homework</div>
+    </div>
+    <div id="teacher-hw-upload" style="display:none">
+      <label class="upload-zone">
+        <input type="file" accept=".pdf,.doc,.docx" onchange="uploadFile(this,'homework')"/>
+        <div class="upload-icon">📤</div>
+        <p><span>Click to upload</span> a new homework assignment</p>
+      </label>
+    </div>
+    <div id="student-hw-upload" style="display:none">
+      <label class="upload-zone">
+        <input type="file" accept=".pdf,.doc,.docx,.jpg,.png" onchange="submitHomework(this)"/>
+        <div class="upload-icon">📤</div>
+        <p><span>Submit your homework</span> — click to upload your file</p>
+        <p style="font-size:12px;margin-top:4px">PDF, Word, or image files accepted</p>
+      </label>
+    </div>
+    <div class="hw-list" id="hw-list">
+      <div class="hw-item"><span style="font-size:20px">📄</span><div class="hw-info"><h4>HW #7 — Quadratic Equations practice</h4><p>Complete exercises 3A to 3D from the worksheet pack</p></div><span class="due-badge">Due Jun 26</span></div>
+      <div class="hw-item"><span style="font-size:20px">📄</span><div class="hw-info"><h4>HW #8 — Circle Theorems diagrams</h4><p>Label and prove all 6 circle theorems with full working</p></div><span class="due-badge">Due Jun 30</span></div>
+      <div class="hw-item"><span style="font-size:20px">📄</span><div class="hw-info"><h4>HW #9 — Probability questions</h4><p>Past paper questions on Venn diagrams and tree diagrams</p></div><span class="due-badge">Due Jul 3</span></div>
+    </div>
+  </div>
+
+  <!-- STUDENTS (teacher only) -->
+  <div id="students" class="page">
+    <div class="section-header">
+      <div class="section-title">👩‍🎓 All students</div>
+    </div>
+    <div class="teacher-panel">
+      <h3>📋 Registered students</h3>
+      <table class="students-table">
+        <thead><tr><th>Name</th><th>Email</th><th>Joined</th><th>Actions</th></tr></thead>
+        <tbody id="students-tbody"><tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:20px">Loading students...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CONTACT -->
+  <div id="contact" class="page">
+    <div class="section-header"><div class="section-title">✉️ Get in touch</div></div>
+    <div class="contact-card">
+      <div class="form-group"><label>Your name</label><input type="text" id="c-name" placeholder="Sara Ahmed"/></div>
+      <div class="form-group"><label>Email</label><input type="email" id="c-email" placeholder="sara@example.com"/></div>
+      <div class="form-group"><label>Subject</label>
+        <select id="c-subject">
+          <option>General question</option>
+          <option>Book a private session</option>
+          <option>Homework help</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Message</label><textarea id="c-msg" style="width:100%;height:100px;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:inherit;font-size:14px;resize:none;" placeholder="Type your message here..."></textarea></div>
+      <button class="btn-primary" onclick="sendMessage()">Send message</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✅ <span id="toast-msg"></span></div>
+
+<script>
+const SUPABASE_URL = 'https://cgenukblxtxwcwjmskey.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_z2_83Toi3VJ8ksYXEayMGQ_vrTSx1fe';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentUser = null;
+let currentRole = null;
+
+// CHECK SESSION ON LOAD
+window.addEventListener('load', async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    await loadUser(session.user);
+  }
+});
+
+async function loadUser(user) {
+  const { data: profile, error } = await sb.from('profiles').select('*').eq('id', user.id).single();
+  if (profile) {
+    currentUser = user;
+    currentRole = profile.role;
+    showApp(profile);
+  } else {
+    // Profile missing — sign out cleanly
+    await sb.auth.signOut();
+    showError('Account setup incomplete. Please sign up again.');
+  }
+}
+
+function showApp(profile) {
+  document.getElementById('auth-page').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('nav-name').textContent = profile.full_name || profile.email;
+  const roleBadge = document.getElementById('nav-role');
+  roleBadge.textContent = profile.role;
+  roleBadge.className = 'role-badge ' + profile.role;
+
+  if (profile.role === 'teacher') {
+    document.getElementById('teacher-nav').style.display = 'block';
+    document.getElementById('add-session-btn').style.display = 'block';
+    document.getElementById('teacher-book-upload').style.display = 'block';
+    document.getElementById('teacher-hw-upload').style.display = 'block';
+    document.getElementById('home-subtitle').textContent = 'Welcome back! Manage your sessions, upload materials, and track your students — all in one place.';
+  } else {
+    document.getElementById('student-hw-upload').style.display = 'block';
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function showSuccess(msg) {
+  const el = document.getElementById('auth-success');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// AUTH
+function switchAuth(tab, event) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  if (event && event.target) event.target.classList.add('active');
+  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('signup-form').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('auth-error').style.display = 'none';
+  document.getElementById('auth-success').style.display = 'none';
+}
+
+async function login() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const btn = document.getElementById('login-btn');
+  document.getElementById('auth-error').style.display = 'none';
+  document.getElementById('auth-success').style.display = 'none';
+
+  if (!email || !pass) { showError('Please enter your email and password.'); return; }
+
+  btn.innerHTML = '<span class="spinner"></span>Logging in...';
+  btn.disabled = true;
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+
+  btn.innerHTML = 'Log in';
+  btn.disabled = false;
+
+  if (error) { showError(error.message); return; }
+  await loadUser(data.user);
+}
+
+async function signup() {
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass = document.getElementById('signup-pass').value;
+  const role = document.getElementById('signup-role').value;
+  const btn = document.getElementById('signup-btn');
+  document.getElementById('auth-error').style.display = 'none';
+  document.getElementById('auth-success').style.display = 'none';
+
+  if (!name) { showError('Please enter your full name.'); return; }
+  if (!email) { showError('Please enter your email.'); return; }
+  if (pass.length < 6) { showError('Password must be at least 6 characters.'); return; }
+
+  btn.innerHTML = '<span class="spinner"></span>Creating account...';
+  btn.disabled = true;
+
+  const { data, error } = await sb.auth.signUp({ email, password: pass });
+
+  btn.innerHTML = 'Create account';
+  btn.disabled = false;
+
+  if (error) { showError(error.message); return; }
+
+  if (data.user) {
+    // Insert profile row
+    const { error: profileError } = await sb.from('profiles').insert({
+      id: data.user.id,
+      email,
+      role,
+      full_name: name
+    });
+
+    if (profileError) {
+      showError('Account created but profile setup failed: ' + profileError.message);
+      return;
+    }
+
+    // If email confirmation is disabled, log in directly
+    if (data.session) {
+      currentUser = data.user;
+      currentRole = role;
+      showApp({ full_name: name, email, role });
+    } else {
+      showSuccess('✅ Account created! Please check your email to confirm, then log in.');
+      switchAuth('login', null);
+      // Re-highlight login tab manually
+      document.querySelectorAll('.auth-tab')[0].classList.add('active');
+      document.querySelectorAll('.auth-tab')[1].classList.remove('active');
+    }
+  }
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  currentUser = null; currentRole = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('auth-page').style.display = 'flex';
+  document.getElementById('auth-error').style.display = 'none';
+  document.getElementById('auth-success').style.display = 'none';
+}
+
+// NAVIGATION
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const pages = ['home','sessions','books','homework','students','contact'];
+  const btns = document.querySelectorAll('.nav-btn');
+  const idx = pages.indexOf(id);
+  if (btns[idx]) btns[idx].classList.add('active');
+  if (id === 'students') loadStudents();
+}
+
+// SESSIONS
+function toggleAddSession() {
+  document.getElementById('add-session-form').classList.toggle('open');
+}
+
+async function addSession() {
+  const topic = document.getElementById('s-topic').value.trim();
+  const date = document.getElementById('s-date').value;
+  const time = document.getElementById('s-time').value;
+  const type = document.getElementById('s-type').value;
+  const zoom = document.getElementById('s-zoom').value.trim();
+  if (!topic || !date) { toast('Please fill in topic and date'); return; }
+  const d = new Date(date);
+  const day = d.getUTCDate();
+  const mon = d.toLocaleString('default',{month:'short',timeZone:'UTC'});
+  const tagClass = type === 'online' ? 'tag-online' : type === 'in-person' ? 'tag-class' : 'tag-hybrid';
+  const zoomBtn = zoom ? `<button class="zoom-btn" onclick="window.open('${zoom}','_blank')">🎥 Join</button>` : '';
+  const li = document.createElement('div');
+  li.className = 'session-item';
+  li.innerHTML = `<div class="session-date"><span class="day">${String(day).padStart(2,'0')}</span><span class="mon">${mon}</span></div><div class="session-info"><h4>${topic}</h4><p>⏱ ${time} &nbsp; <span class="tag ${tagClass}">${type}</span></p></div>${zoomBtn}`;
+  document.getElementById('session-list').prepend(li);
+  document.getElementById('add-session-form').classList.remove('open');
+  // Clear fields
+  document.getElementById('s-topic').value = '';
+  document.getElementById('s-date').value = '';
+  document.getElementById('s-time').value = '';
+  document.getElementById('s-zoom').value = '';
+  toast('Session added!');
+}
+
+// FILE UPLOAD
+async function uploadFile(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  toast('Uploading ' + file.name + '...');
+  const path = `${type}s/${Date.now()}_${file.name}`;
+  const { data, error } = await sb.storage.from('astar-files').upload(path, file);
+  if (error) { toast('Upload failed: ' + error.message); return; }
+  const { data: urlData } = sb.storage.from('astar-files').getPublicUrl(path);
+  await sb.from('files').insert({ name: file.name, url: urlData.publicUrl, type, uploaded_by: currentUser.id });
+  toast('Uploaded successfully!');
+  if (type === 'book') addFileCard(file.name, urlData.publicUrl);
+}
+
+function addFileCard(name, url) {
+  const card = document.createElement('div');
+  card.className = 'file-card';
+  card.innerHTML = `<div class="file-icon">📄</div><h4>${name}</h4><p>Uploaded by teacher</p><a href="${url}" target="_blank" class="btn-outline">⬇ Download</a>`;
+  document.getElementById('books-grid').prepend(card);
+}
+
+async function submitHomework(input) {
+  const file = input.files[0];
+  if (!file) return;
+  toast('Submitting homework: ' + file.name + '...');
+  const path = `homework/${currentUser.id}/${Date.now()}_${file.name}`;
+  const { data, error } = await sb.storage.from('astar-files').upload(path, file);
+  if (error) { toast('Submission failed: ' + error.message); return; }
+  toast('Homework submitted! ✅');
+}
+
+// LOAD STUDENTS (teacher only)
+async function loadStudents() {
+  if (currentRole !== 'teacher') return;
+  const { data: students } = await sb.from('profiles').select('*').eq('role','student').order('full_name');
+  const tbody = document.getElementById('students-tbody');
+  if (!students || students.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:20px">No students registered yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = students.map(s => `
+    <tr>
+      <td><strong>${s.full_name || '—'}</strong></td>
+      <td>${s.email}</td>
+      <td style="color:var(--text-muted);font-size:12px">Recently joined</td>
+      <td><button class="btn-small" onclick="toast('Viewing ${(s.full_name || s.email).replace(/'/g,"\\'")}')">View work</button></td>
+    </tr>
+  `).join('');
+}
+
+// CONTACT
+function sendMessage() {
+  const name = document.getElementById('c-name').value.trim();
+  if (!name) { toast('Please fill in your name'); return; }
+  toast('Message sent! We\'ll reply within 24 hours ✅');
+  document.getElementById('c-name').value = '';
+  document.getElementById('c-email').value = '';
+  document.getElementById('c-msg').value = '';
+}
+
+// TOAST
+function toast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.style.display = 'flex';
+  setTimeout(() => t.style.display = 'none', 3500);
+}
+</script>
+</body>
+</html>
