@@ -21,7 +21,7 @@
   #auth-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--blue-light) 0%,var(--green-light) 100%);}
   .auth-card{background:var(--white);border-radius:16px;padding:40px;width:100%;max-width:400px;box-shadow:0 4px 24px rgba(0,0,0,0.08);}
   .auth-logo{text-align:center;margin-bottom:28px;}
-  .auth-logo img{width:170px;margin-bottom:8px;border-radius:16px;display:block;}
+  .auth-logo img{width:140px;margin-bottom:8px;border-radius:12px;}
   .auth-logo p{font-size:13px;color:var(--text-muted);margin-top:4px;}
   .auth-tabs{display:flex;margin-bottom:24px;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
   .auth-tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-muted);background:var(--bg);border:none;font-family:inherit;transition:all 0.15s;}
@@ -39,7 +39,7 @@
   /* PENDING */
   #pending-page{display:none;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--blue-light) 0%,var(--green-light) 100%);}
   .pending-card{background:var(--white);border-radius:16px;padding:40px;width:100%;max-width:420px;box-shadow:0 4px 24px rgba(0,0,0,0.08);text-align:center;}
-  .pending-card img{width:110px;border-radius:14px;display:block;}
+  .pending-card img{width:90px;margin-bottom:12px;}
   .pending-icon{font-size:56px;margin-bottom:16px;}
   .pending-card h2{font-size:22px;font-weight:800;margin-bottom:10px;}
   .pending-card p{font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:20px;}
@@ -50,7 +50,7 @@
   #app.visible{display:flex;}
   .sidebar{width:var(--sidebar-width);background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;}
   .sidebar-logo{padding:20px 16px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:6px;}
-  .sidebar-logo img{width:100px;border-radius:14px;display:block;}
+  .sidebar-logo img{width:80px;}
   .sidebar-logo p{font-size:10px;color:var(--text-muted);text-align:center;}
   .sidebar-nav{flex:1;padding:16px 10px;display:flex;flex-direction:column;gap:4px;}
   .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-muted);border:none;background:none;font-family:inherit;width:100%;text-align:left;transition:all 0.15s;}
@@ -107,6 +107,12 @@
   .visibility-options{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
   .vis-btn{border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;background:var(--white);color:var(--text-muted);transition:all 0.15s;}
   .vis-btn.selected{background:var(--blue);color:#fff;border-color:var(--blue);}
+  .student-picker-list{max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;}
+  .student-picker-row{padding:9px 14px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.1s;}
+  .student-picker-row:last-child{border-bottom:none;}
+  .student-picker-row:hover{background:var(--bg);}
+  .student-picker-row.selected{background:var(--blue-light);color:var(--blue);font-weight:600;}
+  .student-picker-empty{padding:14px;font-size:13px;color:var(--text-muted);text-align:center;}
 
   /* STUDENTS TABLE */
   .teacher-panel{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:24px;}
@@ -130,6 +136,24 @@
   @keyframes spin{to{transform:rotate(360deg);}}
   .empty-state{text-align:center;padding:48px 20px;color:var(--text-muted);font-size:14px;}
   .empty-state .empty-icon{font-size:40px;margin-bottom:12px;}
+
+  /* SESSION BLOCKS (Home tab) */
+  .sessions-toolbar-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:28px;margin-bottom:14px;flex-wrap:wrap;}
+  .sessions-toolbar-row h2{font-size:16px;font-weight:800;}
+  .session-search-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+  .session-search-row .search-bar{margin-bottom:0;flex:1;min-width:200px;}
+  .session-list{display:flex;flex-direction:column;gap:10px;}
+  .session-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;transition:all 0.15s;}
+  .session-card:hover{border-color:var(--blue);box-shadow:0 2px 12px rgba(24,95,165,0.08);}
+  .session-card-main{flex:1;min-width:0;}
+  .session-card-name{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .session-card-meta{font-size:12px;color:var(--text-muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .session-card-meta a{color:var(--blue);text-decoration:none;font-weight:600;}
+  .session-card-meta a:hover{text-decoration:underline;}
+  .session-card-time{display:inline-flex;align-items:center;gap:4px;}
+  .session-vis-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--blue-light);color:var(--blue);white-space:nowrap;}
+  .session-delete{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;color:var(--text-muted);font-family:inherit;flex-shrink:0;transition:all 0.15s;}
+  .session-delete:hover{border-color:var(--red);color:var(--red);background:var(--red-light);}
 </style>
 </head>
 <body>
@@ -174,7 +198,6 @@
 <!-- PENDING -->
 <div id="pending-page">
   <div class="pending-card">
-    <img src="https://cgenukblxtxwcwjmskey.supabase.co/storage/v1/object/public/astar-files/logo.png" alt="A* Journey Logo"/>
     <div class="pending-badge">Awaiting Approval</div>
     <h2>You're on the list!</h2>
     <p>Your account has been created. Your teacher needs to approve it before you can access the platform.<br><br>Please check back later or contact your teacher directly.</p>
@@ -215,36 +238,27 @@
         <h1>Welcome back 👋</h1>
         <p id="home-subtitle">Your maths learning hub.</p>
       </div>
+
+      <div class="sessions-toolbar-row">
+        <h2>📅 Upcoming Sessions</h2>
+        <button class="btn-add-folder" id="add-session-btn" style="display:none" onclick="openSessionModal()">+ New session</button>
+      </div>
+      <div class="session-list" id="session-list"></div>
     </div>
 
     <!-- SESSIONS -->
     <div id="sessions" class="page">
       <div class="page-header"><h1>📅 Sessions</h1><p>Your upcoming sessions.</p></div>
-      <input class="search-bar" placeholder="🔍 Search sessions..." oninput="filterFolders('sessions-grid', this.value)"/>
-      <div class="folders-toolbar" id="sessions-toolbar" style="display:none">
-        <button class="btn-add-folder" onclick="openFolderModal('session')">+ New folder</button>
-      </div>
-      <div class="folders-grid" id="sessions-grid"></div>
     </div>
 
     <!-- PDFs -->
     <div id="books" class="page">
       <div class="page-header"><h1>📚 PDFs</h1><p>Books and resources.</p></div>
-      <input class="search-bar" placeholder="🔍 Search PDFs..." oninput="filterFolders('books-grid', this.value)"/>
-      <div class="folders-toolbar" id="books-toolbar" style="display:none">
-        <button class="btn-add-folder" onclick="openFolderModal('pdf')">+ New folder</button>
-      </div>
-      <div class="folders-grid" id="books-grid"></div>
     </div>
 
     <!-- ASSIGNMENTS -->
     <div id="homework" class="page">
       <div class="page-header"><h1>📝 Assignments</h1><p>Your homework and assignments.</p></div>
-      <input class="search-bar" placeholder="🔍 Search assignments..." oninput="filterFolders('homework-grid', this.value)"/>
-      <div class="folders-toolbar" id="homework-toolbar" style="display:none">
-        <button class="btn-add-folder" onclick="openFolderModal('assignment')">+ New folder</button>
-      </div>
-      <div class="folders-grid" id="homework-grid"></div>
     </div>
 
     <!-- STUDENTS -->
@@ -265,33 +279,41 @@
   </main>
 </div>
 
-<!-- FOLDER MODAL -->
-<div class="modal-overlay" id="folder-modal">
+<!-- SESSION MODAL -->
+<div class="modal-overlay" id="session-modal">
   <div class="modal">
-    <h3>📁 New folder</h3>
+    <h3>📅 New session</h3>
     <div class="form-group">
-      <label>Folder name</label>
-      <input type="text" id="folder-name" placeholder="e.g. Quadratic Equations"/>
+      <label>Session name</label>
+      <input type="text" id="session-name" placeholder=""/>
+    </div>
+    <div class="form-group">
+      <label>Link</label>
+      <input type="text" id="session-link" placeholder=""/>
+    </div>
+    <div class="form-group">
+      <label>Time</label>
+      <input type="text" id="session-time" placeholder=""/>
     </div>
     <div class="form-group">
       <label>Visible to</label>
       <div class="visibility-options">
-        <button class="vis-btn selected" data-vis="all" onclick="selectVisibility('all')">Everyone</button>
-        <button class="vis-btn" data-vis="OL" onclick="selectVisibility('OL')">OL only</button>
-        <button class="vis-btn" data-vis="AS" onclick="selectVisibility('AS')">AS only</button>
-        <button class="vis-btn" data-vis="A2" onclick="selectVisibility('A2')">A2 only</button>
-        <button class="vis-btn" data-vis="student" onclick="selectVisibility('student')">Specific student</button>
+        <button class="vis-btn selected" data-vis="all" onclick="selectSessionVisibility('all')">Everyone</button>
+        <button class="vis-btn" data-vis="OL" onclick="selectSessionVisibility('OL')">OL only</button>
+        <button class="vis-btn" data-vis="AS" onclick="selectSessionVisibility('AS')">AS only</button>
+        <button class="vis-btn" data-vis="A2" onclick="selectSessionVisibility('A2')">A2 only</button>
+        <button class="vis-btn" data-vis="student" onclick="selectSessionVisibility('student')">Specific student</button>
       </div>
     </div>
-    <div class="form-group" id="student-picker" style="display:none">
+    <div class="form-group" id="session-student-picker" style="display:none">
       <label>Choose student</label>
-      <select id="folder-student-id">
-        <option value="">Loading students...</option>
-      </select>
+      <input type="text" class="search-bar" id="session-student-search" placeholder="🔍 Search students..." style="margin-bottom:8px" oninput="filterSessionStudentPicker(this.value)"/>
+      <div id="session-student-list" class="student-picker-list"></div>
+      <input type="hidden" id="session-student-id" value=""/>
     </div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeFolderModal()">Cancel</button>
-      <button class="btn-save" onclick="saveFolder()">Create folder</button>
+      <button class="btn-cancel" onclick="closeSessionModal()">Cancel</button>
+      <button class="btn-save" onclick="saveSession()">Create session</button>
     </div>
   </div>
 </div>
@@ -308,8 +330,6 @@ let currentUser = null;
 let currentRole = null;
 let currentYearGroup = null;
 let currentStudentTab = 'approved';
-let currentFolderType = null;
-let selectedVisibility = 'all';
 let allStudentsRows = [];
 
 window.addEventListener('load', async () => {
@@ -346,11 +366,10 @@ function showApp(profile) {
   document.getElementById('nav-role').textContent = profile.role + yearLabel;
   if (profile.role === 'teacher') {
     document.getElementById('teacher-nav').style.display = 'flex';
-    document.getElementById('sessions-toolbar').style.display = 'flex';
-    document.getElementById('books-toolbar').style.display = 'flex';
-    document.getElementById('homework-toolbar').style.display = 'flex';
+    document.getElementById('add-session-btn').style.display = 'inline-block';
     document.getElementById('home-subtitle').textContent = 'Manage sessions, upload materials, and approve students.';
   }
+  loadSessions();
 }
 
 function showError(msg) { const el = document.getElementById('auth-error'); el.textContent = msg; el.style.display = 'block'; }
@@ -422,86 +441,139 @@ function showPage(id) {
   const idx = pages.indexOf(id);
   if (navItems[idx]) navItems[idx].classList.add('active');
   if (id === 'students') loadStudents();
-  if (id === 'sessions') loadFolders('session','sessions-grid');
-  if (id === 'books') loadFolders('pdf','books-grid');
-  if (id === 'homework') loadFolders('assignment','homework-grid');
+  if (id === 'home') loadSessions();
 }
 
-// ── FOLDERS ──────────────────────────────────────────────
-async function loadFolders(type, gridId) {
-  const grid = document.getElementById(gridId);
-  grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
-  const { data: folders, error } = await sb.from('folders').select('*').eq('type', type).order('created_at', { ascending: false });
-  if (error || !folders || folders.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📂</div>No folders yet.</div>';
+// ── SESSIONS (Home tab) ───────────────────────────────────
+let allSessionsRows = [];
+let selectedSessionVisibility = 'all';
+
+async function loadSessions() {
+  const list = document.getElementById('session-list');
+  list.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
+  const { data: sessionsData, error } = await sb.from('sessions').select('*').order('created_at', { ascending: false });
+  if (error) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load sessions.</div>';
     return;
   }
-  grid.innerHTML = folders.map(f => {
-    const visLabel = f.visibility === 'all' ? 'Everyone' : f.visibility === 'student' ? 'Private' : f.visibility;
-    const deleteBtn = currentRole === 'teacher' ? `<button class="folder-delete" onclick="deleteFolder(event,'${f.id}','${type}','${gridId}')">🗑</button>` : '';
-    return `<div class="folder-card" data-name="${f.name.toLowerCase()}">
+  allSessionsRows = sessionsData || [];
+  renderSessions(allSessionsRows);
+}
+
+function renderSessions(rows) {
+  const list = document.getElementById('session-list');
+  if (!rows || rows.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div>There is no upcoming session right now.</div>';
+    return;
+  }
+  list.innerHTML = rows.map(s => {
+    const visLabel = s.visibility === 'all' ? 'Everyone' : s.visibility === 'student' ? 'Specific student' : s.visibility;
+    const linkHtml = s.link ? `<a href="${s.link}" target="_blank" rel="noopener">🔗 Join link</a>` : '';
+    const timeHtml = s.time_text ? `<span class="session-card-time">🕒 ${s.time_text}</span>` : '';
+    const deleteBtn = currentRole === 'teacher' ? `<button class="session-delete" onclick="deleteSession('${s.id}')">🗑 Delete</button>` : '';
+    return `<div class="session-card" data-name="${(s.name || '').toLowerCase()}">
+      <div class="session-card-main">
+        <div class="session-card-name">${s.name}</div>
+        <div class="session-card-meta">
+          ${timeHtml}
+          ${linkHtml}
+          <span class="session-vis-tag">${visLabel}</span>
+        </div>
+      </div>
       ${deleteBtn}
-      <div class="folder-icon">📁</div>
-      <div class="folder-name">${f.name}</div>
-      <div class="folder-meta">Visible to: ${visLabel}</div>
     </div>`;
   }).join('');
 }
 
-async function deleteFolder(e, id, type, gridId) {
-  e.stopPropagation();
-  if (!confirm('Delete this folder?')) return;
-  const { error } = await sb.from('folders').delete().eq('id', id);
+async function deleteSession(id) {
+  if (!confirm('Delete this session?')) return;
+  const { error } = await sb.from('sessions').delete().eq('id', id);
   if (error) { toast('Error: ' + error.message); return; }
-  toast('Folder deleted.');
-  loadFolders(type, gridId);
+  toast('Session deleted.');
+  loadSessions();
 }
 
-function filterFolders(gridId, query) {
-  const cards = document.querySelectorAll(`#${gridId} .folder-card`);
-  const q = query.toLowerCase();
-  cards.forEach(c => { c.style.display = c.dataset.name.includes(q) ? '' : 'none'; });
+// ── SESSION MODAL ──────────────────────────────────────────
+let sessionPickerStudents = [];
+let selectedSessionStudentId = '';
+
+function openSessionModal() {
+  selectedSessionVisibility = 'all';
+  selectedSessionStudentId = '';
+  document.getElementById('session-name').value = '';
+  document.getElementById('session-link').value = '';
+  document.getElementById('session-time').value = '';
+  document.getElementById('session-student-search').value = '';
+  document.getElementById('session-student-id').value = '';
+  document.getElementById('session-student-picker').style.display = 'none';
+  document.querySelectorAll('#session-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === 'all'));
+  loadStudentsForSessionPicker();
+  document.getElementById('session-modal').classList.add('open');
 }
 
-// ── FOLDER MODAL ──────────────────────────────────────────
-function openFolderModal(type) {
-  currentFolderType = type;
-  selectedVisibility = 'all';
-  document.getElementById('folder-name').value = '';
-  document.getElementById('student-picker').style.display = 'none';
-  document.querySelectorAll('.vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === 'all'));
-  loadStudentsForPicker();
-  document.getElementById('folder-modal').classList.add('open');
+function closeSessionModal() { document.getElementById('session-modal').classList.remove('open'); }
+
+function selectSessionVisibility(vis) {
+  selectedSessionVisibility = vis;
+  document.querySelectorAll('#session-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === vis));
+  document.getElementById('session-student-picker').style.display = vis === 'student' ? 'block' : 'none';
 }
 
-function closeFolderModal() { document.getElementById('folder-modal').classList.remove('open'); }
-
-function selectVisibility(vis) {
-  selectedVisibility = vis;
-  document.querySelectorAll('.vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === vis));
-  document.getElementById('student-picker').style.display = vis === 'student' ? 'block' : 'none';
-}
-
-async function loadStudentsForPicker() {
+async function loadStudentsForSessionPicker() {
   const { data } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name');
-  const sel = document.getElementById('folder-student-id');
-  if (!data || data.length === 0) { sel.innerHTML = '<option>No approved students</option>'; return; }
-  sel.innerHTML = data.map(s => `<option value="${s.id}">${s.full_name || s.email} (${s.year_group || '—'})</option>`).join('');
+  sessionPickerStudents = data || [];
+  renderSessionStudentPicker(sessionPickerStudents);
 }
 
-async function saveFolder() {
-  const name = document.getElementById('folder-name').value.trim();
-  if (!name) { toast('Please enter a folder name.'); return; }
-  const studentId = selectedVisibility === 'student' ? document.getElementById('folder-student-id').value : null;
-  const { error } = await sb.from('folders').insert({
-    name, type: currentFolderType, created_by: currentUser.id,
-    visibility: selectedVisibility, student_id: studentId || null
+function renderSessionStudentPicker(students) {
+  const list = document.getElementById('session-student-list');
+  if (!students || students.length === 0) {
+    list.innerHTML = '<div class="student-picker-empty">No approved students found</div>';
+    return;
+  }
+  list.innerHTML = students.map(s => {
+    const label = `${s.full_name || s.email}${s.year_group ? ' (' + s.year_group + ')' : ''}`;
+    const isSelected = s.id === selectedSessionStudentId;
+    return `<div class="student-picker-row${isSelected ? ' selected' : ''}" onclick="pickSessionStudent('${s.id}')">${label}</div>`;
+  }).join('');
+}
+
+function filterSessionStudentPicker(query) {
+  const q = query.toLowerCase();
+  const filtered = sessionPickerStudents.filter(s =>
+    (s.full_name || '').toLowerCase().includes(q) ||
+    (s.email || '').toLowerCase().includes(q) ||
+    (s.year_group || '').toLowerCase().includes(q)
+  );
+  renderSessionStudentPicker(filtered);
+}
+
+function pickSessionStudent(id) {
+  selectedSessionStudentId = id;
+  document.getElementById('session-student-id').value = id;
+  renderSessionStudentPicker(sessionPickerStudents.filter(s => {
+    const q = document.getElementById('session-student-search').value.toLowerCase();
+    return (s.full_name || '').toLowerCase().includes(q) ||
+           (s.email || '').toLowerCase().includes(q) ||
+           (s.year_group || '').toLowerCase().includes(q);
+  }));
+}
+
+async function saveSession() {
+  const name = document.getElementById('session-name').value.trim();
+  const link = document.getElementById('session-link').value.trim();
+  const timeText = document.getElementById('session-time').value.trim();
+  if (!name) { toast('Please enter a session name.'); return; }
+  if (selectedSessionVisibility === 'student' && !selectedSessionStudentId) { toast('Please choose a student.'); return; }
+  const studentId = selectedSessionVisibility === 'student' ? selectedSessionStudentId : null;
+  const { error } = await sb.from('sessions').insert({
+    name, link: link || null, time_text: timeText || null, created_by: currentUser.id,
+    visibility: selectedSessionVisibility, student_id: studentId || null
   });
   if (error) { toast('Error: ' + error.message); return; }
-  closeFolderModal();
-  toast('Folder created! 📁');
-  const gridMap = { session: 'sessions-grid', pdf: 'books-grid', assignment: 'homework-grid' };
-  loadFolders(currentFolderType, gridMap[currentFolderType]);
+  closeSessionModal();
+  toast('Session created! 📅');
+  loadSessions();
 }
 
 // ── STUDENTS ──────────────────────────────────────────────
