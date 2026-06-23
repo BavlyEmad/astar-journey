@@ -453,6 +453,7 @@ function showApp(profile) {
     document.getElementById('home-subtitle').textContent = 'Manage sessions, upload materials, and approve students.';
   }
   loadSessions();
+  loadChapters();
 }
 
 function showError(msg) { const el = document.getElementById('auth-error'); el.textContent = msg; el.style.display = 'block'; }
@@ -507,6 +508,7 @@ async function signup() {
 async function logout() {
   await sb.auth.signOut();
   currentUser = null; currentRole = null; currentYearGroup = null;
+  activeChapterId = null; allChapters = [];
   document.getElementById('app').style.display = 'none';
   document.getElementById('app').classList.remove('visible');
   document.getElementById('pending-page').style.display = 'none';
