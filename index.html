@@ -154,6 +154,37 @@
   .session-vis-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--blue-light);color:var(--blue);white-space:nowrap;}
   .session-delete{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;color:var(--text-muted);font-family:inherit;flex-shrink:0;transition:all 0.15s;}
   .session-delete:hover{border-color:var(--red);color:var(--red);background:var(--red-light);}
+
+  /* SESSIONS TAB — "Chapters" binder UI */
+  .chapters-rail{display:flex;align-items:flex-end;gap:6px;margin-bottom:0;overflow-x:auto;padding:0 2px;scrollbar-width:thin;}
+  .chapter-tab{position:relative;flex-shrink:0;background:var(--white);border:1px solid var(--border);border-bottom:none;border-radius:10px 10px 0 0;padding:12px 18px 14px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-muted);transition:all 0.15s;white-space:nowrap;top:1px;}
+  .chapter-tab:hover{color:var(--text);background:var(--bg);}
+  .chapter-tab.active{color:var(--text);background:var(--white);border-color:var(--border);z-index:2;box-shadow:0 -2px 8px rgba(0,0,0,0.03);}
+  .chapter-tab .chapter-tab-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle;}
+  .dot-all{background:var(--blue);}
+  .dot-OL{background:#7c3aed;}
+  .dot-AS{background:#d97706;}
+  .dot-A2{background:#16a34a;}
+  .dot-student{background:#64748b;}
+  .chapter-tab-delete{background:none;border:none;cursor:pointer;font-size:11px;margin-left:8px;opacity:0;color:var(--text-muted);transition:opacity 0.15s;}
+  .chapter-tab:hover .chapter-tab-delete{opacity:1;}
+  .chapter-tab-delete:hover{color:var(--red);}
+  .add-chapter-tab{flex-shrink:0;background:var(--bg);border:1px dashed var(--border);border-radius:10px 10px 0 0;padding:12px 16px 14px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text-muted);transition:all 0.15s;top:1px;}
+  .add-chapter-tab:hover{color:var(--blue);border-color:var(--blue);}
+  .chapter-panel{background:var(--white);border:1px solid var(--border);border-radius:0 12px 12px 12px;padding:24px;min-height:220px;}
+  .chapter-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+  .chapter-panel-title{font-size:15px;font-weight:800;}
+  .chapter-panel-vis{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--blue-light);color:var(--blue);margin-left:8px;vertical-align:middle;}
+  .lessons-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+  .lesson-card{background:linear-gradient(150deg,var(--blue-light) 0%,var(--white) 55%);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;transition:all 0.15s;}
+  .lesson-card:hover{border-color:var(--blue);box-shadow:0 3px 14px rgba(24,95,165,0.12);transform:translateY(-1px);}
+  .lesson-card-reel{font-size:22px;margin-bottom:8px;}
+  .lesson-card-name{font-size:14px;font-weight:700;margin-bottom:14px;line-height:1.35;word-break:break-word;}
+  .lesson-card-actions{display:flex;align-items:center;gap:8px;}
+  .btn-watch{flex:1;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;display:inline-block;transition:opacity 0.15s;}
+  .btn-watch:hover{opacity:0.88;}
+  .lesson-delete{background:none;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;cursor:pointer;color:var(--text-muted);font-family:inherit;flex-shrink:0;transition:all 0.15s;}
+  .lesson-delete:hover{border-color:var(--red);color:var(--red);background:var(--red-light);}
 </style>
 </head>
 <body>
@@ -248,7 +279,9 @@
 
     <!-- SESSIONS -->
     <div id="sessions" class="page">
-      <div class="page-header"><h1>📅 Sessions</h1><p>Your upcoming sessions.</p></div>
+      <div class="page-header"><h1>📅 Sessions</h1><p>Recorded lessons, organized by chapter.</p></div>
+      <div class="chapters-rail" id="chapters-rail"></div>
+      <div class="chapter-panel" id="chapter-panel"></div>
     </div>
 
     <!-- PDFs -->
@@ -314,6 +347,56 @@
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeSessionModal()">Cancel</button>
       <button class="btn-save" onclick="saveSession()">Create session</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHAPTER MODAL (Sessions tab) -->
+<div class="modal-overlay" id="chapter-modal">
+  <div class="modal">
+    <h3>📖 New chapter</h3>
+    <div class="form-group">
+      <label>Lesson / chapter name</label>
+      <input type="text" id="chapter-name" placeholder=""/>
+    </div>
+    <div class="form-group">
+      <label>Visible to</label>
+      <div class="visibility-options">
+        <button class="vis-btn selected" data-vis="all" onclick="selectChapterVisibility('all')">Everyone</button>
+        <button class="vis-btn" data-vis="OL" onclick="selectChapterVisibility('OL')">OL only</button>
+        <button class="vis-btn" data-vis="AS" onclick="selectChapterVisibility('AS')">AS only</button>
+        <button class="vis-btn" data-vis="A2" onclick="selectChapterVisibility('A2')">A2 only</button>
+        <button class="vis-btn" data-vis="student" onclick="selectChapterVisibility('student')">Specific student</button>
+      </div>
+    </div>
+    <div class="form-group" id="chapter-student-picker" style="display:none">
+      <label>Choose student</label>
+      <input type="text" class="search-bar" id="chapter-student-search" placeholder="🔍 Search students..." style="margin-bottom:8px" oninput="filterChapterStudentPicker(this.value)"/>
+      <div id="chapter-student-list" class="student-picker-list"></div>
+      <input type="hidden" id="chapter-student-id" value=""/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeChapterModal()">Cancel</button>
+      <button class="btn-save" onclick="saveChapter()">Create chapter</button>
+    </div>
+  </div>
+</div>
+
+<!-- LESSON MODAL (Sessions tab) -->
+<div class="modal-overlay" id="lesson-modal">
+  <div class="modal">
+    <h3>🎬 New recording</h3>
+    <div class="form-group">
+      <label>Lesson name</label>
+      <input type="text" id="lesson-name" placeholder=""/>
+    </div>
+    <div class="form-group">
+      <label>Drive link</label>
+      <input type="text" id="lesson-link" placeholder=""/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeLessonModal()">Cancel</button>
+      <button class="btn-save" onclick="saveLesson()">Add recording</button>
     </div>
   </div>
 </div>
@@ -446,6 +529,7 @@ function showPage(id) {
   if (navItems[idx]) navItems[idx].classList.add('active');
   if (id === 'students') loadStudents();
   if (id === 'home') loadSessions();
+  if (id === 'sessions') loadChapters();
 }
 
 // ── SESSIONS (Home tab) ───────────────────────────────────
@@ -579,6 +663,214 @@ async function saveSession() {
   closeSessionModal();
   toast('Session created! 📅');
   loadSessions();
+}
+
+// ── SESSIONS TAB: CHAPTERS ─────────────────────────────────
+let allChapters = [];
+let activeChapterId = null;
+let selectedChapterVisibility = 'all';
+let chapterPickerStudents = [];
+let selectedChapterStudentId = '';
+
+async function loadChapters() {
+  const rail = document.getElementById('chapters-rail');
+  rail.innerHTML = '<div class="empty-state" style="padding:20px"><div class="empty-icon">⏳</div>Loading...</div>';
+  const { data, error } = await sb.from('session_chapters').select('*').order('created_at', { ascending: true });
+  if (error) {
+    rail.innerHTML = '';
+    document.getElementById('chapter-panel').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load chapters.</div>';
+    return;
+  }
+  allChapters = data || [];
+  if (!activeChapterId && allChapters.length > 0) activeChapterId = allChapters[0].id;
+  if (activeChapterId && !allChapters.find(c => c.id === activeChapterId)) {
+    activeChapterId = allChapters.length > 0 ? allChapters[0].id : null;
+  }
+  renderChaptersRail();
+  renderChapterPanel();
+}
+
+function renderChaptersRail() {
+  const rail = document.getElementById('chapters-rail');
+  const addBtn = currentRole === 'teacher' ? `<button class="add-chapter-tab" onclick="openChapterModal()">+ Add chapter</button>` : '';
+  if (allChapters.length === 0) {
+    rail.innerHTML = addBtn;
+    return;
+  }
+  rail.innerHTML = allChapters.map(c => {
+    const dotClass = c.visibility === 'student' ? 'dot-student' : `dot-${c.visibility}`;
+    const isActive = c.id === activeChapterId;
+    const deleteBtn = currentRole === 'teacher' ? `<button class="chapter-tab-delete" onclick="deleteChapter(event,'${c.id}')">✕</button>` : '';
+    return `<button class="chapter-tab${isActive ? ' active' : ''}" onclick="selectChapter('${c.id}')">
+      <span class="chapter-tab-dot ${dotClass}"></span>${c.name}${deleteBtn}
+    </button>`;
+  }).join('') + addBtn;
+}
+
+function selectChapter(id) {
+  activeChapterId = id;
+  renderChaptersRail();
+  renderChapterPanel();
+}
+
+async function renderChapterPanel() {
+  const panel = document.getElementById('chapter-panel');
+  if (!activeChapterId) {
+    panel.innerHTML = '<div class="empty-state"><div class="empty-icon">📖</div>No chapters yet.<br>There is nothing here right now.</div>';
+    return;
+  }
+  const chapter = allChapters.find(c => c.id === activeChapterId);
+  if (!chapter) { panel.innerHTML = ''; return; }
+  const visLabel = chapter.visibility === 'all' ? 'Everyone' : chapter.visibility === 'student' ? 'Specific student' : chapter.visibility;
+  const addLessonBtn = currentRole === 'teacher' ? `<button class="btn-add-folder" onclick="openLessonModal()">+ Add recording</button>` : '';
+  panel.innerHTML = `
+    <div class="chapter-panel-header">
+      <div><span class="chapter-panel-title">${chapter.name}</span><span class="chapter-panel-vis">${visLabel}</span></div>
+      ${addLessonBtn}
+    </div>
+    <div class="lessons-grid" id="lessons-grid"><div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div></div>
+  `;
+  loadLessons(chapter.id);
+}
+
+async function loadLessons(chapterId) {
+  const { data, error } = await sb.from('session_lessons').select('*').eq('chapter_id', chapterId).order('created_at', { ascending: false });
+  const grid = document.getElementById('lessons-grid');
+  if (!grid) return;
+  if (error || !data || data.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">🎬</div>This chapter is empty — no recordings yet.</div>';
+    return;
+  }
+  grid.innerHTML = data.map(l => {
+    const deleteBtn = currentRole === 'teacher' ? `<button class="lesson-delete" onclick="deleteLesson('${l.id}')">🗑</button>` : '';
+    return `<div class="lesson-card">
+      <div class="lesson-card-reel">🎞️</div>
+      <div class="lesson-card-name">${l.name}</div>
+      <div class="lesson-card-actions">
+        <a href="${l.drive_link}" target="_blank" rel="noopener" class="btn-watch">▶ Watch</a>
+        ${deleteBtn}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function deleteChapter(e, id) {
+  e.stopPropagation();
+  if (!confirm('Delete this chapter and all its recordings?')) return;
+  const { error } = await sb.from('session_chapters').delete().eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('Chapter deleted.');
+  if (activeChapterId === id) activeChapterId = null;
+  loadChapters();
+}
+
+async function deleteLesson(id) {
+  if (!confirm('Delete this recording?')) return;
+  const { error } = await sb.from('session_lessons').delete().eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('Recording deleted.');
+  loadLessons(activeChapterId);
+}
+
+// ── CHAPTER MODAL ──────────────────────────────────────────
+function openChapterModal() {
+  selectedChapterVisibility = 'all';
+  selectedChapterStudentId = '';
+  document.getElementById('chapter-name').value = '';
+  document.getElementById('chapter-student-search').value = '';
+  document.getElementById('chapter-student-id').value = '';
+  document.getElementById('chapter-student-picker').style.display = 'none';
+  document.querySelectorAll('#chapter-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === 'all'));
+  loadStudentsForChapterPicker();
+  document.getElementById('chapter-modal').classList.add('open');
+}
+
+function closeChapterModal() { document.getElementById('chapter-modal').classList.remove('open'); }
+
+function selectChapterVisibility(vis) {
+  selectedChapterVisibility = vis;
+  document.querySelectorAll('#chapter-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === vis));
+  document.getElementById('chapter-student-picker').style.display = vis === 'student' ? 'block' : 'none';
+}
+
+async function loadStudentsForChapterPicker() {
+  const { data } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name');
+  chapterPickerStudents = data || [];
+  renderChapterStudentPicker(chapterPickerStudents);
+}
+
+function renderChapterStudentPicker(students) {
+  const list = document.getElementById('chapter-student-list');
+  if (!students || students.length === 0) {
+    list.innerHTML = '<div class="student-picker-empty">No approved students found</div>';
+    return;
+  }
+  list.innerHTML = students.map(s => {
+    const label = `${s.full_name || s.email}${s.year_group ? ' (' + s.year_group + ')' : ''}`;
+    const isSelected = s.id === selectedChapterStudentId;
+    return `<div class="student-picker-row${isSelected ? ' selected' : ''}" onclick="pickChapterStudent('${s.id}')">${label}</div>`;
+  }).join('');
+}
+
+function filterChapterStudentPicker(query) {
+  const q = query.toLowerCase();
+  const filtered = chapterPickerStudents.filter(s =>
+    (s.full_name || '').toLowerCase().includes(q) ||
+    (s.email || '').toLowerCase().includes(q) ||
+    (s.year_group || '').toLowerCase().includes(q)
+  );
+  renderChapterStudentPicker(filtered);
+}
+
+function pickChapterStudent(id) {
+  selectedChapterStudentId = id;
+  document.getElementById('chapter-student-id').value = id;
+  const q = document.getElementById('chapter-student-search').value.toLowerCase();
+  renderChapterStudentPicker(chapterPickerStudents.filter(s =>
+    (s.full_name || '').toLowerCase().includes(q) ||
+    (s.email || '').toLowerCase().includes(q) ||
+    (s.year_group || '').toLowerCase().includes(q)
+  ));
+}
+
+async function saveChapter() {
+  const name = document.getElementById('chapter-name').value.trim();
+  if (!name) { toast('Please enter a chapter name.'); return; }
+  if (selectedChapterVisibility === 'student' && !selectedChapterStudentId) { toast('Please choose a student.'); return; }
+  const studentId = selectedChapterVisibility === 'student' ? selectedChapterStudentId : null;
+  const { error } = await sb.from('session_chapters').insert({
+    name, created_by: currentUser.id,
+    visibility: selectedChapterVisibility, student_id: studentId || null
+  });
+  if (error) { toast('Error: ' + error.message); return; }
+  closeChapterModal();
+  toast('Chapter created! 📖');
+  loadChapters();
+}
+
+// ── LESSON MODAL ───────────────────────────────────────────
+function openLessonModal() {
+  document.getElementById('lesson-name').value = '';
+  document.getElementById('lesson-link').value = '';
+  document.getElementById('lesson-modal').classList.add('open');
+}
+
+function closeLessonModal() { document.getElementById('lesson-modal').classList.remove('open'); }
+
+async function saveLesson() {
+  const name = document.getElementById('lesson-name').value.trim();
+  let link = document.getElementById('lesson-link').value.trim();
+  if (link && !/^https?:\/\//i.test(link)) { link = 'https://' + link; }
+  if (!name) { toast('Please enter a lesson name.'); return; }
+  if (!link) { toast('Please enter a drive link.'); return; }
+  if (!activeChapterId) { toast('No chapter selected.'); return; }
+  const { error } = await sb.from('session_lessons').insert({
+    chapter_id: activeChapterId, name, drive_link: link, created_by: currentUser.id
+  });
+  if (error) { toast('Error: ' + error.message); return; }
+  closeLessonModal();
+  toast('Recording added! 🎬');
+  loadLessons(activeChapterId);
 }
 
 // ── STUDENTS ──────────────────────────────────────────────
