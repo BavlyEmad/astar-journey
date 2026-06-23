@@ -565,7 +565,8 @@ function pickSessionStudent(id) {
 
 async function saveSession() {
   const name = document.getElementById('session-name').value.trim();
-  const link = document.getElementById('session-link').value.trim();
+  let link = document.getElementById('session-link').value.trim();
+  if (link && !/^https?:\/\//i.test(link)) { link = 'https://' + link; }
   const timeText = document.getElementById('session-time').value.trim();
   if (!name) { toast('Please enter a session name.'); return; }
   if (selectedSessionVisibility === 'student' && !selectedSessionStudentId) { toast('Please choose a student.'); return; }
