@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>A* Journey — Maths Learning Hub</title>
+<title>A* Journey — Math Teaching Team</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   *{box-sizing:border-box;margin:0;padding:0;}
@@ -21,8 +21,7 @@
   #auth-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--blue-light) 0%,var(--green-light) 100%);}
   .auth-card{background:var(--white);border-radius:16px;padding:40px;width:100%;max-width:400px;box-shadow:0 4px 24px rgba(0,0,0,0.08);}
   .auth-logo{text-align:center;margin-bottom:28px;}
-  .auth-logo h1{font-size:26px;font-weight:800;color:var(--text);}
-  .auth-logo h1 span{color:var(--blue);}
+  .auth-logo img{width:140px;margin-bottom:8px;mix-blend-mode:multiply;}
   .auth-logo p{font-size:13px;color:var(--text-muted);margin-top:4px;}
   .auth-tabs{display:flex;margin-bottom:24px;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
   .auth-tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-muted);background:var(--bg);border:none;font-family:inherit;transition:all 0.15s;}
@@ -40,44 +39,76 @@
   /* PENDING */
   #pending-page{display:none;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--blue-light) 0%,var(--green-light) 100%);}
   .pending-card{background:var(--white);border-radius:16px;padding:40px;width:100%;max-width:420px;box-shadow:0 4px 24px rgba(0,0,0,0.08);text-align:center;}
+  .pending-card img{width:90px;margin-bottom:12px;}
   .pending-icon{font-size:56px;margin-bottom:16px;}
   .pending-card h2{font-size:22px;font-weight:800;margin-bottom:10px;}
   .pending-card p{font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:20px;}
   .pending-badge{display:inline-block;background:var(--orange-light);color:var(--orange);font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;margin-bottom:20px;border:1px solid #fcd34d;}
 
-  /* MAIN APP LAYOUT */
-  #app{display:none;min-height:100vh;flex-direction:row;}
+  /* APP LAYOUT */
+  #app{display:none;min-height:100vh;}
   #app.visible{display:flex;}
-
-  /* SIDEBAR */
   .sidebar{width:var(--sidebar-width);background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;}
-  .sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--border);}
-  .sidebar-logo h2{font-size:18px;font-weight:800;color:var(--text);}
-  .sidebar-logo h2 span{color:var(--blue);}
-  .sidebar-logo p{font-size:11px;color:var(--text-muted);margin-top:2px;}
+  .sidebar-logo{padding:20px 16px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .sidebar-logo img{width:80px;}
+  .sidebar-logo p{font-size:10px;color:var(--text-muted);text-align:center;}
   .sidebar-nav{flex:1;padding:16px 10px;display:flex;flex-direction:column;gap:4px;}
   .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-muted);border:none;background:none;font-family:inherit;width:100%;text-align:left;transition:all 0.15s;}
   .nav-item:hover{background:var(--bg);color:var(--text);}
   .nav-item.active{background:var(--blue-light);color:var(--blue);font-weight:600;}
-  .nav-item .nav-icon{font-size:16px;width:20px;text-align:center;}
+  .nav-icon{font-size:16px;width:20px;text-align:center;}
   .sidebar-footer{padding:16px;border-top:1px solid var(--border);}
   .user-info{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
   .user-avatar{width:32px;height:32px;background:var(--blue-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--blue);flex-shrink:0;}
   .user-details{flex:1;min-width:0;}
-  .user-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .user-role{font-size:11px;color:var(--text-muted);text-transform:capitalize;}
+  .user-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .user-role-line{font-size:11px;color:var(--text-muted);text-transform:capitalize;}
   .logout-btn{width:100%;background:none;border:1px solid var(--border);border-radius:8px;padding:8px;font-size:12px;color:var(--text-muted);cursor:pointer;font-family:inherit;transition:all 0.15s;}
   .logout-btn:hover{border-color:var(--red);color:var(--red);}
-
-  /* MAIN CONTENT */
-  .main-content{margin-left:var(--sidebar-width);flex:1;padding:32px 36px;max-width:calc(100vw - var(--sidebar-width));}
+  .main-content{margin-left:var(--sidebar-width);flex:1;padding:32px 36px;}
   .page{display:none;}
   .page.active{display:block;}
-  .page-header{margin-bottom:28px;}
-  .page-header h1{font-size:22px;font-weight:800;color:var(--text);}
+  .page-header{margin-bottom:24px;}
+  .page-header h1{font-size:22px;font-weight:800;}
   .page-header p{font-size:14px;color:var(--text-muted);margin-top:4px;}
 
-  /* STUDENTS PAGE */
+  /* SEARCH BAR */
+  .search-bar{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:14px;font-family:inherit;background:var(--white);margin-bottom:20px;transition:border-color 0.15s;}
+  .search-bar:focus{outline:none;border-color:var(--blue);}
+
+  /* YEAR GROUP BADGE */
+  .year-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;display:inline-block;}
+  .year-OL{background:#ede9fe;color:#5b21b6;}
+  .year-AS{background:#fef3c7;color:#92400e;}
+  .year-A2{background:#dcfce7;color:#166534;}
+
+  /* FOLDERS */
+  .folders-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap;}
+  .btn-add-folder{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .btn-add-folder:hover{opacity:0.9;}
+  .folders-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
+  .folder-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;transition:all 0.15s;position:relative;}
+  .folder-card:hover{border-color:var(--blue);box-shadow:0 2px 12px rgba(24,95,165,0.1);}
+  .folder-icon{font-size:32px;margin-bottom:10px;}
+  .folder-name{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .folder-meta{font-size:11px;color:var(--text-muted);}
+  .folder-delete{position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;font-size:14px;opacity:0;transition:opacity 0.15s;}
+  .folder-card:hover .folder-delete{opacity:1;}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:none;align-items:center;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--white);border-radius:16px;padding:32px;width:100%;max-width:440px;box-shadow:0 8px 32px rgba(0,0,0,0.15);}
+  .modal h3{font-size:17px;font-weight:800;margin-bottom:20px;}
+  .modal-actions{display:flex;gap:10px;margin-top:20px;}
+  .btn-cancel{flex:1;background:none;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--text-muted);}
+  .btn-save{flex:2;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+  .btn-save:hover{opacity:0.9;}
+  .visibility-options{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+  .vis-btn{border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;background:var(--white);color:var(--text-muted);transition:all 0.15s;}
+  .vis-btn.selected{background:var(--blue);color:#fff;border-color:var(--blue);}
+
+  /* STUDENTS TABLE */
   .teacher-panel{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:24px;}
   .panel-tabs{display:flex;gap:8px;margin-bottom:16px;}
   .panel-tab{background:none;border:1px solid var(--border);border-radius:8px;padding:7px 16px;cursor:pointer;font-size:13px;font-family:inherit;color:var(--text-muted);}
@@ -93,22 +124,22 @@
   .status-pending{background:var(--orange-light);color:var(--orange);}
   .status-approved{background:var(--green-light);color:#085041;}
 
-  /* TOAST */
+  /* TOAST & SPINNER */
   .toast{position:fixed;bottom:24px;right:24px;background:#1a1a1a;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;display:none;align-items:center;gap:8px;z-index:1000;box-shadow:0 4px 16px rgba(0,0,0,0.2);}
-
-  /* SPINNER */
   .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px;}
   @keyframes spin{to{transform:rotate(360deg);}}
+  .empty-state{text-align:center;padding:48px 20px;color:var(--text-muted);font-size:14px;}
+  .empty-state .empty-icon{font-size:40px;margin-bottom:12px;}
 </style>
 </head>
 <body>
 
-<!-- AUTH PAGE -->
+<!-- AUTH -->
 <div id="auth-page">
   <div class="auth-card">
     <div class="auth-logo">
-      <h1>A<span>*</span> Journey</h1>
-      <p>Maths learning hub</p>
+      <img src="https://cgenukblxtxwcwjmskey.supabase.co/storage/v1/object/public/astar-files/logo.png" alt="A* Journey Logo"/>
+      <p>Math Teaching Team</p>
     </div>
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchAuth('login',event)">Log in</button>
@@ -125,16 +156,25 @@
       <div class="form-group"><label>Full name</label><input type="text" id="signup-name" placeholder="Your full name"/></div>
       <div class="form-group"><label>Email</label><input type="email" id="signup-email" placeholder="your@email.com"/></div>
       <div class="form-group"><label>Password</label><input type="password" id="signup-pass" placeholder="Min 6 characters"/></div>
+      <div class="form-group">
+        <label>Year Group</label>
+        <select id="signup-year">
+          <option value="">Select your year group</option>
+          <option value="OL">OL</option>
+          <option value="AS">AS</option>
+          <option value="A2">A2</option>
+        </select>
+      </div>
       <select id="signup-role" style="display:none"><option value="student">Student</option></select>
       <button class="btn-primary" id="signup-btn" onclick="signup()">Create account</button>
     </div>
   </div>
 </div>
 
-<!-- PENDING PAGE -->
+<!-- PENDING -->
 <div id="pending-page">
   <div class="pending-card">
-    <div class="pending-icon">⏳</div>
+    <img src="https://cgenukblxtxwcwjmskey.supabase.co/storage/v1/object/public/astar-files/logo.png" alt="A* Journey Logo"/>
     <div class="pending-badge">Awaiting Approval</div>
     <h2>You're on the list!</h2>
     <p>Your account has been created. Your teacher needs to approve it before you can access the platform.<br><br>Please check back later or contact your teacher directly.</p>
@@ -144,17 +184,16 @@
 
 <!-- MAIN APP -->
 <div id="app">
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <h2>A<span>*</span> Journey</h2>
-      <p>Maths Learning Hub</p>
+      <img src="https://cgenukblxtxwcwjmskey.supabase.co/storage/v1/object/public/astar-files/logo.png" alt="A* Journey Logo"/>
+      <p>Math Teaching Team</p>
     </div>
     <nav class="sidebar-nav">
       <button class="nav-item active" onclick="showPage('home')"><span class="nav-icon">🏠</span> Home</button>
       <button class="nav-item" onclick="showPage('sessions')"><span class="nav-icon">📅</span> Sessions</button>
       <button class="nav-item" onclick="showPage('books')"><span class="nav-icon">📚</span> PDFs</button>
-      <button class="nav-item" onclick="showPage('homework')"><span class="nav-icon">📝</span> Assignment</button>
+      <button class="nav-item" onclick="showPage('homework')"><span class="nav-icon">📝</span> Assignments</button>
       <button class="nav-item" id="teacher-nav" style="display:none" onclick="showPage('students')"><span class="nav-icon">👩‍🎓</span> Students</button>
     </nav>
     <div class="sidebar-footer">
@@ -162,14 +201,13 @@
         <div class="user-avatar" id="user-avatar">?</div>
         <div class="user-details">
           <div class="user-name" id="nav-name">—</div>
-          <div class="user-role" id="nav-role">—</div>
+          <div class="user-role-line" id="nav-role">—</div>
         </div>
       </div>
       <button class="logout-btn" onclick="logout()">Log out</button>
     </div>
   </aside>
 
-  <!-- MAIN CONTENT -->
   <main class="main-content">
     <!-- HOME -->
     <div id="home" class="page active">
@@ -181,46 +219,81 @@
 
     <!-- SESSIONS -->
     <div id="sessions" class="page">
-      <div class="page-header">
-        <h1>📅 Sessions</h1>
-        <p>Your upcoming and past sessions.</p>
+      <div class="page-header"><h1>📅 Sessions</h1><p>Your upcoming sessions.</p></div>
+      <input class="search-bar" placeholder="🔍 Search sessions..." oninput="filterFolders('sessions-grid', this.value)"/>
+      <div class="folders-toolbar" id="sessions-toolbar" style="display:none">
+        <button class="btn-add-folder" onclick="openFolderModal('session')">+ New folder</button>
       </div>
+      <div class="folders-grid" id="sessions-grid"></div>
     </div>
 
-    <!-- BOOKS / PDFs -->
+    <!-- PDFs -->
     <div id="books" class="page">
-      <div class="page-header">
-        <h1>📚 PDFs</h1>
-        <p>Books and resources uploaded by your teacher.</p>
+      <div class="page-header"><h1>📚 PDFs</h1><p>Books and resources.</p></div>
+      <input class="search-bar" placeholder="🔍 Search PDFs..." oninput="filterFolders('books-grid', this.value)"/>
+      <div class="folders-toolbar" id="books-toolbar" style="display:none">
+        <button class="btn-add-folder" onclick="openFolderModal('pdf')">+ New folder</button>
       </div>
+      <div class="folders-grid" id="books-grid"></div>
     </div>
 
-    <!-- HOMEWORK / ASSIGNMENTS -->
+    <!-- ASSIGNMENTS -->
     <div id="homework" class="page">
-      <div class="page-header">
-        <h1>📝 Assignments</h1>
-        <p>Your homework and assignments.</p>
+      <div class="page-header"><h1>📝 Assignments</h1><p>Your homework and assignments.</p></div>
+      <input class="search-bar" placeholder="🔍 Search assignments..." oninput="filterFolders('homework-grid', this.value)"/>
+      <div class="folders-toolbar" id="homework-toolbar" style="display:none">
+        <button class="btn-add-folder" onclick="openFolderModal('assignment')">+ New folder</button>
       </div>
+      <div class="folders-grid" id="homework-grid"></div>
     </div>
 
-    <!-- STUDENTS (teacher only) -->
+    <!-- STUDENTS -->
     <div id="students" class="page">
-      <div class="page-header">
-        <h1>👩‍🎓 Students</h1>
-        <p>Manage and approve your students.</p>
-      </div>
+      <div class="page-header"><h1>👩‍🎓 Students</h1><p>Manage and approve your students.</p></div>
+      <input class="search-bar" placeholder="🔍 Search students..." oninput="filterStudents(this.value)"/>
       <div class="teacher-panel">
         <div class="panel-tabs">
           <button class="panel-tab active" onclick="switchStudentTab('approved',event)">✅ Approved</button>
           <button class="panel-tab" onclick="switchStudentTab('pending',event)">⏳ Pending</button>
         </div>
         <table class="students-table">
-          <thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody id="students-tbody"><tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:20px">Loading...</td></tr></tbody>
+          <thead><tr><th>Name</th><th>Email</th><th>Year</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="students-tbody"></tbody>
         </table>
       </div>
     </div>
   </main>
+</div>
+
+<!-- FOLDER MODAL -->
+<div class="modal-overlay" id="folder-modal">
+  <div class="modal">
+    <h3>📁 New folder</h3>
+    <div class="form-group">
+      <label>Folder name</label>
+      <input type="text" id="folder-name" placeholder="e.g. Quadratic Equations"/>
+    </div>
+    <div class="form-group">
+      <label>Visible to</label>
+      <div class="visibility-options">
+        <button class="vis-btn selected" data-vis="all" onclick="selectVisibility('all')">Everyone</button>
+        <button class="vis-btn" data-vis="OL" onclick="selectVisibility('OL')">OL only</button>
+        <button class="vis-btn" data-vis="AS" onclick="selectVisibility('AS')">AS only</button>
+        <button class="vis-btn" data-vis="A2" onclick="selectVisibility('A2')">A2 only</button>
+        <button class="vis-btn" data-vis="student" onclick="selectVisibility('student')">Specific student</button>
+      </div>
+    </div>
+    <div class="form-group" id="student-picker" style="display:none">
+      <label>Choose student</label>
+      <select id="folder-student-id">
+        <option value="">Loading students...</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeFolderModal()">Cancel</button>
+      <button class="btn-save" onclick="saveFolder()">Create folder</button>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast">✅ <span id="toast-msg"></span></div>
@@ -233,7 +306,11 @@ const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
 let currentRole = null;
+let currentYearGroup = null;
 let currentStudentTab = 'approved';
+let currentFolderType = null;
+let selectedVisibility = 'all';
+let allStudentsRows = [];
 
 window.addEventListener('load', async () => {
   const { data: { session } } = await sb.auth.getSession();
@@ -242,51 +319,42 @@ window.addEventListener('load', async () => {
 
 async function loadUser(user) {
   const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
-  if (!profile) {
-    await sb.auth.signOut();
-    showError('Account not found. Please sign up again.');
-    return;
-  }
+  if (!profile) { await sb.auth.signOut(); showError('Account not found. Please sign up again.'); return; }
   currentUser = user;
   currentRole = profile.role;
-  if (profile.role === 'student' && profile.status === 'pending') {
-    showPendingScreen();
-    return;
-  }
+  currentYearGroup = profile.year_group;
+  if (profile.role === 'student' && profile.status === 'pending') { showPendingScreen(); return; }
   showApp(profile);
 }
 
 function showPendingScreen() {
   document.getElementById('auth-page').style.display = 'none';
   document.getElementById('app').classList.remove('visible');
+  document.getElementById('app').style.display = 'none';
   document.getElementById('pending-page').style.display = 'flex';
 }
 
 function showApp(profile) {
   document.getElementById('auth-page').style.display = 'none';
   document.getElementById('pending-page').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
   document.getElementById('app').classList.add('visible');
   const initials = (profile.full_name || profile.email || '?').charAt(0).toUpperCase();
   document.getElementById('user-avatar').textContent = initials;
   document.getElementById('nav-name').textContent = profile.full_name || profile.email;
-  document.getElementById('nav-role').textContent = profile.role;
+  const yearLabel = profile.year_group ? ` · ${profile.year_group}` : '';
+  document.getElementById('nav-role').textContent = profile.role + yearLabel;
   if (profile.role === 'teacher') {
     document.getElementById('teacher-nav').style.display = 'flex';
-    document.getElementById('home-subtitle').textContent = 'Manage your sessions, upload materials, and approve students.';
+    document.getElementById('sessions-toolbar').style.display = 'flex';
+    document.getElementById('books-toolbar').style.display = 'flex';
+    document.getElementById('homework-toolbar').style.display = 'flex';
+    document.getElementById('home-subtitle').textContent = 'Manage sessions, upload materials, and approve students.';
   }
 }
 
-function showError(msg) {
-  const el = document.getElementById('auth-error');
-  el.textContent = msg;
-  el.style.display = 'block';
-}
-
-function showSuccess(msg) {
-  const el = document.getElementById('auth-success');
-  el.textContent = msg;
-  el.style.display = 'block';
-}
+function showError(msg) { const el = document.getElementById('auth-error'); el.textContent = msg; el.style.display = 'block'; }
+function showSuccess(msg) { const el = document.getElementById('auth-success'); el.textContent = msg; el.style.display = 'block'; }
 
 function switchAuth(tab, event) {
   document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
@@ -302,13 +370,10 @@ async function login() {
   const pass = document.getElementById('login-pass').value;
   const btn = document.getElementById('login-btn');
   document.getElementById('auth-error').style.display = 'none';
-  document.getElementById('auth-success').style.display = 'none';
   if (!email || !pass) { showError('Please enter your email and password.'); return; }
-  btn.innerHTML = '<span class="spinner"></span>Logging in...';
-  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Logging in...'; btn.disabled = true;
   const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-  btn.innerHTML = 'Log in';
-  btn.disabled = false;
+  btn.innerHTML = 'Log in'; btn.disabled = false;
   if (error) { showError(error.message); return; }
   await loadUser(data.user);
 }
@@ -317,38 +382,30 @@ async function signup() {
   const name = document.getElementById('signup-name').value.trim();
   const email = document.getElementById('signup-email').value.trim();
   const pass = document.getElementById('signup-pass').value;
+  const year = document.getElementById('signup-year').value;
   const role = document.getElementById('signup-role').value;
   const btn = document.getElementById('signup-btn');
   document.getElementById('auth-error').style.display = 'none';
-  document.getElementById('auth-success').style.display = 'none';
   if (!name) { showError('Please enter your full name.'); return; }
   if (!email) { showError('Please enter your email.'); return; }
   if (pass.length < 6) { showError('Password must be at least 6 characters.'); return; }
-  btn.innerHTML = '<span class="spinner"></span>Creating account...';
-  btn.disabled = true;
+  if (!year) { showError('Please select your year group.'); return; }
+  btn.innerHTML = '<span class="spinner"></span>Creating account...'; btn.disabled = true;
   const { data, error } = await sb.auth.signUp({ email, password: pass });
-  btn.innerHTML = 'Create account';
-  btn.disabled = false;
+  btn.innerHTML = 'Create account'; btn.disabled = false;
   if (error) { showError(error.message); return; }
   if (data.user) {
-    const status = role === 'teacher' ? 'approved' : 'pending';
-    const { error: profileError } = await sb.from('profiles').insert({ id: data.user.id, email, role, full_name: name, status });
+    const { error: profileError } = await sb.from('profiles').insert({ id: data.user.id, email, role, full_name: name, status: 'pending', year_group: year });
     if (profileError) { showError('Profile setup failed: ' + profileError.message); return; }
-    if (data.session) {
-      currentUser = data.user;
-      currentRole = role;
-      if (role === 'student') { showPendingScreen(); }
-      else { showApp({ full_name: name, email, role }); }
-    } else {
-      showSuccess('✅ Account created! Please check your email to confirm, then log in.');
-      switchAuth('login', null);
-    }
+    if (data.session) { currentUser = data.user; currentRole = role; showPendingScreen(); }
+    else { showSuccess('✅ Account created! Please log in.'); switchAuth('login', null); }
   }
 }
 
 async function logout() {
   await sb.auth.signOut();
-  currentUser = null; currentRole = null;
+  currentUser = null; currentRole = null; currentYearGroup = null;
+  document.getElementById('app').style.display = 'none';
   document.getElementById('app').classList.remove('visible');
   document.getElementById('pending-page').style.display = 'none';
   document.getElementById('auth-page').style.display = 'flex';
@@ -365,8 +422,89 @@ function showPage(id) {
   const idx = pages.indexOf(id);
   if (navItems[idx]) navItems[idx].classList.add('active');
   if (id === 'students') loadStudents();
+  if (id === 'sessions') loadFolders('session','sessions-grid');
+  if (id === 'books') loadFolders('pdf','books-grid');
+  if (id === 'homework') loadFolders('assignment','homework-grid');
 }
 
+// ── FOLDERS ──────────────────────────────────────────────
+async function loadFolders(type, gridId) {
+  const grid = document.getElementById(gridId);
+  grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
+  const { data: folders, error } = await sb.from('folders').select('*').eq('type', type).order('created_at', { ascending: false });
+  if (error || !folders || folders.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📂</div>No folders yet.</div>';
+    return;
+  }
+  grid.innerHTML = folders.map(f => {
+    const visLabel = f.visibility === 'all' ? 'Everyone' : f.visibility === 'student' ? 'Private' : f.visibility;
+    const deleteBtn = currentRole === 'teacher' ? `<button class="folder-delete" onclick="deleteFolder(event,'${f.id}','${type}','${gridId}')">🗑</button>` : '';
+    return `<div class="folder-card" data-name="${f.name.toLowerCase()}">
+      ${deleteBtn}
+      <div class="folder-icon">📁</div>
+      <div class="folder-name">${f.name}</div>
+      <div class="folder-meta">Visible to: ${visLabel}</div>
+    </div>`;
+  }).join('');
+}
+
+async function deleteFolder(e, id, type, gridId) {
+  e.stopPropagation();
+  if (!confirm('Delete this folder?')) return;
+  const { error } = await sb.from('folders').delete().eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('Folder deleted.');
+  loadFolders(type, gridId);
+}
+
+function filterFolders(gridId, query) {
+  const cards = document.querySelectorAll(`#${gridId} .folder-card`);
+  const q = query.toLowerCase();
+  cards.forEach(c => { c.style.display = c.dataset.name.includes(q) ? '' : 'none'; });
+}
+
+// ── FOLDER MODAL ──────────────────────────────────────────
+function openFolderModal(type) {
+  currentFolderType = type;
+  selectedVisibility = 'all';
+  document.getElementById('folder-name').value = '';
+  document.getElementById('student-picker').style.display = 'none';
+  document.querySelectorAll('.vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === 'all'));
+  loadStudentsForPicker();
+  document.getElementById('folder-modal').classList.add('open');
+}
+
+function closeFolderModal() { document.getElementById('folder-modal').classList.remove('open'); }
+
+function selectVisibility(vis) {
+  selectedVisibility = vis;
+  document.querySelectorAll('.vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === vis));
+  document.getElementById('student-picker').style.display = vis === 'student' ? 'block' : 'none';
+}
+
+async function loadStudentsForPicker() {
+  const { data } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name');
+  const sel = document.getElementById('folder-student-id');
+  if (!data || data.length === 0) { sel.innerHTML = '<option>No approved students</option>'; return; }
+  sel.innerHTML = data.map(s => `<option value="${s.id}">${s.full_name || s.email} (${s.year_group || '—'})</option>`).join('');
+}
+
+async function saveFolder() {
+  const name = document.getElementById('folder-name').value.trim();
+  if (!name) { toast('Please enter a folder name.'); return; }
+  const studentId = selectedVisibility === 'student' ? document.getElementById('folder-student-id').value : null;
+  const { error } = await sb.from('folders').insert({
+    name, type: currentFolderType, created_by: currentUser.id,
+    visibility: selectedVisibility, student_id: studentId || null
+  });
+  if (error) { toast('Error: ' + error.message); return; }
+  closeFolderModal();
+  toast('Folder created! 📁');
+  const gridMap = { session: 'sessions-grid', pdf: 'books-grid', assignment: 'homework-grid' };
+  loadFolders(currentFolderType, gridMap[currentFolderType]);
+}
+
+// ── STUDENTS ──────────────────────────────────────────────
 function switchStudentTab(tab, event) {
   currentStudentTab = tab;
   document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
@@ -377,26 +515,42 @@ function switchStudentTab(tab, event) {
 async function loadStudents() {
   if (currentRole !== 'teacher') return;
   const { data: students } = await sb.from('profiles').select('*').eq('role','student').eq('status', currentStudentTab).order('full_name');
+  allStudentsRows = students || [];
+  renderStudents(allStudentsRows);
+}
+
+function renderStudents(students) {
   const tbody = document.getElementById('students-tbody');
   if (!students || students.length === 0) {
     const msg = currentStudentTab === 'pending' ? 'No students waiting for approval' : 'No approved students yet';
-    tbody.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:20px">${msg}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" style="color:var(--text-muted);text-align:center;padding:20px">${msg}</td></tr>`;
     return;
   }
-  tbody.innerHTML = students.map(s => `
-    <tr id="row-${s.id}">
+  tbody.innerHTML = students.map(s => {
+    const yearBadge = s.year_group ? `<span class="year-badge year-${s.year_group}">${s.year_group}</span>` : '—';
+    return `<tr id="row-${s.id}">
       <td><strong>${s.full_name || '—'}</strong></td>
       <td>${s.email}</td>
+      <td>${yearBadge}</td>
       <td><span class="status-badge status-${s.status}">${s.status}</span></td>
       <td>
         ${s.status === 'pending'
           ? `<button class="btn-approve" onclick="approveStudent('${s.id}')">✅ Approve</button>
              <button class="btn-reject" onclick="rejectStudent('${s.id}')">❌ Reject</button>`
-          : `<button class="btn-small" onclick="rejectStudent('${s.id}')">Remove</button>`
-        }
+          : `<button class="btn-small" onclick="rejectStudent('${s.id}')">Remove</button>`}
       </td>
-    </tr>
-  `).join('');
+    </tr>`;
+  }).join('');
+}
+
+function filterStudents(query) {
+  const q = query.toLowerCase();
+  const filtered = allStudentsRows.filter(s =>
+    (s.full_name || '').toLowerCase().includes(q) ||
+    (s.email || '').toLowerCase().includes(q) ||
+    (s.year_group || '').toLowerCase().includes(q)
+  );
+  renderStudents(filtered);
 }
 
 async function approveStudent(id) {
@@ -407,9 +561,9 @@ async function approveStudent(id) {
 }
 
 async function rejectStudent(id) {
-  const { error } = await sb.from('profiles').update({ status: 'pending' }).eq('id', id);
+  const { error } = await sb.from('profiles').delete().eq('id', id);
   if (error) { toast('Error: ' + error.message); return; }
-  toast('Student moved to pending.');
+  toast('Student removed.');
   loadStudents();
 }
 
