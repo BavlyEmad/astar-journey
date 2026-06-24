@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>A* Journey — Math Teaching Team</title>
+<title>Astar Journey</title>
+<link rel="icon" href="https://cgenukblxtxwcwjmskey.supabase.co/storage/v1/object/public/astar-files/logo.png" type="image/png"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   *{box-sizing:border-box;margin:0;padding:0;}
@@ -16,8 +17,6 @@
     --sidebar-width:220px;
   }
   body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-
-  /* AUTH */
   #auth-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--blue-light) 0%,var(--green-light) 100%);}
   .auth-card{background:var(--white);border-radius:16px;padding:40px;width:100%;max-width:400px;box-shadow:0 4px 24px rgba(0,0,0,0.08);}
   .auth-logo{text-align:center;margin-bottom:28px;}
@@ -35,15 +34,11 @@
   .btn-primary:disabled{opacity:0.6;cursor:not-allowed;}
   .auth-error{background:var(--red-light);color:var(--red);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:16px;display:none;}
   .auth-success{background:var(--green-light);color:#085041;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:16px;display:none;}
-
-  /* PENDING */
   #pending-page{display:none;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--blue-light) 0%,var(--green-light) 100%);}
   .pending-card{background:var(--white);border-radius:16px;padding:40px;width:100%;max-width:420px;box-shadow:0 4px 24px rgba(0,0,0,0.08);text-align:center;}
   .pending-badge{display:inline-block;background:var(--orange-light);color:var(--orange);font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;margin-bottom:20px;border:1px solid #fcd34d;}
   .pending-card h2{font-size:22px;font-weight:800;margin-bottom:10px;}
   .pending-card p{font-size:14px;color:var(--text-muted);line-height:1.7;margin-bottom:20px;}
-
-  /* APP LAYOUT */
   #app{display:none;min-height:100vh;}
   #app.visible{display:flex;}
   .sidebar{width:var(--sidebar-width);background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;}
@@ -69,31 +64,21 @@
   .page-header{margin-bottom:24px;}
   .page-header h1{font-size:22px;font-weight:800;}
   .page-header p{font-size:14px;color:var(--text-muted);margin-top:4px;}
-
-  /* SEARCH BAR */
   .search-bar{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:14px;font-family:inherit;background:var(--white);margin-bottom:20px;transition:border-color 0.15s;}
   .search-bar:focus{outline:none;border-color:var(--blue);}
-
-  /* YEAR GROUP BADGE */
   .year-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;display:inline-block;}
   .year-OL{background:#ede9fe;color:#5b21b6;}
   .year-AS{background:#fef3c7;color:#92400e;}
   .year-A2{background:#dcfce7;color:#166534;}
-
-  /* ── EXPLORER TOOLBAR ── */
   .explorer-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap;}
   .explorer-toolbar-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0;}
   .explorer-toolbar-right{display:flex;gap:8px;flex-shrink:0;}
-
-  /* BREADCRUMB */
   .breadcrumb{display:flex;align-items:center;gap:4px;font-size:13px;flex-wrap:wrap;}
   .breadcrumb-item{color:var(--blue);font-weight:600;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background 0.12s;white-space:nowrap;}
   .breadcrumb-item:hover{background:var(--blue-light);}
   .breadcrumb-item.current{color:var(--text);font-weight:700;cursor:default;}
   .breadcrumb-item.current:hover{background:none;}
   .breadcrumb-sep{color:var(--text-muted);font-size:12px;user-select:none;}
-
-  /* FOLDER / FILE GRID */
   .explorer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;}
   .explorer-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px 16px;cursor:pointer;transition:all 0.15s;position:relative;user-select:none;}
   .explorer-card:hover{border-color:var(--blue);box-shadow:0 2px 12px rgba(24,95,165,0.10);}
@@ -103,22 +88,14 @@
   .explorer-card-delete{position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;font-size:13px;opacity:0;padding:3px 5px;border-radius:5px;transition:all 0.12s;}
   .explorer-card:hover .explorer-card-delete{opacity:1;}
   .explorer-card-delete:hover{background:var(--red-light);color:var(--red);}
-
-  /* FILE CARD specific */
   .explorer-card.file-card{cursor:default;}
   .file-watch-btn{display:inline-block;background:var(--blue);color:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;margin-top:10px;transition:opacity 0.15s;}
   .file-watch-btn:hover{opacity:0.88;}
-
-  /* VIS BADGE on card */
   .vis-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--blue-light);color:var(--blue);margin-top:5px;}
-
-  /* ADD BUTTONS */
   .btn-add{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;display:flex;align-items:center;gap:5px;}
   .btn-add:hover{opacity:0.9;}
   .btn-add-outline{background:var(--white);color:var(--blue);border:1px solid var(--blue);border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;display:flex;align-items:center;gap:5px;}
   .btn-add-outline:hover{background:var(--blue-light);}
-
-  /* MODAL */
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:none;align-items:center;justify-content:center;}
   .modal-overlay.open{display:flex;}
   .modal{background:var(--white);border-radius:16px;padding:32px;width:100%;max-width:440px;box-shadow:0 8px 32px rgba(0,0,0,0.15);}
@@ -136,8 +113,6 @@
   .student-picker-row:hover{background:var(--bg);}
   .student-picker-row.selected{background:var(--blue-light);color:var(--blue);font-weight:600;}
   .student-picker-empty{padding:14px;font-size:13px;color:var(--text-muted);text-align:center;}
-
-  /* SESSIONS (Home tab) */
   .sessions-toolbar-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:28px;margin-bottom:14px;flex-wrap:wrap;}
   .sessions-toolbar-row h2{font-size:16px;font-weight:800;}
   .session-list{display:flex;flex-direction:column;gap:10px;}
@@ -151,8 +126,6 @@
   .session-vis-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--blue-light);color:var(--blue);white-space:nowrap;}
   .session-delete{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;color:var(--text-muted);font-family:inherit;flex-shrink:0;transition:all 0.15s;}
   .session-delete:hover{border-color:var(--red);color:var(--red);background:var(--red-light);}
-
-  /* STUDENTS TABLE */
   .teacher-panel{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:24px;}
   .panel-tabs{display:flex;gap:8px;margin-bottom:16px;}
   .panel-tab{background:none;border:1px solid var(--border);border-radius:8px;padding:7px 16px;cursor:pointer;font-size:13px;font-family:inherit;color:var(--text-muted);}
@@ -167,8 +140,6 @@
   .status-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
   .status-pending{background:var(--orange-light);color:var(--orange);}
   .status-approved{background:var(--green-light);color:#085041;}
-
-  /* TOAST & SPINNER */
   .toast{position:fixed;bottom:24px;right:24px;background:#1a1a1a;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;display:none;align-items:center;gap:8px;z-index:1000;box-shadow:0 4px 16px rgba(0,0,0,0.2);}
   .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px;}
   @keyframes spin{to{transform:rotate(360deg);}}
@@ -178,7 +149,6 @@
 </head>
 <body>
 
-<!-- AUTH -->
 <div id="auth-page">
   <div class="auth-card">
     <div class="auth-logo">
@@ -215,7 +185,6 @@
   </div>
 </div>
 
-<!-- PENDING -->
 <div id="pending-page">
   <div class="pending-card">
     <div class="pending-badge">Awaiting Approval</div>
@@ -225,7 +194,6 @@
   </div>
 </div>
 
-<!-- MAIN APP -->
 <div id="app">
   <aside class="sidebar">
     <div class="sidebar-logo">
@@ -252,8 +220,6 @@
   </aside>
 
   <main class="main-content">
-
-    <!-- HOME -->
     <div id="home" class="page active">
       <div class="page-header">
         <h1>Welcome back 👋</h1>
@@ -266,46 +232,34 @@
       <div class="session-list" id="session-list"></div>
     </div>
 
-    <!-- SESSIONS / RECORDINGS EXPLORER -->
     <div id="sessions" class="page">
       <div class="page-header">
         <h1>📅 Sessions</h1>
         <p>Recorded lessons, organized by chapter.</p>
       </div>
-
-      <!-- Breadcrumb + toolbar -->
       <div class="explorer-toolbar">
-        <div class="explorer-toolbar-left">
-          <div class="breadcrumb" id="sessions-breadcrumb"></div>
-        </div>
+        <div class="explorer-toolbar-left"><div class="breadcrumb" id="sessions-breadcrumb"></div></div>
         <div class="explorer-toolbar-right" id="sessions-toolbar-btns"></div>
       </div>
-
-      <!-- Grid -->
       <div class="explorer-grid" id="sessions-explorer-grid"></div>
     </div>
 
-    <!-- PDFs -->
     <div id="books" class="page">
       <div class="page-header">
         <h1>📚 PDFs</h1>
         <p>Books and resources, organised by topic.</p>
       </div>
       <div class="explorer-toolbar">
-        <div class="explorer-toolbar-left">
-          <div class="breadcrumb" id="books-breadcrumb"></div>
-        </div>
+        <div class="explorer-toolbar-left"><div class="breadcrumb" id="books-breadcrumb"></div></div>
         <div class="explorer-toolbar-right" id="books-toolbar-btns"></div>
       </div>
       <div class="explorer-grid" id="books-explorer-grid"></div>
     </div>
 
-    <!-- ASSIGNMENTS -->
     <div id="homework" class="page">
       <div class="page-header"><h1>📝 Assignments</h1><p>Your homework and assignments.</p></div>
     </div>
 
-    <!-- STUDENTS -->
     <div id="students" class="page">
       <div class="page-header"><h1>👩‍🎓 Students</h1><p>Manage and approve your students.</p></div>
       <input class="search-bar" placeholder="🔍 Search students..." oninput="filterStudents(this.value)"/>
@@ -320,11 +274,10 @@
         </table>
       </div>
     </div>
-
   </main>
 </div>
 
-<!-- SESSION MODAL (Home tab) -->
+<!-- SESSION MODAL -->
 <div class="modal-overlay" id="session-modal">
   <div class="modal">
     <h3>📅 New session</h3>
@@ -354,7 +307,7 @@
   </div>
 </div>
 
-<!-- EXPLORER: NEW FOLDER MODAL -->
+<!-- EXPLORER FOLDER MODAL -->
 <div class="modal-overlay" id="explorer-folder-modal">
   <div class="modal">
     <h3 id="explorer-folder-modal-title">📁 New folder</h3>
@@ -382,7 +335,7 @@
   </div>
 </div>
 
-<!-- EXPLORER: NEW FILE MODAL -->
+<!-- EXPLORER FILE MODAL -->
 <div class="modal-overlay" id="explorer-file-modal">
   <div class="modal">
     <h3>🎬 Add recording</h3>
@@ -419,7 +372,7 @@
   </div>
 </div>
 
-<!-- PDF FOLDER MODAL (reuses explorer folder modal logic but for pdfs section) -->
+<!-- PDF FOLDER MODAL -->
 <div class="modal-overlay" id="pdf-folder-modal">
   <div class="modal">
     <h3 id="pdf-folder-modal-title">📁 New folder</h3>
@@ -491,7 +444,7 @@ function showApp(profile) {
   const initials = (profile.full_name || profile.email || '?').charAt(0).toUpperCase();
   document.getElementById('user-avatar').textContent = initials;
   document.getElementById('nav-name').textContent = profile.full_name || profile.email;
-  const yearLabel = profile.year_group ? ` · ${profile.year_group}` : '';
+  const yearLabel = (profile.role === 'student' && profile.year_group) ? ' · ' + profile.year_group : '';
   document.getElementById('nav-role').textContent = profile.role + yearLabel;
   if (profile.role === 'teacher') {
     document.getElementById('teacher-nav').style.display = 'flex';
@@ -581,9 +534,6 @@ function showPage(id) {
   if (id === 'books') loadExplorer('books');
 }
 
-/* ══════════════════════════════════════════════════════════
-   SESSIONS (Home tab)
-══════════════════════════════════════════════════════════ */
 let allSessionsRows = [];
 let selectedSessionVisibility = 'all';
 
@@ -603,17 +553,11 @@ function renderSessions(rows) {
     return;
   }
   list.innerHTML = rows.map(s => {
-    const visLabel = s.visibility === 'all' ? 'Everyone' : s.visibility === 'student' ? 'Specific student' : s.visibility;
+    const vl = s.visibility === 'all' ? 'Everyone' : s.visibility === 'student' ? 'Specific student' : s.visibility;
     const linkHtml = s.link ? `<a href="${s.link}" target="_blank" rel="noopener">🔗 Join link</a>` : '';
     const timeHtml = s.time_text ? `<span>🕒 ${s.time_text}</span>` : '';
     const deleteBtn = currentRole === 'teacher' ? `<button class="session-delete" onclick="deleteSession('${s.id}')">🗑 Delete</button>` : '';
-    return `<div class="session-card">
-      <div class="session-card-main">
-        <div class="session-card-name">${s.name}</div>
-        <div class="session-card-meta">${timeHtml}${linkHtml}<span class="session-vis-tag">${visLabel}</span></div>
-      </div>
-      ${deleteBtn}
-    </div>`;
+    return `<div class="session-card"><div class="session-card-main"><div class="session-card-name">${s.name}</div><div class="session-card-meta">${timeHtml}${linkHtml}<span class="session-vis-tag">${vl}</span></div></div>${deleteBtn}</div>`;
   }).join('');
 }
 
@@ -693,87 +637,46 @@ async function saveSession() {
   loadSessions();
 }
 
-/* ══════════════════════════════════════════════════════════
-   EXPLORER — infinite folder / file tree (Sessions tab)
-   
-   DB tables needed:
-     explorer_nodes (
-       id uuid pk,
-       section text not null default 'sessions',  -- 'sessions','pdfs','assignments'
-       parent_id uuid references explorer_nodes(id) on delete cascade,
-       type text not null check (type in ('folder','file')),
-       name text not null,
-       description text,
-       drive_link text,
-       visibility text default 'all',             -- only used on root folders
-       student_id uuid references profiles(id),
-       created_by uuid references profiles(id),
-       created_at timestamptz default now()
-     )
-══════════════════════════════════════════════════════════ */
-
-// explorerPaths: per-section navigation stack [{id,name}]
 let explorerPaths = { sessions: [], books: [] };
 let explorerCache = {};
 let activeExplorerSection = 'sessions';
-
 let efPickerStudents = [];
 let selectedEFStudentId = '';
 let selectedExplorerFolderVis = 'all';
 
-// Per-section config
 const EXPLORER_CONFIG = {
   sessions: {
-    rootLabel: '📅 Sessions',
-    gridId: 'sessions-explorer-grid',
-    breadcrumbId: 'sessions-breadcrumb',
-    toolbarId: 'sessions-toolbar-btns',
-    addFolderFn: 'openExplorerFolderModal',
-    addFileFn: 'openExplorerFileModal',
+    rootLabel: '📅 Sessions', gridId: 'sessions-explorer-grid',
+    breadcrumbId: 'sessions-breadcrumb', toolbarId: 'sessions-toolbar-btns',
+    addFolderFn: 'openExplorerFolderModal', addFileFn: 'openExplorerFileModal',
     addFileLabel: '🎬 Add recording',
     emptyRootMsg: 'No folders yet. Create one to get started.',
     emptyFolderMsg: 'This folder is empty.',
   },
   books: {
-    rootLabel: '📚 PDFs',
-    gridId: 'books-explorer-grid',
-    breadcrumbId: 'books-breadcrumb',
-    toolbarId: 'books-toolbar-btns',
-    addFolderFn: 'openPdfFolderModal',
-    addFileFn: 'openPdfFileModal',
+    rootLabel: '📚 PDFs', gridId: 'books-explorer-grid',
+    breadcrumbId: 'books-breadcrumb', toolbarId: 'books-toolbar-btns',
+    addFolderFn: 'openPdfFolderModal', addFileFn: 'openPdfFileModal',
     addFileLabel: '📄 Add PDF',
     emptyRootMsg: 'No folders yet. Create one to get started.',
     emptyFolderMsg: 'This folder is empty.',
   }
 };
 
-/* ── LOAD & RENDER ── */
-
 async function loadExplorer(section) {
   activeExplorerSection = section;
   const cfg = EXPLORER_CONFIG[section];
   const path = explorerPaths[section];
   const parentId = path.length === 0 ? null : path[path.length - 1].id;
-
   renderExplorerBreadcrumb(section);
   renderExplorerToolbar(section);
-
   const grid = document.getElementById(cfg.gridId);
   grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
-
-  let query = sb.from('explorer_nodes').select('*').eq('section', section).order('type', { ascending: true }).order('name', { ascending: true });
-  if (parentId === null) {
-    query = query.filter('parent_id', 'is', 'null');
-  } else {
-    query = query.eq('parent_id', parentId);
-  }
+  let query = sb.from('explorer_nodes').select('*').eq('section', section).order('type',{ascending:true}).order('name',{ascending:true});
+  if (parentId === null) query = query.filter('parent_id','is','null');
+  else query = query.eq('parent_id', parentId);
   const { data, error } = await query;
-
-  if (error) {
-    console.error('Explorer load error:', error);
-    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load content.<br><small style="font-size:11px">${error.message}</small></div>`;
-    return;
-  }
+  if (error) { grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load content.<br><small>${error.message}</small></div>`; return; }
   renderExplorerGrid(section, data || []);
 }
 
@@ -785,7 +688,7 @@ function renderExplorerBreadcrumb(section) {
   bc.innerHTML = items.map((item, idx) => {
     const isLast = idx === items.length - 1;
     const sep = idx < items.length - 1 ? `<span class="breadcrumb-sep">›</span>` : '';
-    return `<span class="breadcrumb-item${isLast ? ' current' : ''}" onclick="${isLast ? '' : `navToDepth('${section}',${idx})`}">${item.name}</span>${sep}`;
+    return `<span class="breadcrumb-item${isLast?' current':''}" onclick="${isLast?'':` navToDepth('${section}',${idx})`}">${item.name}</span>${sep}`;
   }).join('');
 }
 
@@ -795,9 +698,7 @@ function renderExplorerToolbar(section) {
   const btns = document.getElementById(cfg.toolbarId);
   if (currentRole !== 'teacher') { btns.innerHTML = ''; return; }
   if (path.length > 0) {
-    btns.innerHTML = `
-      <button class="btn-add-outline" onclick="${cfg.addFolderFn}()">📁 Add folder</button>
-      <button class="btn-add" onclick="${cfg.addFileFn}()">${cfg.addFileLabel}</button>`;
+    btns.innerHTML = `<button class="btn-add-outline" onclick="${cfg.addFolderFn}()">📁 Add folder</button><button class="btn-add" onclick="${cfg.addFileFn}()">${cfg.addFileLabel}</button>`;
   } else {
     btns.innerHTML = `<button class="btn-add" onclick="${cfg.addFolderFn}()">📁 Add folder</button>`;
   }
@@ -809,7 +710,7 @@ function renderExplorerGrid(section, nodes) {
   const grid = document.getElementById(cfg.gridId);
   if (!nodes || nodes.length === 0) {
     const isRoot = path.length === 0;
-    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">${isRoot ? '📁' : '📄'}</div>${isRoot ? cfg.emptyRootMsg : cfg.emptyFolderMsg}</div>`;
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">${isRoot?'📁':'📄'}</div>${isRoot?cfg.emptyRootMsg:cfg.emptyFolderMsg}</div>`;
     return;
   }
   grid.innerHTML = nodes.map(node => {
@@ -828,70 +729,32 @@ function visLabel(vis) {
 function renderFolderCard(node, section) {
   const isRoot = node.parent_id === null;
   const badge = isRoot ? `<div class="vis-badge">${visLabel(node.visibility)}</div>` : '';
-  const delBtn = currentRole === 'teacher'
-    ? `<button class="explorer-card-delete" onclick="event.stopPropagation();deleteExplorerNode('${node.id}','${section}')" title="Delete">🗑</button>`
-    : '';
-  return `<div class="explorer-card" onclick="openFolder('${section}','${node.id}','${escHtml(node.name)}')">
-    ${delBtn}
-    <div class="explorer-card-icon">📁</div>
-    <div class="explorer-card-name">${node.name}</div>
-    ${badge}
-  </div>`;
+  const delBtn = currentRole === 'teacher' ? `<button class="explorer-card-delete" onclick="event.stopPropagation();deleteExplorerNode('${node.id}','${section}')" title="Delete">🗑</button>` : '';
+  return `<div class="explorer-card" onclick="openFolder('${section}','${node.id}','${escHtml(node.name)}')">${delBtn}<div class="explorer-card-icon">📁</div><div class="explorer-card-name">${node.name}</div>${badge}</div>`;
 }
 
 function renderFileCard(node) {
-  const delBtn = currentRole === 'teacher'
-    ? `<button class="explorer-card-delete" onclick="deleteExplorerNode('${node.id}','sessions')" title="Delete">🗑</button>`
-    : '';
+  const delBtn = currentRole === 'teacher' ? `<button class="explorer-card-delete" onclick="deleteExplorerNode('${node.id}','sessions')" title="Delete">🗑</button>` : '';
   const desc = node.description ? `<div class="explorer-card-meta">${node.description}</div>` : '';
-  const link = node.drive_link
-    ? `<a class="file-watch-btn" href="${node.drive_link}" target="_blank" rel="noopener">▶ Watch</a>`
-    : '';
-  return `<div class="explorer-card file-card">
-    ${delBtn}
-    <div class="explorer-card-icon">🎞️</div>
-    <div class="explorer-card-name">${node.name}</div>
-    ${desc}
-    ${link}
-  </div>`;
+  const link = node.drive_link ? `<a class="file-watch-btn" href="${node.drive_link}" target="_blank" rel="noopener">▶ Watch</a>` : '';
+  return `<div class="explorer-card file-card">${delBtn}<div class="explorer-card-icon">🎞️</div><div class="explorer-card-name">${node.name}</div>${desc}${link}</div>`;
 }
 
 function renderPdfCard(node) {
-  const delBtn = currentRole === 'teacher'
-    ? `<button class="explorer-card-delete" onclick="deletePdfNode('${node.id}')" title="Delete">🗑</button>`
-    : '';
+  const delBtn = currentRole === 'teacher' ? `<button class="explorer-card-delete" onclick="deletePdfNode('${node.id}')" title="Delete">🗑</button>` : '';
   const desc = node.description ? `<div class="explorer-card-meta">${node.description}</div>` : '';
-  const link = node.drive_link
-    ? `<a class="file-watch-btn" href="${node.drive_link}" target="_blank" rel="noopener">📖 Open PDF</a>`
-    : '';
-  return `<div class="explorer-card file-card">
-    ${delBtn}
-    <div class="explorer-card-icon">📄</div>
-    <div class="explorer-card-name">${node.name}</div>
-    ${desc}
-    ${link}
-  </div>`;
+  const link = node.drive_link ? `<a class="file-watch-btn" href="${node.drive_link}" target="_blank" rel="noopener">📖 Open PDF</a>` : '';
+  return `<div class="explorer-card file-card">${delBtn}<div class="explorer-card-icon">📄</div><div class="explorer-card-name">${node.name}</div>${desc}${link}</div>`;
 }
 
 function escHtml(str) { return (str||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;'); }
 
-/* ── NAVIGATION ── */
-
-function openFolder(section, id, name) {
-  explorerPaths[section].push({ id, name });
-  loadExplorer(section);
-}
+function openFolder(section, id, name) { explorerPaths[section].push({ id, name }); loadExplorer(section); }
 
 function navToDepth(section, idx) {
-  if (idx === 0) {
-    explorerPaths[section] = [];
-  } else {
-    explorerPaths[section] = explorerPaths[section].slice(0, idx);
-  }
+  explorerPaths[section] = idx === 0 ? [] : explorerPaths[section].slice(0, idx);
   loadExplorer(section);
 }
-
-/* ── DELETE ── */
 
 async function deleteExplorerNode(id, section) {
   if (!confirm('Delete this item and everything inside it?')) return;
@@ -903,19 +766,15 @@ async function deleteExplorerNode(id, section) {
 
 async function deletePdfNode(id) {
   if (!confirm('Delete this PDF?')) return;
-  // Also delete the file from storage if it has a storage_path
   const { data: node } = await sb.from('explorer_nodes').select('storage_path').eq('id', id).single();
-  if (node && node.storage_path) {
-    await sb.storage.from('astar-files').remove([node.storage_path]);
-  }
+  if (node && node.storage_path) await sb.storage.from('astar-files').remove([node.storage_path]);
   const { error } = await sb.from('explorer_nodes').delete().eq('id', id);
   if (error) { toast('Error: ' + error.message); return; }
   toast('PDF deleted.');
   loadExplorer('books');
 }
 
-/* ── FOLDER MODAL ── */
-
+/* FOLDER MODAL - SESSIONS */
 function openExplorerFolderModal() {
   selectedExplorerFolderVis = 'all';
   selectedEFStudentId = '';
@@ -923,8 +782,7 @@ function openExplorerFolderModal() {
   document.getElementById('ef-student-search').value = '';
   document.getElementById('ef-student-id').value = '';
   document.getElementById('explorer-folder-student-picker').style.display = 'none';
-  // Only show visibility picker at root level
-  const isRoot = explorerPath.length === 0;
+  const isRoot = explorerPaths['sessions'].length === 0;
   document.getElementById('explorer-folder-vis-group').style.display = isRoot ? 'block' : 'none';
   document.getElementById('explorer-folder-modal-title').textContent = isRoot ? '📁 New folder' : '📁 New subfolder';
   document.querySelectorAll('#explorer-folder-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === 'all'));
@@ -974,10 +832,7 @@ async function saveExplorerFolder() {
   if (isRoot && selectedExplorerFolderVis === 'student' && !selectedEFStudentId) { toast('Please choose a student.'); return; }
   const parentId = isRoot ? null : path[path.length - 1].id;
   const { error } = await sb.from('explorer_nodes').insert({
-    section: 'sessions',
-    parent_id: parentId,
-    type: 'folder',
-    name,
+    section: 'sessions', parent_id: parentId, type: 'folder', name,
     visibility: isRoot ? selectedExplorerFolderVis : null,
     student_id: (isRoot && selectedExplorerFolderVis === 'student') ? selectedEFStudentId : null,
     created_by: currentUser.id
@@ -988,8 +843,7 @@ async function saveExplorerFolder() {
   loadExplorer('sessions');
 }
 
-/* ── FILE MODAL ── */
-
+/* FILE MODAL - SESSIONS */
 function openExplorerFileModal() {
   document.getElementById('explorer-file-name').value = '';
   document.getElementById('explorer-file-desc').value = '';
@@ -1009,13 +863,8 @@ async function saveExplorerFile() {
   if (path.length === 0) { toast('Please open a folder first.'); return; }
   const parentId = path[path.length - 1].id;
   const { error } = await sb.from('explorer_nodes').insert({
-    section: 'sessions',
-    parent_id: parentId,
-    type: 'file',
-    name,
-    description: desc || null,
-    drive_link: link,
-    created_by: currentUser.id
+    section: 'sessions', parent_id: parentId, type: 'file', name,
+    description: desc || null, drive_link: link, created_by: currentUser.id
   });
   if (error) { toast('Error: ' + error.message); return; }
   closeExplorerFileModal();
@@ -1023,15 +872,11 @@ async function saveExplorerFile() {
   loadExplorer('sessions');
 }
 
-/* ══════════════════════════════════════════════════════════
-   PDF EXPLORER (Books tab)
-══════════════════════════════════════════════════════════ */
-
+/* PDF EXPLORER */
 let selectedPdfFolderVis = 'all';
 let pfPickerStudents = [];
 let selectedPFStudentId = '';
 
-/* ── PDF FOLDER MODAL ── */
 function openPdfFolderModal() {
   selectedPdfFolderVis = 'all';
   selectedPFStudentId = '';
@@ -1089,10 +934,7 @@ async function savePdfFolder() {
   if (isRoot && selectedPdfFolderVis === 'student' && !selectedPFStudentId) { toast('Please choose a student.'); return; }
   const parentId = isRoot ? null : path[path.length - 1].id;
   const { error } = await sb.from('explorer_nodes').insert({
-    section: 'books',
-    parent_id: parentId,
-    type: 'folder',
-    name,
+    section: 'books', parent_id: parentId, type: 'folder', name,
     visibility: isRoot ? selectedPdfFolderVis : null,
     student_id: (isRoot && selectedPdfFolderVis === 'student') ? selectedPFStudentId : null,
     created_by: currentUser.id
@@ -1103,7 +945,6 @@ async function savePdfFolder() {
   loadExplorer('books');
 }
 
-/* ── PDF FILE MODAL ── */
 function openPdfFileModal() {
   document.getElementById('pdf-file-name').value = '';
   document.getElementById('pdf-file-desc').value = '';
@@ -1126,63 +967,40 @@ async function savePdfFile() {
   const path = explorerPaths['books'];
   if (path.length === 0) { toast('Please open a folder first.'); return; }
   const parentId = path[path.length - 1].id;
-
-  // Show progress
   const btn = document.getElementById('pdf-save-btn');
-  btn.disabled = true;
-  btn.textContent = 'Uploading...';
+  btn.disabled = true; btn.textContent = 'Uploading...';
   document.getElementById('pdf-upload-progress').style.display = 'block';
   document.getElementById('pdf-progress-bar').style.width = '30%';
-
-  // Upload to Supabase Storage
   const ext = file.name.split('.').pop();
   const storagePath = `pdfs/${currentUser.id}/${Date.now()}.${ext}`;
   const { error: uploadError } = await sb.storage.from('astar-files').upload(storagePath, file, { contentType: 'application/pdf' });
-
   if (uploadError) {
     toast('Upload failed: ' + uploadError.message);
     btn.disabled = false; btn.textContent = 'Upload PDF';
     document.getElementById('pdf-upload-progress').style.display = 'none';
     return;
   }
-
   document.getElementById('pdf-progress-bar').style.width = '80%';
-
-  // Get public URL
   const { data: urlData } = sb.storage.from('astar-files').getPublicUrl(storagePath);
-  const publicUrl = urlData.publicUrl;
-
   document.getElementById('pdf-progress-bar').style.width = '100%';
   document.getElementById('pdf-progress-label').textContent = 'Saving...';
-
-  // Save node to DB
   const { error: dbError } = await sb.from('explorer_nodes').insert({
-    section: 'books',
-    parent_id: parentId,
-    type: 'file',
-    name,
-    description: desc || null,
-    drive_link: publicUrl,
-    storage_path: storagePath,
-    created_by: currentUser.id
+    section: 'books', parent_id: parentId, type: 'file', name,
+    description: desc || null, drive_link: urlData.publicUrl,
+    storage_path: storagePath, created_by: currentUser.id
   });
-
   if (dbError) {
     toast('Error saving: ' + dbError.message);
     btn.disabled = false; btn.textContent = 'Upload PDF';
     document.getElementById('pdf-upload-progress').style.display = 'none';
     return;
   }
-
   closePdfFileModal();
   toast('PDF uploaded! 📄');
   loadExplorer('books');
 }
 
-/* ══════════════════════════════════════════════════════════
-   STUDENTS
-══════════════════════════════════════════════════════════ */
-
+/* STUDENTS */
 function switchStudentTab(tab, event) {
   currentStudentTab = tab;
   document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
@@ -1211,11 +1029,9 @@ function renderStudents(students) {
       <td>${s.email}</td>
       <td>${yearBadge}</td>
       <td><span class="status-badge status-${s.status}">${s.status}</span></td>
-      <td>
-        ${s.status === 'pending'
-          ? `<button class="btn-approve" onclick="approveStudent('${s.id}')">✅ Approve</button>
-             <button class="btn-reject" onclick="rejectStudent('${s.id}')">❌ Reject</button>`
-          : `<button class="btn-small" onclick="rejectStudent('${s.id}')">Remove</button>`}
+      <td>${s.status === 'pending'
+        ? `<button class="btn-approve" onclick="approveStudent('${s.id}')">✅ Approve</button><button class="btn-reject" onclick="rejectStudent('${s.id}')">❌ Reject</button>`
+        : `<button class="btn-small" onclick="rejectStudent('${s.id}')">Remove</button>`}
       </td>
     </tr>`;
   }).join('');
@@ -1241,7 +1057,6 @@ async function rejectStudent(id) {
   loadStudents();
 }
 
-/* ── TOAST ── */
 function toast(msg) {
   const t = document.getElementById('toast');
   document.getElementById('toast-msg').textContent = msg;
