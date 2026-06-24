@@ -566,17 +566,9 @@ function showApp(profile) {
   document.getElementById('app').style.display = 'flex';
   const initials = (profile.full_name || profile.email || '?').charAt(0).toUpperCase();
   document.getElementById('user-avatar').textContent = initials;
-  document.getElementById('profile-avatar').textContent = initials;
   document.getElementById('nav-name').textContent = profile.full_name || profile.email;
   const yearLabel = (profile.role === 'student' && profile.year_group) ? ' · ' + profile.year_group : '';
   document.getElementById('nav-role').textContent = profile.role + yearLabel;
-  // Profile page
-  document.getElementById('profile-name').textContent = profile.full_name || '—';
-  document.getElementById('profile-email').textContent = profile.email || '—';
-  document.getElementById('profile-role').textContent = profile.role;
-  document.getElementById('profile-year').textContent = profile.year_group || '—';
-  document.getElementById('profile-status').textContent = profile.status || '—';
-  if (profile.role !== 'student') document.getElementById('profile-year-row').style.display = 'none';
   if (profile.role === 'teacher') {
     document.getElementById('teacher-nav').style.display = 'flex';
     document.getElementById('add-session-btn').style.display = 'inline-flex';
@@ -1264,7 +1256,7 @@ async function saveEditNode() {
   loadExplorer(section);
 }
 
-
+function toast(msg) {
   const t=document.getElementById('toast');
   document.getElementById('toast-msg').textContent=msg;
   t.style.display='flex';
