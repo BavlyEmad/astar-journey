@@ -287,7 +287,17 @@
 
     <!-- PDFs -->
     <div id="books" class="page">
-      <div class="page-header"><h1>📚 PDFs</h1><p>Books and resources.</p></div>
+      <div class="page-header">
+        <h1>📚 PDFs</h1>
+        <p>Books and resources, organised by topic.</p>
+      </div>
+      <div class="explorer-toolbar">
+        <div class="explorer-toolbar-left">
+          <div class="breadcrumb" id="books-breadcrumb"></div>
+        </div>
+        <div class="explorer-toolbar-right" id="books-toolbar-btns"></div>
+      </div>
+      <div class="explorer-grid" id="books-explorer-grid"></div>
     </div>
 
     <!-- ASSIGNMENTS -->
@@ -386,6 +396,57 @@
   </div>
 </div>
 
+<!-- PDF UPLOAD MODAL -->
+<div class="modal-overlay" id="pdf-file-modal">
+  <div class="modal">
+    <h3>📄 Add PDF</h3>
+    <div class="form-group"><label>Title</label><input type="text" id="pdf-file-name" placeholder="e.g. Cambridge AS Pure Mathematics"/></div>
+    <div class="form-group"><label>Description <span style="font-weight:400;text-transform:none;font-size:11px">(optional)</span></label><input type="text" id="pdf-file-desc" placeholder="A short note about this PDF"/></div>
+    <div class="form-group">
+      <label>PDF file</label>
+      <input type="file" id="pdf-file-input" accept=".pdf" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;font-family:inherit;background:var(--white);cursor:pointer;"/>
+    </div>
+    <div id="pdf-upload-progress" style="display:none;margin-top:8px;">
+      <div style="background:var(--border);border-radius:99px;height:6px;overflow:hidden;">
+        <div id="pdf-progress-bar" style="height:100%;background:var(--blue);width:0%;transition:width 0.2s;border-radius:99px;"></div>
+      </div>
+      <p id="pdf-progress-label" style="font-size:12px;color:var(--text-muted);margin-top:6px;text-align:center;">Uploading...</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closePdfFileModal()">Cancel</button>
+      <button class="btn-save" id="pdf-save-btn" onclick="savePdfFile()">Upload PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- PDF FOLDER MODAL (reuses explorer folder modal logic but for pdfs section) -->
+<div class="modal-overlay" id="pdf-folder-modal">
+  <div class="modal">
+    <h3 id="pdf-folder-modal-title">📁 New folder</h3>
+    <div class="form-group"><label>Folder name</label><input type="text" id="pdf-folder-name" placeholder="e.g. Pure Mathematics"/></div>
+    <div class="form-group" id="pdf-folder-vis-group">
+      <label>Visible to</label>
+      <div class="visibility-options">
+        <button class="vis-btn selected" data-vis="all" onclick="selectPdfFolderVis('all')">Everyone</button>
+        <button class="vis-btn" data-vis="OL" onclick="selectPdfFolderVis('OL')">OL only</button>
+        <button class="vis-btn" data-vis="AS" onclick="selectPdfFolderVis('AS')">AS only</button>
+        <button class="vis-btn" data-vis="A2" onclick="selectPdfFolderVis('A2')">A2 only</button>
+        <button class="vis-btn" data-vis="student" onclick="selectPdfFolderVis('student')">Specific student</button>
+      </div>
+    </div>
+    <div class="form-group" id="pdf-folder-student-picker" style="display:none">
+      <label>Choose student</label>
+      <input type="text" class="search-bar" id="pf-student-search" placeholder="🔍 Search..." style="margin-bottom:8px" oninput="filterPFStudentPicker(this.value)"/>
+      <div id="pf-student-list" class="student-picker-list"></div>
+      <input type="hidden" id="pf-student-id" value=""/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closePdfFolderModal()">Cancel</button>
+      <button class="btn-save" onclick="savePdfFolder()">Create folder</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast">✅ <span id="toast-msg"></span></div>
 
 <script>
@@ -438,7 +499,7 @@ function showApp(profile) {
     document.getElementById('home-subtitle').textContent = 'Manage sessions, upload materials, and approve students.';
   }
   loadSessions();
-  loadExplorer();
+  loadExplorer('sessions');
 }
 
 function showError(msg) { const el = document.getElementById('auth-error'); el.textContent = msg; el.style.display = 'block'; }
@@ -493,7 +554,7 @@ async function signup() {
 async function logout() {
   await sb.auth.signOut();
   currentUser = null; currentRole = null; currentYearGroup = null;
-  explorerPath = []; explorerCache = {};
+  explorerPaths = { sessions: [], books: [] }; explorerCache = {};
   document.getElementById('app').style.display = 'none';
   document.getElementById('app').classList.remove('visible');
   document.getElementById('pending-page').style.display = 'none';
@@ -516,7 +577,8 @@ function showPage(id) {
   if (navItems[idx]) navItems[idx].classList.add('active');
   if (id === 'students') loadStudents();
   if (id === 'home') loadSessions();
-  if (id === 'sessions') loadExplorer();
+  if (id === 'sessions') loadExplorer('sessions');
+  if (id === 'books') loadExplorer('books');
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -650,24 +712,56 @@ async function saveSession() {
      )
 ══════════════════════════════════════════════════════════ */
 
-// explorerPath: array of {id, name} — null id = root
-let explorerPath = [];
-let explorerCache = {};  // parentId -> [{node}]
+// explorerPaths: per-section navigation stack [{id,name}]
+let explorerPaths = { sessions: [], books: [] };
+let explorerCache = {};
+let activeExplorerSection = 'sessions';
+
 let efPickerStudents = [];
 let selectedEFStudentId = '';
 let selectedExplorerFolderVis = 'all';
 
+// Per-section config
+const EXPLORER_CONFIG = {
+  sessions: {
+    rootLabel: '📅 Sessions',
+    gridId: 'sessions-explorer-grid',
+    breadcrumbId: 'sessions-breadcrumb',
+    toolbarId: 'sessions-toolbar-btns',
+    addFolderFn: 'openExplorerFolderModal',
+    addFileFn: 'openExplorerFileModal',
+    addFileLabel: '🎬 Add recording',
+    emptyRootMsg: 'No folders yet. Create one to get started.',
+    emptyFolderMsg: 'This folder is empty.',
+  },
+  books: {
+    rootLabel: '📚 PDFs',
+    gridId: 'books-explorer-grid',
+    breadcrumbId: 'books-breadcrumb',
+    toolbarId: 'books-toolbar-btns',
+    addFolderFn: 'openPdfFolderModal',
+    addFileFn: 'openPdfFileModal',
+    addFileLabel: '📄 Add PDF',
+    emptyRootMsg: 'No folders yet. Create one to get started.',
+    emptyFolderMsg: 'This folder is empty.',
+  }
+};
+
 /* ── LOAD & RENDER ── */
 
-async function loadExplorer() {
-  const parentId = explorerPath.length === 0 ? null : explorerPath[explorerPath.length - 1].id;
-  renderExplorerBreadcrumb();
-  renderExplorerToolbar(parentId);
+async function loadExplorer(section) {
+  activeExplorerSection = section;
+  const cfg = EXPLORER_CONFIG[section];
+  const path = explorerPaths[section];
+  const parentId = path.length === 0 ? null : path[path.length - 1].id;
 
-  const grid = document.getElementById('sessions-explorer-grid');
+  renderExplorerBreadcrumb(section);
+  renderExplorerToolbar(section);
+
+  const grid = document.getElementById(cfg.gridId);
   grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
 
-  let query = sb.from('explorer_nodes').select('*').eq('section', 'sessions').order('type', { ascending: true }).order('name', { ascending: true });
+  let query = sb.from('explorer_nodes').select('*').eq('section', section).order('type', { ascending: true }).order('name', { ascending: true });
   if (parentId === null) {
     query = query.filter('parent_id', 'is', 'null');
   } else {
@@ -680,43 +774,47 @@ async function loadExplorer() {
     grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load content.<br><small style="font-size:11px">${error.message}</small></div>`;
     return;
   }
-  explorerCache[parentId || 'root'] = data || [];
-  renderExplorerGrid(data || []);
+  renderExplorerGrid(section, data || []);
 }
 
-function renderExplorerBreadcrumb() {
-  const bc = document.getElementById('sessions-breadcrumb');
-  const items = [{ id: null, name: '📅 Sessions' }, ...explorerPath];
+function renderExplorerBreadcrumb(section) {
+  const cfg = EXPLORER_CONFIG[section];
+  const path = explorerPaths[section];
+  const bc = document.getElementById(cfg.breadcrumbId);
+  const items = [{ id: null, name: cfg.rootLabel }, ...path];
   bc.innerHTML = items.map((item, idx) => {
     const isLast = idx === items.length - 1;
     const sep = idx < items.length - 1 ? `<span class="breadcrumb-sep">›</span>` : '';
-    return `<span class="breadcrumb-item${isLast ? ' current' : ''}" onclick="${isLast ? '' : `navToDepth(${idx})`}">${item.name}</span>${sep}`;
+    return `<span class="breadcrumb-item${isLast ? ' current' : ''}" onclick="${isLast ? '' : `navToDepth('${section}',${idx})`}">${item.name}</span>${sep}`;
   }).join('');
 }
 
-function renderExplorerToolbar(parentId) {
-  const btns = document.getElementById('sessions-toolbar-btns');
+function renderExplorerToolbar(section) {
+  const cfg = EXPLORER_CONFIG[section];
+  const path = explorerPaths[section];
+  const btns = document.getElementById(cfg.toolbarId);
   if (currentRole !== 'teacher') { btns.innerHTML = ''; return; }
-  // Inside a folder: show "+ Add folder" and "+ Add recording"
-  // At root: show "+ Add folder" only (can't add files at root)
-  if (explorerPath.length > 0) {
+  if (path.length > 0) {
     btns.innerHTML = `
-      <button class="btn-add-outline" onclick="openExplorerFolderModal()">📁 Add folder</button>
-      <button class="btn-add" onclick="openExplorerFileModal()">🎬 Add recording</button>`;
+      <button class="btn-add-outline" onclick="${cfg.addFolderFn}()">📁 Add folder</button>
+      <button class="btn-add" onclick="${cfg.addFileFn}()">${cfg.addFileLabel}</button>`;
   } else {
-    btns.innerHTML = `<button class="btn-add" onclick="openExplorerFolderModal()">📁 Add folder</button>`;
+    btns.innerHTML = `<button class="btn-add" onclick="${cfg.addFolderFn}()">📁 Add folder</button>`;
   }
 }
 
-function renderExplorerGrid(nodes) {
-  const grid = document.getElementById('sessions-explorer-grid');
+function renderExplorerGrid(section, nodes) {
+  const cfg = EXPLORER_CONFIG[section];
+  const path = explorerPaths[section];
+  const grid = document.getElementById(cfg.gridId);
   if (!nodes || nodes.length === 0) {
-    const isRoot = explorerPath.length === 0;
-    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">${isRoot ? '📁' : '🎬'}</div>${isRoot ? 'No folders yet. Create one to get started.' : 'This folder is empty.'}</div>`;
+    const isRoot = path.length === 0;
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">${isRoot ? '📁' : '📄'}</div>${isRoot ? cfg.emptyRootMsg : cfg.emptyFolderMsg}</div>`;
     return;
   }
   grid.innerHTML = nodes.map(node => {
-    if (node.type === 'folder') return renderFolderCard(node);
+    if (node.type === 'folder') return renderFolderCard(node, section);
+    if (section === 'books') return renderPdfCard(node);
     return renderFileCard(node);
   }).join('');
 }
@@ -727,13 +825,13 @@ function visLabel(vis) {
   return vis;
 }
 
-function renderFolderCard(node) {
+function renderFolderCard(node, section) {
   const isRoot = node.parent_id === null;
   const badge = isRoot ? `<div class="vis-badge">${visLabel(node.visibility)}</div>` : '';
   const delBtn = currentRole === 'teacher'
-    ? `<button class="explorer-card-delete" onclick="event.stopPropagation();deleteExplorerNode('${node.id}')" title="Delete">🗑</button>`
+    ? `<button class="explorer-card-delete" onclick="event.stopPropagation();deleteExplorerNode('${node.id}','${section}')" title="Delete">🗑</button>`
     : '';
-  return `<div class="explorer-card" onclick="openFolder('${node.id}','${escHtml(node.name)}')">
+  return `<div class="explorer-card" onclick="openFolder('${section}','${node.id}','${escHtml(node.name)}')">
     ${delBtn}
     <div class="explorer-card-icon">📁</div>
     <div class="explorer-card-name">${node.name}</div>
@@ -743,7 +841,7 @@ function renderFolderCard(node) {
 
 function renderFileCard(node) {
   const delBtn = currentRole === 'teacher'
-    ? `<button class="explorer-card-delete" onclick="deleteExplorerNode('${node.id}')" title="Delete">🗑</button>`
+    ? `<button class="explorer-card-delete" onclick="deleteExplorerNode('${node.id}','sessions')" title="Delete">🗑</button>`
     : '';
   const desc = node.description ? `<div class="explorer-card-meta">${node.description}</div>` : '';
   const link = node.drive_link
@@ -758,32 +856,62 @@ function renderFileCard(node) {
   </div>`;
 }
 
+function renderPdfCard(node) {
+  const delBtn = currentRole === 'teacher'
+    ? `<button class="explorer-card-delete" onclick="deletePdfNode('${node.id}')" title="Delete">🗑</button>`
+    : '';
+  const desc = node.description ? `<div class="explorer-card-meta">${node.description}</div>` : '';
+  const link = node.drive_link
+    ? `<a class="file-watch-btn" href="${node.drive_link}" target="_blank" rel="noopener">📖 Open PDF</a>`
+    : '';
+  return `<div class="explorer-card file-card">
+    ${delBtn}
+    <div class="explorer-card-icon">📄</div>
+    <div class="explorer-card-name">${node.name}</div>
+    ${desc}
+    ${link}
+  </div>`;
+}
+
 function escHtml(str) { return (str||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;'); }
 
 /* ── NAVIGATION ── */
 
-function openFolder(id, name) {
-  explorerPath.push({ id, name });
-  loadExplorer();
+function openFolder(section, id, name) {
+  explorerPaths[section].push({ id, name });
+  loadExplorer(section);
 }
 
-function navToDepth(idx) {
+function navToDepth(section, idx) {
   if (idx === 0) {
-    explorerPath = [];
+    explorerPaths[section] = [];
   } else {
-    explorerPath = explorerPath.slice(0, idx);
+    explorerPaths[section] = explorerPaths[section].slice(0, idx);
   }
-  loadExplorer();
+  loadExplorer(section);
 }
 
 /* ── DELETE ── */
 
-async function deleteExplorerNode(id) {
+async function deleteExplorerNode(id, section) {
   if (!confirm('Delete this item and everything inside it?')) return;
   const { error } = await sb.from('explorer_nodes').delete().eq('id', id);
   if (error) { toast('Error: ' + error.message); return; }
   toast('Deleted.');
-  loadExplorer();
+  loadExplorer(section || activeExplorerSection);
+}
+
+async function deletePdfNode(id) {
+  if (!confirm('Delete this PDF?')) return;
+  // Also delete the file from storage if it has a storage_path
+  const { data: node } = await sb.from('explorer_nodes').select('storage_path').eq('id', id).single();
+  if (node && node.storage_path) {
+    await sb.storage.from('astar-files').remove([node.storage_path]);
+  }
+  const { error } = await sb.from('explorer_nodes').delete().eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('PDF deleted.');
+  loadExplorer('books');
 }
 
 /* ── FOLDER MODAL ── */
@@ -841,9 +969,10 @@ function pickEFStudent(id) {
 async function saveExplorerFolder() {
   const name = document.getElementById('explorer-folder-name').value.trim();
   if (!name) { toast('Please enter a folder name.'); return; }
-  const isRoot = explorerPath.length === 0;
+  const path = explorerPaths['sessions'];
+  const isRoot = path.length === 0;
   if (isRoot && selectedExplorerFolderVis === 'student' && !selectedEFStudentId) { toast('Please choose a student.'); return; }
-  const parentId = isRoot ? null : explorerPath[explorerPath.length - 1].id;
+  const parentId = isRoot ? null : path[path.length - 1].id;
   const { error } = await sb.from('explorer_nodes').insert({
     section: 'sessions',
     parent_id: parentId,
@@ -856,7 +985,7 @@ async function saveExplorerFolder() {
   if (error) { toast('Error: ' + error.message); return; }
   closeExplorerFolderModal();
   toast('Folder created! 📁');
-  loadExplorer(); // real-time refresh — no reload needed
+  loadExplorer('sessions');
 }
 
 /* ── FILE MODAL ── */
@@ -876,8 +1005,9 @@ async function saveExplorerFile() {
   if (!name) { toast('Please enter a lesson name.'); return; }
   if (!link) { toast('Please enter a Google Drive link.'); return; }
   if (!/^https?:\/\//i.test(link)) link = 'https://' + link;
-  if (explorerPath.length === 0) { toast('Please open a folder first.'); return; }
-  const parentId = explorerPath[explorerPath.length - 1].id;
+  const path = explorerPaths['sessions'];
+  if (path.length === 0) { toast('Please open a folder first.'); return; }
+  const parentId = path[path.length - 1].id;
   const { error } = await sb.from('explorer_nodes').insert({
     section: 'sessions',
     parent_id: parentId,
@@ -890,7 +1020,163 @@ async function saveExplorerFile() {
   if (error) { toast('Error: ' + error.message); return; }
   closeExplorerFileModal();
   toast('Recording added! 🎬');
-  loadExplorer(); // real-time refresh — no reload needed
+  loadExplorer('sessions');
+}
+
+/* ══════════════════════════════════════════════════════════
+   PDF EXPLORER (Books tab)
+══════════════════════════════════════════════════════════ */
+
+let selectedPdfFolderVis = 'all';
+let pfPickerStudents = [];
+let selectedPFStudentId = '';
+
+/* ── PDF FOLDER MODAL ── */
+function openPdfFolderModal() {
+  selectedPdfFolderVis = 'all';
+  selectedPFStudentId = '';
+  document.getElementById('pdf-folder-name').value = '';
+  document.getElementById('pf-student-search').value = '';
+  document.getElementById('pf-student-id').value = '';
+  document.getElementById('pdf-folder-student-picker').style.display = 'none';
+  const isRoot = explorerPaths['books'].length === 0;
+  document.getElementById('pdf-folder-vis-group').style.display = isRoot ? 'block' : 'none';
+  document.getElementById('pdf-folder-modal-title').textContent = isRoot ? '📁 New folder' : '📁 New subfolder';
+  document.querySelectorAll('#pdf-folder-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === 'all'));
+  if (isRoot) loadStudentsForPFPicker();
+  document.getElementById('pdf-folder-modal').classList.add('open');
+}
+function closePdfFolderModal() { document.getElementById('pdf-folder-modal').classList.remove('open'); }
+
+function selectPdfFolderVis(vis) {
+  selectedPdfFolderVis = vis;
+  document.querySelectorAll('#pdf-folder-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === vis));
+  document.getElementById('pdf-folder-student-picker').style.display = vis === 'student' ? 'block' : 'none';
+}
+
+async function loadStudentsForPFPicker() {
+  const { data } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name');
+  pfPickerStudents = data || [];
+  renderPFStudentPicker(pfPickerStudents);
+}
+
+function renderPFStudentPicker(students) {
+  const list = document.getElementById('pf-student-list');
+  if (!students || students.length === 0) { list.innerHTML = '<div class="student-picker-empty">No approved students found</div>'; return; }
+  list.innerHTML = students.map(s => {
+    const label = `${s.full_name || s.email}${s.year_group ? ' (' + s.year_group + ')' : ''}`;
+    return `<div class="student-picker-row${s.id === selectedPFStudentId ? ' selected' : ''}" onclick="pickPFStudent('${s.id}')">${label}</div>`;
+  }).join('');
+}
+
+function filterPFStudentPicker(query) {
+  const q = query.toLowerCase();
+  renderPFStudentPicker(pfPickerStudents.filter(s =>
+    (s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q)));
+}
+
+function pickPFStudent(id) {
+  selectedPFStudentId = id;
+  document.getElementById('pf-student-id').value = id;
+  renderPFStudentPicker(pfPickerStudents);
+}
+
+async function savePdfFolder() {
+  const name = document.getElementById('pdf-folder-name').value.trim();
+  if (!name) { toast('Please enter a folder name.'); return; }
+  const path = explorerPaths['books'];
+  const isRoot = path.length === 0;
+  if (isRoot && selectedPdfFolderVis === 'student' && !selectedPFStudentId) { toast('Please choose a student.'); return; }
+  const parentId = isRoot ? null : path[path.length - 1].id;
+  const { error } = await sb.from('explorer_nodes').insert({
+    section: 'books',
+    parent_id: parentId,
+    type: 'folder',
+    name,
+    visibility: isRoot ? selectedPdfFolderVis : null,
+    student_id: (isRoot && selectedPdfFolderVis === 'student') ? selectedPFStudentId : null,
+    created_by: currentUser.id
+  });
+  if (error) { toast('Error: ' + error.message); return; }
+  closePdfFolderModal();
+  toast('Folder created! 📁');
+  loadExplorer('books');
+}
+
+/* ── PDF FILE MODAL ── */
+function openPdfFileModal() {
+  document.getElementById('pdf-file-name').value = '';
+  document.getElementById('pdf-file-desc').value = '';
+  document.getElementById('pdf-file-input').value = '';
+  document.getElementById('pdf-upload-progress').style.display = 'none';
+  document.getElementById('pdf-progress-bar').style.width = '0%';
+  document.getElementById('pdf-save-btn').disabled = false;
+  document.getElementById('pdf-save-btn').textContent = 'Upload PDF';
+  document.getElementById('pdf-file-modal').classList.add('open');
+}
+function closePdfFileModal() { document.getElementById('pdf-file-modal').classList.remove('open'); }
+
+async function savePdfFile() {
+  const name = document.getElementById('pdf-file-name').value.trim();
+  const desc = document.getElementById('pdf-file-desc').value.trim();
+  const fileInput = document.getElementById('pdf-file-input');
+  const file = fileInput.files[0];
+  if (!name) { toast('Please enter a title.'); return; }
+  if (!file) { toast('Please choose a PDF file.'); return; }
+  const path = explorerPaths['books'];
+  if (path.length === 0) { toast('Please open a folder first.'); return; }
+  const parentId = path[path.length - 1].id;
+
+  // Show progress
+  const btn = document.getElementById('pdf-save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Uploading...';
+  document.getElementById('pdf-upload-progress').style.display = 'block';
+  document.getElementById('pdf-progress-bar').style.width = '30%';
+
+  // Upload to Supabase Storage
+  const ext = file.name.split('.').pop();
+  const storagePath = `pdfs/${currentUser.id}/${Date.now()}.${ext}`;
+  const { error: uploadError } = await sb.storage.from('astar-files').upload(storagePath, file, { contentType: 'application/pdf' });
+
+  if (uploadError) {
+    toast('Upload failed: ' + uploadError.message);
+    btn.disabled = false; btn.textContent = 'Upload PDF';
+    document.getElementById('pdf-upload-progress').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('pdf-progress-bar').style.width = '80%';
+
+  // Get public URL
+  const { data: urlData } = sb.storage.from('astar-files').getPublicUrl(storagePath);
+  const publicUrl = urlData.publicUrl;
+
+  document.getElementById('pdf-progress-bar').style.width = '100%';
+  document.getElementById('pdf-progress-label').textContent = 'Saving...';
+
+  // Save node to DB
+  const { error: dbError } = await sb.from('explorer_nodes').insert({
+    section: 'books',
+    parent_id: parentId,
+    type: 'file',
+    name,
+    description: desc || null,
+    drive_link: publicUrl,
+    storage_path: storagePath,
+    created_by: currentUser.id
+  });
+
+  if (dbError) {
+    toast('Error saving: ' + dbError.message);
+    btn.disabled = false; btn.textContent = 'Upload PDF';
+    document.getElementById('pdf-upload-progress').style.display = 'none';
+    return;
+  }
+
+  closePdfFileModal();
+  toast('PDF uploaded! 📄');
+  loadExplorer('books');
 }
 
 /* ══════════════════════════════════════════════════════════
