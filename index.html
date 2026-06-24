@@ -990,4 +990,286 @@ async function loadStudentsForEFPicker() {
 
 function renderEFStudentPicker(students) {
   const list = document.getElementById('ef-student-list');
-  if (!students||stude
+  if (!students||students.length===0) { list.innerHTML='<div class="student-picker-empty">No approved students found</div>'; return; }
+  list.innerHTML = students.map(s => {
+    const label = `${s.full_name||s.email}${s.year_group?' ('+s.year_group+')':''}`;
+    return `<div class="student-picker-row${s.id===selectedEFStudentId?' selected':''}" onclick="pickEFStudent('${s.id}')">${label}</div>`;
+  }).join('');
+}
+
+function filterEFStudentPicker(query) {
+  const q=query.toLowerCase();
+  renderEFStudentPicker(efPickerStudents.filter(s=>(s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q)));
+}
+
+function pickEFStudent(id) { selectedEFStudentId=id; document.getElementById('ef-student-id').value=id; renderEFStudentPicker(efPickerStudents); }
+
+async function saveExplorerFolder() {
+  const name = document.getElementById('explorer-folder-name').value.trim();
+  if (!name) { toast('Please enter a folder name.'); return; }
+  const path = explorerPaths['sessions'];
+  const isRoot = path.length === 0;
+  if (isRoot && selectedExplorerFolderVis==='student' && !selectedEFStudentId) { toast('Please choose a student.'); return; }
+  const parentId = isRoot ? null : path[path.length-1].id;
+  const { error } = await sb.from('explorer_nodes').insert({
+    section:'sessions', parent_id:parentId, type:'folder', name,
+    visibility: isRoot ? selectedExplorerFolderVis : null,
+    student_id: (isRoot && selectedExplorerFolderVis==='student') ? selectedEFStudentId : null,
+    created_by: currentUser.id
+  });
+  if (error) { toast('Error: ' + error.message); return; }
+  closeExplorerFolderModal();
+  toast('Folder created! 📁');
+  loadExplorer('sessions');
+  checkNotificationDots();
+}
+
+/* FILE MODAL - SESSIONS */
+function openExplorerFileModal() {
+  document.getElementById('explorer-file-name').value='';
+  document.getElementById('explorer-file-desc').value='';
+  document.getElementById('explorer-file-link').value='';
+  document.getElementById('explorer-file-modal').classList.add('open');
+}
+function closeExplorerFileModal() { document.getElementById('explorer-file-modal').classList.remove('open'); }
+
+async function saveExplorerFile() {
+  const name = document.getElementById('explorer-file-name').value.trim();
+  const desc = document.getElementById('explorer-file-desc').value.trim();
+  let link = document.getElementById('explorer-file-link').value.trim();
+  if (!name) { toast('Please enter a lesson name.'); return; }
+  if (!link) { toast('Please enter a Google Drive link.'); return; }
+  if (!/^https?:\/\//i.test(link)) link = 'https://' + link;
+  const path = explorerPaths['sessions'];
+  if (path.length === 0) { toast('Please open a folder first.'); return; }
+  const parentId = path[path.length-1].id;
+  const { error } = await sb.from('explorer_nodes').insert({
+    section:'sessions', parent_id:parentId, type:'file', name,
+    description:desc||null, drive_link:link, created_by:currentUser.id
+  });
+  if (error) { toast('Error: ' + error.message); return; }
+  closeExplorerFileModal();
+  toast('Recording added! 🎬');
+  loadExplorer('sessions');
+  checkNotificationDots();
+}
+
+/* PDF EXPLORER */
+function openPdfFolderModal() {
+  selectedPdfFolderVis='all'; selectedPFStudentId='';
+  document.getElementById('pdf-folder-name').value='';
+  document.getElementById('pf-student-search').value='';
+  document.getElementById('pf-student-id').value='';
+  document.getElementById('pdf-folder-student-picker').style.display='none';
+  const isRoot = explorerPaths['books'].length === 0;
+  document.getElementById('pdf-folder-vis-group').style.display = isRoot ? 'block' : 'none';
+  document.getElementById('pdf-folder-modal-title').textContent = isRoot ? '📁 New folder' : '📁 New subfolder';
+  document.querySelectorAll('#pdf-folder-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis==='all'));
+  if (isRoot) loadStudentsForPFPicker();
+  document.getElementById('pdf-folder-modal').classList.add('open');
+}
+function closePdfFolderModal() { document.getElementById('pdf-folder-modal').classList.remove('open'); }
+
+function selectPdfFolderVis(vis) {
+  selectedPdfFolderVis=vis;
+  document.querySelectorAll('#pdf-folder-modal .vis-btn').forEach(b=>b.classList.toggle('selected',b.dataset.vis===vis));
+  document.getElementById('pdf-folder-student-picker').style.display=vis==='student'?'block':'none';
+}
+
+async function loadStudentsForPFPicker() {
+  const { data } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name');
+  pfPickerStudents=data||[];
+  renderPFStudentPicker(pfPickerStudents);
+}
+
+function renderPFStudentPicker(students) {
+  const list=document.getElementById('pf-student-list');
+  if (!students||students.length===0) { list.innerHTML='<div class="student-picker-empty">No approved students found</div>'; return; }
+  list.innerHTML=students.map(s=>{
+    const label=`${s.full_name||s.email}${s.year_group?' ('+s.year_group+')':''}`;
+    return `<div class="student-picker-row${s.id===selectedPFStudentId?' selected':''}" onclick="pickPFStudent('${s.id}')">${label}</div>`;
+  }).join('');
+}
+
+function filterPFStudentPicker(query) {
+  const q=query.toLowerCase();
+  renderPFStudentPicker(pfPickerStudents.filter(s=>(s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q)));
+}
+
+function pickPFStudent(id) { selectedPFStudentId=id; document.getElementById('pf-student-id').value=id; renderPFStudentPicker(pfPickerStudents); }
+
+async function savePdfFolder() {
+  const name=document.getElementById('pdf-folder-name').value.trim();
+  if (!name) { toast('Please enter a folder name.'); return; }
+  const path=explorerPaths['books'];
+  const isRoot=path.length===0;
+  if (isRoot&&selectedPdfFolderVis==='student'&&!selectedPFStudentId) { toast('Please choose a student.'); return; }
+  const parentId=isRoot?null:path[path.length-1].id;
+  const { error }=await sb.from('explorer_nodes').insert({
+    section:'books', parent_id:parentId, type:'folder', name,
+    visibility:isRoot?selectedPdfFolderVis:null,
+    student_id:(isRoot&&selectedPdfFolderVis==='student')?selectedPFStudentId:null,
+    created_by:currentUser.id
+  });
+  if (error) { toast('Error: '+error.message); return; }
+  closePdfFolderModal();
+  toast('Folder created! 📁');
+  loadExplorer('books');
+  checkNotificationDots();
+}
+
+function openPdfFileModal() {
+  document.getElementById('pdf-file-name').value='';
+  document.getElementById('pdf-file-desc').value='';
+  document.getElementById('pdf-file-input').value='';
+  document.getElementById('pdf-upload-progress').style.display='none';
+  document.getElementById('pdf-progress-bar').style.width='0%';
+  document.getElementById('pdf-save-btn').disabled=false;
+  document.getElementById('pdf-save-btn').textContent='Upload PDF';
+  document.getElementById('pdf-file-modal').classList.add('open');
+}
+function closePdfFileModal() { document.getElementById('pdf-file-modal').classList.remove('open'); }
+
+async function savePdfFile() {
+  const name=document.getElementById('pdf-file-name').value.trim();
+  const desc=document.getElementById('pdf-file-desc').value.trim();
+  const fileInput=document.getElementById('pdf-file-input');
+  const file=fileInput.files[0];
+  if (!name) { toast('Please enter a title.'); return; }
+  if (!file) { toast('Please choose a PDF file.'); return; }
+  const path=explorerPaths['books'];
+  if (path.length===0) { toast('Please open a folder first.'); return; }
+  const parentId=path[path.length-1].id;
+  const btn=document.getElementById('pdf-save-btn');
+  btn.disabled=true; btn.textContent='Uploading...';
+  document.getElementById('pdf-upload-progress').style.display='block';
+  document.getElementById('pdf-progress-bar').style.width='30%';
+  const ext=file.name.split('.').pop();
+  const storagePath=`pdfs/${currentUser.id}/${Date.now()}.${ext}`;
+  const { error:uploadError }=await sb.storage.from('astar-files').upload(storagePath,file,{contentType:'application/pdf'});
+  if (uploadError) { toast('Upload failed: '+uploadError.message); btn.disabled=false; btn.textContent='Upload PDF'; document.getElementById('pdf-upload-progress').style.display='none'; return; }
+  document.getElementById('pdf-progress-bar').style.width='80%';
+  const { data:urlData }=sb.storage.from('astar-files').getPublicUrl(storagePath);
+  document.getElementById('pdf-progress-bar').style.width='100%';
+  document.getElementById('pdf-progress-label').textContent='Saving...';
+  const { error:dbError }=await sb.from('explorer_nodes').insert({
+    section:'books', parent_id:parentId, type:'file', name,
+    description:desc||null, drive_link:urlData.publicUrl,
+    storage_path:storagePath, created_by:currentUser.id
+  });
+  if (dbError) { toast('Error saving: '+dbError.message); btn.disabled=false; btn.textContent='Upload PDF'; document.getElementById('pdf-upload-progress').style.display='none'; return; }
+  closePdfFileModal();
+  toast('PDF uploaded! 📄');
+  loadExplorer('books');
+  checkNotificationDots();
+}
+
+/* STUDENTS */
+function switchStudentTab(tab, event) {
+  currentStudentTab=tab;
+  document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));
+  if (event&&event.target) event.target.classList.add('active');
+  loadStudents();
+}
+
+async function loadStudents() {
+  if (currentRole!=='teacher') return;
+  const { data }=await sb.from('profiles').select('*').eq('role','student').eq('status',currentStudentTab).order('full_name');
+  allStudentsRows=data||[];
+  renderStudents(allStudentsRows);
+}
+
+function renderStudents(students) {
+  const tbody=document.getElementById('students-tbody');
+  if (!students||students.length===0) {
+    const msg=currentStudentTab==='pending'?'No students waiting for approval':'No approved students yet';
+    tbody.innerHTML=`<tr><td colspan="5" style="color:var(--text-muted);text-align:center;padding:20px">${msg}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML=students.map(s=>{
+    const yearBadge=s.year_group?`<span class="year-badge year-${s.year_group}">${s.year_group}</span>`:'—';
+    return `<tr>
+      <td><strong>${s.full_name||'—'}</strong></td>
+      <td>${s.email}</td>
+      <td>${yearBadge}</td>
+      <td><span class="status-badge status-${s.status}">${s.status}</span></td>
+      <td>${s.status==='pending'
+        ?`<button class="btn-approve" onclick="approveStudent('${s.id}')">✅ Approve</button><button class="btn-reject" onclick="rejectStudent('${s.id}')">❌ Reject</button>`
+        :`<button class="btn-small" onclick="rejectStudent('${s.id}')">Remove</button>`}
+      </td></tr>`;
+  }).join('');
+}
+
+function filterStudents(query) {
+  const q=query.toLowerCase();
+  renderStudents(allStudentsRows.filter(s=>(s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q)));
+}
+
+async function approveStudent(id) {
+  const { error }=await sb.from('profiles').update({status:'approved'}).eq('id',id);
+  if (error) { toast('Error: '+error.message); return; }
+  toast('Student approved! ✅');
+  loadStudents();
+  if (currentRole==='teacher') loadTeacherDash();
+}
+
+async function rejectStudent(id) {
+  const { error }=await sb.from('profiles').delete().eq('id',id);
+  if (error) { toast('Error: '+error.message); return; }
+  toast('Student removed.');
+  loadStudents();
+  if (currentRole==='teacher') loadTeacherDash();
+}
+
+/* EDIT NODE (folder/file) */
+function openEditNodeModal(id, name, type, section, desc='', link='') {
+  document.getElementById('edit-node-id').value = id;
+  document.getElementById('edit-node-type').value = type;
+  document.getElementById('edit-node-section').value = section;
+  document.getElementById('edit-node-name').value = name;
+  document.getElementById('edit-node-title').textContent = type==='folder' ? '✏️ Rename folder' : '✏️ Edit item';
+  const extra = document.getElementById('edit-node-extra');
+  if (type === 'file') {
+    extra.style.display = 'block';
+    document.getElementById('edit-node-desc').value = desc;
+    document.getElementById('edit-node-link').value = link;
+    // hide link field for PDFs (link is auto from storage)
+    document.getElementById('edit-node-link-group').style.display = section==='books' ? 'none' : 'block';
+  } else {
+    extra.style.display = 'none';
+  }
+  document.getElementById('edit-node-modal').classList.add('open');
+}
+function closeEditNodeModal() { document.getElementById('edit-node-modal').classList.remove('open'); }
+
+async function saveEditNode() {
+  const id = document.getElementById('edit-node-id').value;
+  const type = document.getElementById('edit-node-type').value;
+  const section = document.getElementById('edit-node-section').value;
+  const name = document.getElementById('edit-node-name').value.trim();
+  if (!name) { toast('Please enter a name.'); return; }
+  const updates = { name };
+  if (type === 'file') {
+    updates.description = document.getElementById('edit-node-desc').value.trim() || null;
+    if (section === 'sessions') {
+      let link = document.getElementById('edit-node-link').value.trim();
+      if (link && !/^https?:\/\//i.test(link)) link = 'https://' + link;
+      updates.drive_link = link || null;
+    }
+  }
+  const { error } = await sb.from('explorer_nodes').update(updates).eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  closeEditNodeModal();
+  toast('Updated! ✅');
+  loadExplorer(section);
+}
+
+
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.style.display='flex';
+  setTimeout(()=>t.style.display='none',3500);
+}
+</script>
+</body>
+</html>
