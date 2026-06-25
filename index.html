@@ -89,6 +89,11 @@
   .dash-stat .num{font-size:30px;font-weight:800;color:var(--blue);}
   .dash-stat .lbl{font-size:12px;color:var(--text-muted);margin-top:2px;}
   .dash-stat.warn .num{color:var(--orange);}
+  .profile-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:28px;max-width:460px;}
+  .profile-avatar-big{width:64px;height:64px;background:var(--blue-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:var(--blue);margin-bottom:16px;}
+  .profile-row{display:flex;flex-direction:column;gap:4px;margin-bottom:16px;}
+  .profile-row label{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;}
+  .profile-row span{font-size:15px;font-weight:600;}
   .explorer-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap;}
   .explorer-toolbar-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0;}
   .explorer-toolbar-right{display:flex;gap:8px;flex-shrink:0;}
@@ -166,12 +171,6 @@
   .status-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
   .status-pending{background:var(--orange-light);color:var(--orange);}
   .status-approved{background:var(--green-light);color:#085041;}
-  .hw-status{display:inline-block;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;}
-  .hw-not-done{background:#fef2f2;color:#dc2626;}
-  .hw-done-not-corrected{background:#fffbeb;color:#d97706;}
-  .hw-corrected{background:#dcfce7;color:#16a34a;}
-  .student-list-sidebar{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;display:none;}
-  .student-list-sidebar.open{display:block;}
   .toast{position:fixed;bottom:24px;right:24px;background:#1a1a1a;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;display:none;align-items:center;gap:8px;z-index:1000;box-shadow:0 4px 16px rgba(0,0,0,0.2);}
   .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px;}
   @keyframes spin{to{transform:rotate(360deg);}}
@@ -183,9 +182,16 @@
 
 <div id="auth-page">
   <div class="auth-card">
-    <div class="auth-logo"><img src="https://cgenukblxtxwcwjmskey.supabase.co/storage/v1/object/public/astar-files/logo.png" alt="A* Journey Logo"/><p>Math Teaching Team</p></div>
-    <div class="auth-tabs"><button class="auth-tab active" onclick="switchAuth('login',event)">Log in</button><button class="auth-tab" onclick="switchAuth('signup',event)">Sign up</button></div>
-    <div id="auth-error" class="auth-error"></div><div id="auth-success" class="auth-success"></div>
+    <div class="auth-logo">
+      <img src="https://cgenukblxtxwcwjmskey.supabase.co/storage/v1/object/public/astar-files/logo.png" alt="A* Journey Logo"/>
+      <p>Math Teaching Team</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuth('login',event)">Log in</button>
+      <button class="auth-tab" onclick="switchAuth('signup',event)">Sign up</button>
+    </div>
+    <div id="auth-error" class="auth-error"></div>
+    <div id="auth-success" class="auth-success"></div>
     <div id="login-form">
       <div class="form-group"><label>Email</label><input type="email" id="login-email" placeholder="your@email.com"/></div>
       <div class="form-group"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••"/></div>
@@ -195,83 +201,307 @@
       <div class="form-group"><label>Full name</label><input type="text" id="signup-name" placeholder="Your full name"/></div>
       <div class="form-group"><label>Email</label><input type="email" id="signup-email" placeholder="your@email.com"/></div>
       <div class="form-group"><label>Password</label><input type="password" id="signup-pass" placeholder="Min 6 characters"/></div>
-      <div class="form-group"><label>Year Group</label><select id="signup-year"><option value="">Select your year group</option><option value="OL">OL</option><option value="AS">AS</option><option value="A2">A2</option></select></div>
+      <div class="form-group">
+        <label>Year Group</label>
+        <select id="signup-year">
+          <option value="">Select your year group</option>
+          <option value="OL">OL</option>
+          <option value="AS">AS</option>
+          <option value="A2">A2</option>
+        </select>
+      </div>
       <select id="signup-role" style="display:none"><option value="student">Student</option></select>
       <button class="btn-primary" id="signup-btn" onclick="signup()">Create account</button>
     </div>
   </div>
 </div>
 
-<div id="pending-page"><div class="pending-card"><div class="pending-badge">Awaiting Approval</div><h2>You're on the list!</h2><p>Your account has been created. Your teacher needs to approve it before you can access the platform.<br><br>Please check back later or contact your teacher directly.</p><button class="btn-primary" onclick="logout()" style="margin-top:8px">Log out</button></div></div>
+<div id="pending-page">
+  <div class="pending-card">
+    <div class="pending-badge">Awaiting Approval</div>
+    <h2>You're on the list!</h2>
+    <p>Your account has been created. Your teacher needs to approve it before you can access the platform.<br><br>Please check back later or contact your teacher directly.</p>
+    <button class="btn-primary" onclick="logout()" style="margin-top:8px">Log out</button>
+  </div>
+</div>
 
 <div id="app">
   <aside class="sidebar">
-    <div class="sidebar-logo"><img src="https://cgenukblxtxwcwjmskey.supabase.co/storage/v1/object/public/astar-files/logo.png" alt="A* Journey Logo"/><p>Math Teaching Team</p></div>
+    <div class="sidebar-logo">
+      <img src="https://cgenukblxtxwcwjmskey.supabase.co/storage/v1/object/public/astar-files/logo.png" alt="A* Journey Logo"/>
+      <p>Math Teaching Team</p>
+    </div>
     <nav class="sidebar-nav">
       <button class="nav-item active" onclick="showPage('home')"><span class="nav-icon">🏠</span> Home</button>
       <button class="nav-item" onclick="showPage('sessions')"><span class="nav-icon">📅</span> Sessions<span class="nav-dot" id="dot-sessions"></span></button>
       <button class="nav-item" onclick="showPage('books')"><span class="nav-icon">📚</span> PDFs<span class="nav-dot" id="dot-books"></span></button>
       <button class="nav-item" onclick="showPage('homework')"><span class="nav-icon">📝</span> Assignments</button>
       <button class="nav-item" id="teacher-nav" style="display:none" onclick="showPage('students')"><span class="nav-icon">👩‍🎓</span> Students</button>
-      <div class="dark-toggle"><span>🌙 Dark mode</span><label class="toggle-switch"><input type="checkbox" id="dark-toggle-input" onchange="toggleDark(this.checked)"/><span class="toggle-slider"></span></label></div>
+      <div class="dark-toggle">
+        <span>🌙 Dark mode</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="dark-toggle-input" onchange="toggleDark(this.checked)"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
     </nav>
-    <div class="sidebar-footer"><div class="user-info"><div class="user-avatar" id="user-avatar">?</div><div class="user-details"><div class="user-name" id="nav-name">—</div><div class="user-role-line" id="nav-role">—</div></div></div><button class="logout-btn" onclick="logout()">Log out</button></div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <div class="user-details">
+          <div class="user-name" id="nav-name">—</div>
+          <div class="user-role-line" id="nav-role">—</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Log out</button>
+    </div>
   </aside>
 
   <main class="main-content">
-    <div id="home" class="page active"><div class="page-header"><h1>Welcome back 👋</h1><p id="home-subtitle">Your maths learning hub.</p></div><div id="teacher-dash" style="display:none"><div class="dash-stats"><div class="dash-stat"><div class="num" id="dash-total">—</div><div class="lbl">Total students</div></div><div class="dash-stat warn"><div class="num" id="dash-pending">—</div><div class="lbl">Pending approval</div></div><div class="dash-stat"><div class="num" id="dash-sessions">—</div><div class="lbl">Sessions</div></div><div class="dash-stat"><div class="num" id="dash-pdfs">—</div><div class="lbl">PDFs uploaded</div></div></div></div><div class="sessions-toolbar-row"><h2>📅 Upcoming Sessions</h2><button class="btn-add" id="add-session-btn" style="display:none" onclick="openSessionModal()">+ New session</button></div><div class="session-list" id="session-list"></div></div>
 
-    <div id="sessions" class="page"><div class="page-header"><h1>📅 Sessions</h1><p>Recorded lessons, organized by chapter.</p></div><input class="search-bar" placeholder="🔍 Search sessions and folders..." oninput="searchExplorer('sessions',this.value)" id="sessions-search"/><div class="explorer-toolbar"><div class="explorer-toolbar-left"><div class="breadcrumb" id="sessions-breadcrumb"></div></div><div class="explorer-toolbar-right" id="sessions-toolbar-btns"></div></div><div class="explorer-grid" id="sessions-explorer-grid"></div></div>
-
-    <div id="books" class="page"><div class="page-header"><h1>📚 PDFs</h1><p>Books and resources, organised by topic.</p></div><input class="search-bar" placeholder="🔍 Search PDFs and folders..." oninput="searchExplorer('books',this.value)" id="books-search"/><div class="explorer-toolbar"><div class="explorer-toolbar-left"><div class="breadcrumb" id="books-breadcrumb"></div></div><div class="explorer-toolbar-right" id="books-toolbar-btns"></div></div><div class="explorer-grid" id="books-explorer-grid"></div></div>
-
-    <div id="homework" class="page">
-      <div class="page-header"><h1>📝 Assignments</h1><p id="hw-subtitle">Your homework and assignments.</p></div>
-      <div id="hw-teacher-controls" style="display:none;margin-bottom:16px;gap:8px;flex-wrap:wrap;"><button class="btn-add-outline" id="hw-student-list-btn" onclick="toggleHWStudentList()">👩‍🎓 Student List</button><button class="btn-add" onclick="openAssignmentModal()">+ New Assignment</button></div>
-      <div id="hw-student-list-sidebar" class="student-list-sidebar"><h3 style="margin-bottom:12px;">Students</h3><input class="search-bar" placeholder="🔍 Search students..." oninput="filterHWStudents(this.value)" style="margin-bottom:12px;"/><div id="hw-student-list-content"></div></div>
-      <div id="hw-student-detail" style="display:none;"><button class="btn-small" onclick="backToHWAssignments()" style="margin-bottom:16px;">⬅ Back to all assignments</button><div id="hw-student-detail-content"></div></div>
-      <div id="hw-assignments-list"></div>
+    <!-- HOME -->
+    <div id="home" class="page active">
+      <div class="page-header">
+        <h1>Welcome back 👋</h1>
+        <p id="home-subtitle">Your maths learning hub.</p>
+      </div>
+      <div id="teacher-dash" style="display:none">
+        <div class="dash-stats">
+          <div class="dash-stat"><div class="num" id="dash-total">—</div><div class="lbl">Total students</div></div>
+          <div class="dash-stat warn"><div class="num" id="dash-pending">—</div><div class="lbl">Pending approval</div></div>
+          <div class="dash-stat"><div class="num" id="dash-sessions">—</div><div class="lbl">Sessions</div></div>
+          <div class="dash-stat"><div class="num" id="dash-pdfs">—</div><div class="lbl">PDFs uploaded</div></div>
+        </div>
+      </div>
+      <div class="sessions-toolbar-row">
+        <h2>📅 Upcoming Sessions</h2>
+        <button class="btn-add" id="add-session-btn" style="display:none" onclick="openSessionModal()">+ New session</button>
+      </div>
+      <div class="session-list" id="session-list"></div>
     </div>
 
+    <!-- SESSIONS -->
+    <div id="sessions" class="page">
+      <div class="page-header">
+        <h1>📅 Sessions</h1>
+        <p>Recorded lessons, organized by chapter.</p>
+      </div>
+      <input class="search-bar" placeholder="🔍 Search sessions and folders..." oninput="searchExplorer('sessions',this.value)" id="sessions-search"/>
+      <div class="explorer-toolbar">
+        <div class="explorer-toolbar-left"><div class="breadcrumb" id="sessions-breadcrumb"></div></div>
+        <div class="explorer-toolbar-right" id="sessions-toolbar-btns"></div>
+      </div>
+      <div class="explorer-grid" id="sessions-explorer-grid"></div>
+    </div>
+
+    <!-- BOOKS -->
+    <div id="books" class="page">
+      <div class="page-header">
+        <h1>📚 PDFs</h1>
+        <p>Books and resources, organised by topic.</p>
+      </div>
+      <input class="search-bar" placeholder="🔍 Search PDFs and folders..." oninput="searchExplorer('books',this.value)" id="books-search"/>
+      <div class="explorer-toolbar">
+        <div class="explorer-toolbar-left"><div class="breadcrumb" id="books-breadcrumb"></div></div>
+        <div class="explorer-toolbar-right" id="books-toolbar-btns"></div>
+      </div>
+      <div class="explorer-grid" id="books-explorer-grid"></div>
+    </div>
+
+    <!-- HOMEWORK -->
+    <div id="homework" class="page">
+      <div class="page-header"><h1>📝 Assignments</h1><p>Your homework and assignments.</p></div>
+    </div>
+
+    <!-- STUDENTS -->
     <div id="students" class="page">
       <div class="page-header"><h1>👩‍🎓 Students</h1><p>Manage and approve your students. <span id="filter-count"></span></p></div>
-      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;"><button class="btn-small" id="filter-btn-students" style="background:var(--blue);color:#fff;border-color:var(--blue);" onclick="filterByRole('students')">👨‍🎓 Students</button><button class="btn-small" id="filter-btn-teachers" onclick="filterByRole('teachers')">👨‍🏫 Teachers</button></div>
-      <div id="year-filter-row" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;"><span style="font-size:12px;color:var(--text-muted);">Year:</span><button class="btn-small" id="filter-year-all" style="background:var(--blue);color:#fff;border-color:var(--blue);" onclick="filterByYear('all')">All</button><button class="btn-small" id="filter-year-OL" onclick="filterByYear('OL')">OL</button><button class="btn-small" id="filter-year-AS" onclick="filterByYear('AS')">AS</button><button class="btn-small" id="filter-year-A2" onclick="filterByYear('A2')">A2</button></div>
+      
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+        <button class="btn-small" id="filter-btn-students" style="background:var(--blue);color:#fff;border-color:var(--blue);" onclick="filterByRole('students')">👨‍🎓 Students</button>
+        <button class="btn-small" id="filter-btn-teachers" onclick="filterByRole('teachers')">👨‍🏫 Teachers</button>
+      </div>
+      
+      <div id="year-filter-row" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <span style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;">Year:</span>
+        <button class="btn-small" id="filter-year-all" style="background:var(--blue);color:#fff;border-color:var(--blue);" onclick="filterByYear('all')">All</button>
+        <button class="btn-small" id="filter-year-OL" onclick="filterByYear('OL')">OL</button>
+        <button class="btn-small" id="filter-year-AS" onclick="filterByYear('AS')">AS</button>
+        <button class="btn-small" id="filter-year-A2" onclick="filterByYear('A2')">A2</button>
+      </div>
+      
       <input class="search-bar" placeholder="🔍 Search students..." oninput="filterStudents(this.value)"/>
-      <div class="teacher-panel"><div class="panel-tabs"><button class="panel-tab active" onclick="switchStudentTab('approved',event)">✅ Approved</button><button class="panel-tab" onclick="switchStudentTab('pending',event)">⏳ Pending</button></div><table class="students-table"><thead><tr><th>Name</th><th>Email</th><th>Year</th><th>Status</th><th>Actions</th></tr></thead><tbody id="students-tbody"></tbody></table></div>
+      <div class="teacher-panel">
+        <div class="panel-tabs">
+          <button class="panel-tab active" onclick="switchStudentTab('approved',event)">✅ Approved</button>
+          <button class="panel-tab" onclick="switchStudentTab('pending',event)">⏳ Pending</button>
+        </div>
+        <table class="students-table">
+          <thead><tr><th>Name</th><th>Email</th><th>Year</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="students-tbody"></tbody>
+        </table>
+      </div>
     </div>
+
   </main>
 </div>
 
 <!-- SESSION MODAL -->
-<div class="modal-overlay" id="session-modal"><div class="modal"><h3 id="session-modal-title">📅 New session</h3><div class="form-group"><label>Session name</label><input type="text" id="session-name"/></div><div class="form-group"><label>Link</label><input type="text" id="session-link"/></div><div class="form-group"><label>Time</label><input type="text" id="session-time" placeholder="e.g. Friday 5pm"/></div><div class="form-group"><label>Visible to</label><div class="visibility-options"><button class="vis-btn selected" data-vis="all" onclick="selectSessionVisibility('all')">Everyone</button><button class="vis-btn" data-vis="OL" onclick="selectSessionVisibility('OL')">OL only</button><button class="vis-btn" data-vis="AS" onclick="selectSessionVisibility('AS')">AS only</button><button class="vis-btn" data-vis="A2" onclick="selectSessionVisibility('A2')">A2 only</button><button class="vis-btn" data-vis="student" onclick="selectSessionVisibility('student')">Specific student</button></div></div><div class="form-group" id="session-student-picker" style="display:none"><label>Choose student</label><input type="text" class="search-bar" id="session-student-search" placeholder="🔍 Search students..." style="margin-bottom:8px" oninput="filterSessionStudentPicker(this.value)"/><div id="session-student-list" class="student-picker-list"></div><input type="hidden" id="session-student-id"/></div><div class="modal-actions"><button class="btn-cancel" onclick="closeSessionModal()">Cancel</button><button class="btn-save" id="session-save-btn" onclick="saveSession()">Create session</button></div></div></div>
+<div class="modal-overlay" id="session-modal">
+  <div class="modal">
+    <h3 id="session-modal-title">📅 New session</h3>
+    <div class="form-group"><label>Session name</label><input type="text" id="session-name" placeholder=""/></div>
+    <div class="form-group"><label>Link</label><input type="text" id="session-link" placeholder=""/></div>
+    <div class="form-group"><label>Time</label><input type="text" id="session-time" placeholder="e.g. Friday 5pm"/></div>
+    <div class="form-group">
+      <label>Visible to</label>
+      <div class="visibility-options">
+        <button class="vis-btn selected" data-vis="all" onclick="selectSessionVisibility('all')">Everyone</button>
+        <button class="vis-btn" data-vis="OL" onclick="selectSessionVisibility('OL')">OL only</button>
+        <button class="vis-btn" data-vis="AS" onclick="selectSessionVisibility('AS')">AS only</button>
+        <button class="vis-btn" data-vis="A2" onclick="selectSessionVisibility('A2')">A2 only</button>
+        <button class="vis-btn" data-vis="student" onclick="selectSessionVisibility('student')">Specific student</button>
+      </div>
+    </div>
+    <div class="form-group" id="session-student-picker" style="display:none">
+      <label>Choose student</label>
+      <input type="text" class="search-bar" id="session-student-search" placeholder="🔍 Search students..." style="margin-bottom:8px" oninput="filterSessionStudentPicker(this.value)"/>
+      <div id="session-student-list" class="student-picker-list"></div>
+      <input type="hidden" id="session-student-id" value=""/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeSessionModal()">Cancel</button>
+      <button class="btn-save" id="session-save-btn" onclick="saveSession()">Create session</button>
+    </div>
+  </div>
+</div>
 
 <!-- EXPLORER FOLDER MODAL -->
-<div class="modal-overlay" id="explorer-folder-modal"><div class="modal"><h3 id="explorer-folder-modal-title">📁 New folder</h3><div class="form-group"><label>Folder name</label><input type="text" id="explorer-folder-name"/></div><div class="form-group" id="explorer-folder-vis-group"><label>Visible to</label><div class="visibility-options"><button class="vis-btn selected" data-vis="all" onclick="selectExplorerFolderVis('all')">Everyone</button><button class="vis-btn" data-vis="OL" onclick="selectExplorerFolderVis('OL')">OL only</button><button class="vis-btn" data-vis="AS" onclick="selectExplorerFolderVis('AS')">AS only</button><button class="vis-btn" data-vis="A2" onclick="selectExplorerFolderVis('A2')">A2 only</button><button class="vis-btn" data-vis="student" onclick="selectExplorerFolderVis('student')">Specific student</button></div></div><div class="form-group" id="explorer-folder-student-picker" style="display:none"><label>Choose student</label><input type="text" class="search-bar" id="ef-student-search" placeholder="🔍 Search..." style="margin-bottom:8px" oninput="filterEFStudentPicker(this.value)"/><div id="ef-student-list" class="student-picker-list"></div><input type="hidden" id="ef-student-id"/></div><div class="modal-actions"><button class="btn-cancel" onclick="closeExplorerFolderModal()">Cancel</button><button class="btn-save" onclick="saveExplorerFolder()">Create folder</button></div></div></div>
+<div class="modal-overlay" id="explorer-folder-modal">
+  <div class="modal">
+    <h3 id="explorer-folder-modal-title">📁 New folder</h3>
+    <div class="form-group"><label>Folder name</label><input type="text" id="explorer-folder-name" placeholder="e.g. Chapter 1 — Algebra"/></div>
+    <div class="form-group" id="explorer-folder-vis-group">
+      <label>Visible to</label>
+      <div class="visibility-options">
+        <button class="vis-btn selected" data-vis="all" onclick="selectExplorerFolderVis('all')">Everyone</button>
+        <button class="vis-btn" data-vis="OL" onclick="selectExplorerFolderVis('OL')">OL only</button>
+        <button class="vis-btn" data-vis="AS" onclick="selectExplorerFolderVis('AS')">AS only</button>
+        <button class="vis-btn" data-vis="A2" onclick="selectExplorerFolderVis('A2')">A2 only</button>
+        <button class="vis-btn" data-vis="student" onclick="selectExplorerFolderVis('student')">Specific student</button>
+      </div>
+    </div>
+    <div class="form-group" id="explorer-folder-student-picker" style="display:none">
+      <label>Choose student</label>
+      <input type="text" class="search-bar" id="ef-student-search" placeholder="🔍 Search..." style="margin-bottom:8px" oninput="filterEFStudentPicker(this.value)"/>
+      <div id="ef-student-list" class="student-picker-list"></div>
+      <input type="hidden" id="ef-student-id" value=""/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeExplorerFolderModal()">Cancel</button>
+      <button class="btn-save" onclick="saveExplorerFolder()">Create folder</button>
+    </div>
+  </div>
+</div>
 
 <!-- EXPLORER FILE MODAL -->
-<div class="modal-overlay" id="explorer-file-modal"><div class="modal"><h3>🎬 Add recording</h3><div class="form-group"><label>Lesson name</label><input type="text" id="explorer-file-name"/></div><div class="form-group"><label>Description <span style="font-weight:400;text-transform:none;font-size:11px">(optional)</span></label><input type="text" id="explorer-file-desc"/></div><div class="form-group"><label>Google Drive link</label><input type="text" id="explorer-file-link"/></div><div class="modal-actions"><button class="btn-cancel" onclick="closeExplorerFileModal()">Cancel</button><button class="btn-save" onclick="saveExplorerFile()">Add recording</button></div></div></div>
+<div class="modal-overlay" id="explorer-file-modal">
+  <div class="modal">
+    <h3>🎬 Add recording</h3>
+    <div class="form-group"><label>Lesson name</label><input type="text" id="explorer-file-name" placeholder="e.g. Introduction to Differentiation"/></div>
+    <div class="form-group"><label>Description <span style="font-weight:400;text-transform:none;font-size:11px">(optional)</span></label><input type="text" id="explorer-file-desc" placeholder="A short note about this lesson"/></div>
+    <div class="form-group"><label>Google Drive link</label><input type="text" id="explorer-file-link" placeholder="https://drive.google.com/..."/></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeExplorerFileModal()">Cancel</button>
+      <button class="btn-save" onclick="saveExplorerFile()">Add recording</button>
+    </div>
+  </div>
+</div>
 
 <!-- EDIT SESSION MODAL -->
-<div class="modal-overlay" id="edit-session-modal"><div class="modal"><h3>✏️ Edit session</h3><input type="hidden" id="edit-session-id"/><div class="form-group"><label>Session name</label><input type="text" id="edit-session-name"/></div><div class="form-group"><label>Link</label><input type="text" id="edit-session-link"/></div><div class="form-group"><label>Time</label><input type="text" id="edit-session-time"/></div><div class="modal-actions"><button class="btn-cancel" onclick="closeEditSessionModal()">Cancel</button><button class="btn-save" onclick="saveEditSession()">Save changes</button></div></div></div>
+<div class="modal-overlay" id="edit-session-modal">
+  <div class="modal">
+    <h3>✏️ Edit session</h3>
+    <input type="hidden" id="edit-session-id"/>
+    <div class="form-group"><label>Session name</label><input type="text" id="edit-session-name"/></div>
+    <div class="form-group"><label>Link</label><input type="text" id="edit-session-link"/></div>
+    <div class="form-group"><label>Time</label><input type="text" id="edit-session-time"/></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEditSessionModal()">Cancel</button>
+      <button class="btn-save" onclick="saveEditSession()">Save changes</button>
+    </div>
+  </div>
+</div>
 
 <!-- PDF UPLOAD MODAL -->
-<div class="modal-overlay" id="pdf-file-modal"><div class="modal"><h3>📄 Add PDF</h3><div class="form-group"><label>Title</label><input type="text" id="pdf-file-name"/></div><div class="form-group"><label>Description <span style="font-weight:400;text-transform:none;font-size:11px">(optional)</span></label><input type="text" id="pdf-file-desc"/></div><div class="form-group"><label>PDF file</label><input type="file" id="pdf-file-input" accept=".pdf" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;font-family:inherit;background:var(--white);cursor:pointer;"/></div><div id="pdf-upload-progress" style="display:none;margin-top:8px;"><div style="background:var(--border);border-radius:99px;height:6px;overflow:hidden;"><div id="pdf-progress-bar" style="height:100%;background:var(--blue);width:0%;transition:width 0.2s;border-radius:99px;"></div></div><p id="pdf-progress-label" style="font-size:12px;color:var(--text-muted);margin-top:6px;text-align:center;">Uploading...</p></div><div class="modal-actions"><button class="btn-cancel" onclick="closePdfFileModal()">Cancel</button><button class="btn-save" id="pdf-save-btn" onclick="savePdfFile()">Upload PDF</button></div></div></div>
+<div class="modal-overlay" id="pdf-file-modal">
+  <div class="modal">
+    <h3>📄 Add PDF</h3>
+    <div class="form-group"><label>Title</label><input type="text" id="pdf-file-name" placeholder="e.g. Cambridge AS Pure Mathematics"/></div>
+    <div class="form-group"><label>Description <span style="font-weight:400;text-transform:none;font-size:11px">(optional)</span></label><input type="text" id="pdf-file-desc" placeholder="A short note about this PDF"/></div>
+    <div class="form-group">
+      <label>PDF file</label>
+      <input type="file" id="pdf-file-input" accept=".pdf" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;font-family:inherit;background:var(--white);cursor:pointer;"/>
+    </div>
+    <div id="pdf-upload-progress" style="display:none;margin-top:8px;">
+      <div style="background:var(--border);border-radius:99px;height:6px;overflow:hidden;">
+        <div id="pdf-progress-bar" style="height:100%;background:var(--blue);width:0%;transition:width 0.2s;border-radius:99px;"></div>
+      </div>
+      <p id="pdf-progress-label" style="font-size:12px;color:var(--text-muted);margin-top:6px;text-align:center;">Uploading...</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closePdfFileModal()">Cancel</button>
+      <button class="btn-save" id="pdf-save-btn" onclick="savePdfFile()">Upload PDF</button>
+    </div>
+  </div>
+</div>
 
 <!-- PDF FOLDER MODAL -->
-<div class="modal-overlay" id="pdf-folder-modal"><div class="modal"><h3 id="pdf-folder-modal-title">📁 New folder</h3><div class="form-group"><label>Folder name</label><input type="text" id="pdf-folder-name"/></div><div class="form-group" id="pdf-folder-vis-group"><label>Visible to</label><div class="visibility-options"><button class="vis-btn selected" data-vis="all" onclick="selectPdfFolderVis('all')">Everyone</button><button class="vis-btn" data-vis="OL" onclick="selectPdfFolderVis('OL')">OL only</button><button class="vis-btn" data-vis="AS" onclick="selectPdfFolderVis('AS')">AS only</button><button class="vis-btn" data-vis="A2" onclick="selectPdfFolderVis('A2')">A2 only</button><button class="vis-btn" data-vis="student" onclick="selectPdfFolderVis('student')">Specific student</button></div></div><div class="form-group" id="pdf-folder-student-picker" style="display:none"><label>Choose student</label><input type="text" class="search-bar" id="pf-student-search" placeholder="🔍 Search..." style="margin-bottom:8px" oninput="filterPFStudentPicker(this.value)"/><div id="pf-student-list" class="student-picker-list"></div><input type="hidden" id="pf-student-id"/></div><div class="modal-actions"><button class="btn-cancel" onclick="closePdfFolderModal()">Cancel</button><button class="btn-save" onclick="savePdfFolder()">Create folder</button></div></div></div>
-
-<!-- ASSIGNMENT MODAL -->
-<div class="modal-overlay" id="assignment-modal"><div class="modal"><h3>📝 New Assignment</h3><div class="form-group"><label>Assignment name</label><input type="text" id="assignment-name" placeholder="e.g. Chapter 3 Exercises"/></div><div class="form-group"><label>Description</label><textarea id="assignment-desc" rows="3" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px;font-family:inherit;font-size:13px;resize:vertical;"></textarea></div><div class="form-group"><label>Due Date</label><input type="date" id="assignment-due-date"/></div><div class="form-group"><label>Due Time</label><input type="time" id="assignment-due-time"/></div><div class="form-group"><label>Visible to</label><div class="visibility-options"><button class="vis-btn selected" data-vis="all" onclick="selectAssignmentVisibility('all')">Everyone</button><button class="vis-btn" data-vis="OL" onclick="selectAssignmentVisibility('OL')">OL only</button><button class="vis-btn" data-vis="AS" onclick="selectAssignmentVisibility('AS')">AS only</button><button class="vis-btn" data-vis="A2" onclick="selectAssignmentVisibility('A2')">A2 only</button><button class="vis-btn" data-vis="student" onclick="selectAssignmentVisibility('student')">Specific student</button></div></div><div class="form-group" id="assignment-student-picker" style="display:none"><label>Choose student</label><input type="text" class="search-bar" id="assignment-student-search" placeholder="🔍 Search..." style="margin-bottom:8px" oninput="filterAssignmentStudentPicker(this.value)"/><div id="assignment-student-list" class="student-picker-list"></div><input type="hidden" id="assignment-student-id"/></div><div class="modal-actions"><button class="btn-cancel" onclick="closeAssignmentModal()">Cancel</button><button class="btn-save" onclick="saveAssignment()">Create Assignment</button></div></div></div>
-
-<!-- SUBMIT ASSIGNMENT MODAL -->
-<div class="modal-overlay" id="hw-submit-modal"><div class="modal"><h3>📤 Submit Assignment</h3><p id="hw-submit-title" style="font-size:14px;margin-bottom:16px;"></p><div class="form-group"><label>Upload PDF</label><input type="file" id="hw-submit-file" accept=".pdf" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px;font-family:inherit;"/></div><div id="hw-submit-progress" style="display:none;margin-top:8px;"><div style="background:var(--border);border-radius:99px;height:6px;overflow:hidden;"><div id="hw-submit-progress-bar" style="height:100%;background:var(--blue);width:0%;transition:width 0.2s;border-radius:99px;"></div></div></div><div class="modal-actions"><button class="btn-cancel" onclick="closeHWSubmitModal()">Cancel</button><button class="btn-save" id="hw-submit-btn" onclick="submitAssignment()">Upload</button></div></div></div>
-
-<!-- REVIEW MODAL -->
-<div class="modal-overlay" id="hw-review-modal"><div class="modal"><h3>📋 Review Submission</h3><div id="hw-review-content"></div><div class="form-group"><label>Notes for student</label><textarea id="hw-review-notes" rows="3" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px;font-family:inherit;font-size:13px;resize:vertical;"></textarea></div><div class="modal-actions"><button class="btn-cancel" onclick="closeHWReviewModal()">Cancel</button><button class="btn-save" onclick="saveHWReview()">✅ Mark as Corrected</button></div></div></div>
+<div class="modal-overlay" id="pdf-folder-modal">
+  <div class="modal">
+    <h3 id="pdf-folder-modal-title">📁 New folder</h3>
+    <div class="form-group"><label>Folder name</label><input type="text" id="pdf-folder-name" placeholder="e.g. Pure Mathematics"/></div>
+    <div class="form-group" id="pdf-folder-vis-group">
+      <label>Visible to</label>
+      <div class="visibility-options">
+        <button class="vis-btn selected" data-vis="all" onclick="selectPdfFolderVis('all')">Everyone</button>
+        <button class="vis-btn" data-vis="OL" onclick="selectPdfFolderVis('OL')">OL only</button>
+        <button class="vis-btn" data-vis="AS" onclick="selectPdfFolderVis('AS')">AS only</button>
+        <button class="vis-btn" data-vis="A2" onclick="selectPdfFolderVis('A2')">A2 only</button>
+        <button class="vis-btn" data-vis="student" onclick="selectPdfFolderVis('student')">Specific student</button>
+      </div>
+    </div>
+    <div class="form-group" id="pdf-folder-student-picker" style="display:none">
+      <label>Choose student</label>
+      <input type="text" class="search-bar" id="pf-student-search" placeholder="🔍 Search..." style="margin-bottom:8px" oninput="filterPFStudentPicker(this.value)"/>
+      <div id="pf-student-list" class="student-picker-list"></div>
+      <input type="hidden" id="pf-student-id" value=""/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closePdfFolderModal()">Cancel</button>
+      <button class="btn-save" onclick="savePdfFolder()">Create folder</button>
+    </div>
+  </div>
+</div>
 
 <!-- EDIT NODE MODAL -->
-<div class="modal-overlay" id="edit-node-modal"><div class="modal"><h3 id="edit-node-title">✏️ Edit</h3><input type="hidden" id="edit-node-id"/><input type="hidden" id="edit-node-type"/><input type="hidden" id="edit-node-section"/><div class="form-group"><label>Name</label><input type="text" id="edit-node-name"/></div><div id="edit-node-extra" style="display:none"><div class="form-group"><label>Description <span style="font-weight:400;text-transform:none;font-size:11px">(optional)</span></label><input type="text" id="edit-node-desc"/></div><div class="form-group" id="edit-node-link-group"><label>Link</label><input type="text" id="edit-node-link"/></div></div><div class="modal-actions"><button class="btn-cancel" onclick="closeEditNodeModal()">Cancel</button><button class="btn-save" onclick="saveEditNode()">Save changes</button></div></div></div>
+<div class="modal-overlay" id="edit-node-modal">
+  <div class="modal">
+    <h3 id="edit-node-title">✏️ Edit</h3>
+    <input type="hidden" id="edit-node-id"/>
+    <input type="hidden" id="edit-node-type"/>
+    <input type="hidden" id="edit-node-section"/>
+    <div class="form-group"><label>Name</label><input type="text" id="edit-node-name"/></div>
+    <div id="edit-node-extra" style="display:none">
+      <div class="form-group"><label>Description <span style="font-weight:400;text-transform:none;font-size:11px">(optional)</span></label><input type="text" id="edit-node-desc"/></div>
+      <div class="form-group" id="edit-node-link-group"><label>Link</label><input type="text" id="edit-node-link"/></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEditNodeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveEditNode()">Save changes</button>
+    </div>
+  </div>
+</div>
 
 <div class="toast" id="toast">✅ <span id="toast-msg"></span></div>
 
@@ -293,17 +523,17 @@ let editingSessionId = null;
 let currentProfile = null;
 let currentYearFilter = 'all';
 let currentRoleFilter = 'students';
-let selectedAssignmentVisibility = 'all', selectedAssignmentStudentId = '';
-let assignmentPickerStudents = [];
-let allAssignments = [], hwStudentList = [];
-let viewingStudentId = null, hwCurrentAssignment = null, hwReviewSubmissionId = null;
 
-// ── DARK MODE ──
-function toggleDark(on) { document.body.classList.toggle('dark', on); localStorage.setItem('darkMode', on ? '1' : '0'); }
-function initDark() { const saved = localStorage.getItem('darkMode'); if (saved === '1') { document.body.classList.add('dark'); document.getElementById('dark-toggle-input').checked = true; } }
+function toggleDark(on) {
+  document.body.classList.toggle('dark', on);
+  localStorage.setItem('darkMode', on ? '1' : '0');
+}
+function initDark() {
+  const saved = localStorage.getItem('darkMode');
+  if (saved === '1') { document.body.classList.add('dark'); document.getElementById('dark-toggle-input').checked = true; }
+}
 initDark();
 
-// ── NOTIFICATION DOTS ──
 const VISIT_KEY_S = 'lastVisit_sessions', VISIT_KEY_B = 'lastVisit_books';
 async function checkNotificationDots() {
   const lastS = localStorage.getItem(VISIT_KEY_S) || '1970-01-01';
@@ -316,21 +546,30 @@ async function checkNotificationDots() {
   document.getElementById('dot-books').classList.toggle('visible', (bc || 0) > 0);
 }
 
-// ── AUTH ──
-window.addEventListener('load', async () => { const { data: { session } } = await sb.auth.getSession(); if (session) await loadUser(session.user); });
+window.addEventListener('load', async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) await loadUser(session.user);
+});
 
 async function loadUser(user) {
   const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
   if (!profile) { await sb.auth.signOut(); showError('Account not found. Please sign up again.'); return; }
-  currentUser = user; currentRole = profile.role; currentYearGroup = profile.year_group; currentProfile = profile;
+  currentUser = user; currentRole = profile.role; currentYearGroup = profile.year_group;
+  currentProfile = profile;
   if (profile.role === 'student' && profile.status === 'pending') { showPendingScreen(); return; }
   showApp(profile);
 }
 
-function showPendingScreen() { document.getElementById('auth-page').style.display = 'none'; document.getElementById('app').style.display = 'none'; document.getElementById('pending-page').style.display = 'flex'; }
+function showPendingScreen() {
+  document.getElementById('auth-page').style.display = 'none';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('pending-page').style.display = 'flex';
+}
 
 function showApp(profile) {
-  document.getElementById('auth-page').style.display = 'none'; document.getElementById('pending-page').style.display = 'none'; document.getElementById('app').style.display = 'flex';
+  document.getElementById('auth-page').style.display = 'none';
+  document.getElementById('pending-page').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
   const initials = (profile.full_name || profile.email || '?').charAt(0).toUpperCase();
   document.getElementById('user-avatar').textContent = initials;
   document.getElementById('nav-name').textContent = profile.full_name || profile.email;
@@ -340,12 +579,12 @@ function showApp(profile) {
     document.getElementById('teacher-nav').style.display = 'flex';
     document.getElementById('add-session-btn').style.display = 'inline-flex';
     document.getElementById('teacher-dash').style.display = 'block';
-    document.getElementById('hw-teacher-controls').style.display = 'flex';
-    document.getElementById('hw-subtitle').textContent = 'Create and review student assignments.';
     document.getElementById('home-subtitle').textContent = 'Manage sessions, upload materials, and approve students.';
     loadTeacherDash();
   }
-  loadSessions(); loadExplorer('sessions'); checkNotificationDots();
+  loadSessions();
+  loadExplorer('sessions');
+  checkNotificationDots();
 }
 
 function showError(msg) { const el = document.getElementById('auth-error'); el.textContent = msg; el.style.display = 'block'; }
@@ -356,7 +595,8 @@ function switchAuth(tab, event) {
   if (event && event.target) event.target.classList.add('active');
   document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
   document.getElementById('signup-form').style.display = tab === 'signup' ? 'block' : 'none';
-  document.getElementById('auth-error').style.display = 'none'; document.getElementById('auth-success').style.display = 'none';
+  document.getElementById('auth-error').style.display = 'none';
+  document.getElementById('auth-success').style.display = 'none';
 }
 
 async function login() {
@@ -400,16 +640,18 @@ async function logout() {
   await sb.auth.signOut();
   currentUser = null; currentRole = null; currentYearGroup = null; currentProfile = null;
   explorerPaths = { sessions: [], books: [] };
-  document.getElementById('app').style.display = 'none'; document.getElementById('pending-page').style.display = 'none';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('pending-page').style.display = 'none';
   document.getElementById('auth-page').style.display = 'flex';
-  document.getElementById('auth-error').style.display = 'none'; document.getElementById('auth-success').style.display = 'none';
-  document.getElementById('teacher-nav').style.display = 'none'; document.getElementById('add-session-btn').style.display = 'none';
-  document.getElementById('teacher-dash').style.display = 'none'; document.getElementById('hw-teacher-controls').style.display = 'none';
+  document.getElementById('auth-error').style.display = 'none';
+  document.getElementById('auth-success').style.display = 'none';
+  document.getElementById('teacher-nav').style.display = 'none';
+  document.getElementById('add-session-btn').style.display = 'none';
+  document.getElementById('teacher-dash').style.display = 'none';
   document.getElementById('home-subtitle').textContent = 'Your maths learning hub.';
   showPage('home');
 }
 
-// ── NAVIGATION ──
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
@@ -419,13 +661,19 @@ function showPage(id) {
   const idx = pages.indexOf(id);
   if (navItems[idx]) navItems[idx].classList.add('active');
   if (id === 'students') loadStudents();
-  if (id === 'homework') loadAssignments();
   if (id === 'home') { loadSessions(); if(currentRole==='teacher') loadTeacherDash(); }
-  if (id === 'sessions') { localStorage.setItem(VISIT_KEY_S, new Date().toISOString()); document.getElementById('dot-sessions').classList.remove('visible'); loadExplorer('sessions'); }
-  if (id === 'books') { localStorage.setItem(VISIT_KEY_B, new Date().toISOString()); document.getElementById('dot-books').classList.remove('visible'); loadExplorer('books'); }
+  if (id === 'sessions') {
+    localStorage.setItem(VISIT_KEY_S, new Date().toISOString());
+    document.getElementById('dot-sessions').classList.remove('visible');
+    loadExplorer('sessions');
+  }
+  if (id === 'books') {
+    localStorage.setItem(VISIT_KEY_B, new Date().toISOString());
+    document.getElementById('dot-books').classList.remove('visible');
+    loadExplorer('books');
+  }
 }
 
-// ── TEACHER DASHBOARD ──
 async function loadTeacherDash() {
   const [{ count: total }, { count: pending }, { count: sessions }, { count: pdfs }] = await Promise.all([
     sb.from('profiles').select('id',{count:'exact',head:true}).eq('role','student').eq('status','approved'),
@@ -433,291 +681,698 @@ async function loadTeacherDash() {
     sb.from('sessions').select('id',{count:'exact',head:true}),
     sb.from('explorer_nodes').select('id',{count:'exact',head:true}).eq('type','file').eq('section','books')
   ]);
-  document.getElementById('dash-total').textContent = total || 0; document.getElementById('dash-pending').textContent = pending || 0;
-  document.getElementById('dash-sessions').textContent = sessions || 0; document.getElementById('dash-pdfs').textContent = pdfs || 0;
+  document.getElementById('dash-total').textContent = total || 0;
+  document.getElementById('dash-pending').textContent = pending || 0;
+  document.getElementById('dash-sessions').textContent = sessions || 0;
+  document.getElementById('dash-pdfs').textContent = pdfs || 0;
 }
 
-// ── SESSIONS ──
 async function loadSessions() {
   const list = document.getElementById('session-list');
   list.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
   const { data, error } = await sb.from('sessions').select('*').order('created_at', { ascending: false });
   if (error) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load sessions.</div>'; return; }
-  allSessionsRows = data || []; renderSessions(allSessionsRows);
+  allSessionsRows = data || [];
+  renderSessions(allSessionsRows);
 }
 
 function renderSessions(rows) {
   const list = document.getElementById('session-list');
-  if (!rows || rows.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div>No upcoming sessions right now.</div>'; return; }
+  if (!rows || rows.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div>No upcoming sessions right now.</div>';
+    return;
+  }
   list.innerHTML = rows.map(s => {
     const vl = s.visibility === 'all' ? 'Everyone' : s.visibility === 'student' ? 'Specific student' : s.visibility;
     const linkHtml = s.link ? `<a href="${s.link}" target="_blank" rel="noopener">🔗 Join link</a>` : '';
     const timeHtml = s.time_text ? `<span>🕒 ${s.time_text}</span>` : '';
-    const teacherBtns = currentRole === 'teacher' ? `<div class="session-actions"><button class="session-edit" onclick="openEditSessionModal('${s.id}','${escHtml(s.name)}','${escHtml(s.link||'')}','${escHtml(s.time_text||'')}')">✏️ Edit</button><button class="session-delete" onclick="deleteSession('${s.id}')">🗑 Delete</button></div>` : '';
-    return `<div class="session-card"><div class="session-card-main"><div class="session-card-name">${s.name}</div><div class="session-card-meta">${timeHtml}${linkHtml}<span class="session-vis-tag">${vl}</span></div></div>${teacherBtns}</div>`;
+    const teacherBtns = currentRole === 'teacher'
+      ? `<div class="session-actions">
+           <button class="session-edit" onclick="openEditSessionModal('${s.id}','${escHtml(s.name)}','${escHtml(s.link||'')}','${escHtml(s.time_text||'')}')">✏️ Edit</button>
+           <button class="session-delete" onclick="deleteSession('${s.id}')">🗑 Delete</button>
+         </div>` : '';
+    return `<div class="session-card">
+      <div class="session-card-main">
+        <div class="session-card-name">${s.name}</div>
+        <div class="session-card-meta">${timeHtml}${linkHtml}<span class="session-vis-tag">${vl}</span></div>
+      </div>${teacherBtns}</div>`;
   }).join('');
 }
 
-async function deleteSession(id) { if (!confirm('Delete this session?')) return; const { error } = await sb.from('sessions').delete().eq('id', id); if (error) { toast('Error: ' + error.message); return; } toast('Session deleted.'); loadSessions(); }
+async function deleteSession(id) {
+  if (!confirm('Delete this session?')) return;
+  const { error } = await sb.from('sessions').delete().eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('Session deleted.');
+  loadSessions();
+}
 
-function openEditSessionModal(id, name, link, time) { editingSessionId = id; document.getElementById('edit-session-id').value = id; document.getElementById('edit-session-name').value = name; document.getElementById('edit-session-link').value = link; document.getElementById('edit-session-time').value = time; document.getElementById('edit-session-modal').classList.add('open'); }
+function openEditSessionModal(id, name, link, time) {
+  editingSessionId = id;
+  document.getElementById('edit-session-id').value = id;
+  document.getElementById('edit-session-name').value = name;
+  document.getElementById('edit-session-link').value = link;
+  document.getElementById('edit-session-time').value = time;
+  document.getElementById('edit-session-modal').classList.add('open');
+}
 function closeEditSessionModal() { document.getElementById('edit-session-modal').classList.remove('open'); }
 
 async function saveEditSession() {
-  const id = document.getElementById('edit-session-id').value; const name = document.getElementById('edit-session-name').value.trim();
-  let link = document.getElementById('edit-session-link').value.trim(); const time = document.getElementById('edit-session-time').value.trim();
+  const id = document.getElementById('edit-session-id').value;
+  const name = document.getElementById('edit-session-name').value.trim();
+  let link = document.getElementById('edit-session-link').value.trim();
+  const time = document.getElementById('edit-session-time').value.trim();
   if (!name) { toast('Please enter a session name.'); return; }
   if (link && !/^https?:\/\//i.test(link)) link = 'https://' + link;
   const { error } = await sb.from('sessions').update({ name, link: link||null, time_text: time||null }).eq('id', id);
   if (error) { toast('Error: ' + error.message); return; }
-  closeEditSessionModal(); toast('Session updated! ✅'); loadSessions();
+  closeEditSessionModal();
+  toast('Session updated! ✅');
+  loadSessions();
 }
 
-function openSessionModal() { /* same as before */ }
+function openSessionModal() {
+  selectedSessionVisibility = 'all'; selectedSessionStudentId = '';
+  document.getElementById('session-name').value = '';
+  document.getElementById('session-link').value = '';
+  document.getElementById('session-time').value = '';
+  document.getElementById('session-student-search').value = '';
+  document.getElementById('session-student-id').value = '';
+  document.getElementById('session-student-picker').style.display = 'none';
+  document.getElementById('session-modal-title').textContent = '📅 New session';
+  document.getElementById('session-save-btn').textContent = 'Create session';
+  document.querySelectorAll('#session-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === 'all'));
+  loadStudentsForSessionPicker();
+  document.getElementById('session-modal').classList.add('open');
+}
 function closeSessionModal() { document.getElementById('session-modal').classList.remove('open'); }
-function selectSessionVisibility(vis) { /* same */ }
-async function loadStudentsForSessionPicker() { /* same */ }
-function renderSessionStudentPicker(students) { /* same */ }
-function filterSessionStudentPicker(query) { /* same */ }
-function pickSessionStudent(id) { /* same */ }
-async function saveSession() { /* same */ }
 
-// ── EXPLORER ──
+function selectSessionVisibility(vis) {
+  selectedSessionVisibility = vis;
+  document.querySelectorAll('#session-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === vis));
+  document.getElementById('session-student-picker').style.display = vis === 'student' ? 'block' : 'none';
+}
+
+async function loadStudentsForSessionPicker() {
+  const { data } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name');
+  sessionPickerStudents = data || [];
+  renderSessionStudentPicker(sessionPickerStudents);
+}
+
+function renderSessionStudentPicker(students) {
+  const list = document.getElementById('session-student-list');
+  if (!students || students.length === 0) { list.innerHTML = '<div class="student-picker-empty">No approved students found</div>'; return; }
+  list.innerHTML = students.map(s => {
+    const label = `${s.full_name || s.email}${s.year_group ? ' (' + s.year_group + ')' : ''}`;
+    return `<div class="student-picker-row${s.id === selectedSessionStudentId ? ' selected' : ''}" onclick="pickSessionStudent('${s.id}')">${label}</div>`;
+  }).join('');
+}
+
+function filterSessionStudentPicker(query) {
+  const q = query.toLowerCase();
+  renderSessionStudentPicker(sessionPickerStudents.filter(s =>
+    (s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q)));
+}
+
+function pickSessionStudent(id) {
+  selectedSessionStudentId = id;
+  document.getElementById('session-student-id').value = id;
+  renderSessionStudentPicker(sessionPickerStudents);
+}
+
+async function saveSession() {
+  const name = document.getElementById('session-name').value.trim();
+  let link = document.getElementById('session-link').value.trim();
+  if (link && !/^https?:\/\//i.test(link)) link = 'https://' + link;
+  const timeText = document.getElementById('session-time').value.trim();
+  if (!name) { toast('Please enter a session name.'); return; }
+  if (selectedSessionVisibility === 'student' && !selectedSessionStudentId) { toast('Please choose a student.'); return; }
+  const { error } = await sb.from('sessions').insert({
+    name, link: link||null, time_text: timeText||null, created_by: currentUser.id,
+    visibility: selectedSessionVisibility,
+    student_id: selectedSessionVisibility==='student' ? selectedSessionStudentId : null
+  });
+  if (error) { toast('Error: ' + error.message); return; }
+  closeSessionModal();
+  toast('Session created! 📅');
+  loadSessions();
+  checkNotificationDots();
+}
+
 const EXPLORER_CONFIG = {
-  sessions: { rootLabel:'📅 Sessions', gridId:'sessions-explorer-grid', breadcrumbId:'sessions-breadcrumb', toolbarId:'sessions-toolbar-btns', addFolderFn:'openExplorerFolderModal', addFileFn:'openExplorerFileModal', addFileLabel:'🎬 Add recording', emptyRootMsg:'No folders yet. Create one to get started.', emptyFolderMsg:'This folder is empty.' },
-  books: { rootLabel:'📚 PDFs', gridId:'books-explorer-grid', breadcrumbId:'books-breadcrumb', toolbarId:'books-toolbar-btns', addFolderFn:'openPdfFolderModal', addFileFn:'openPdfFileModal', addFileLabel:'📄 Add PDF', emptyRootMsg:'No folders yet. Create one to get started.', emptyFolderMsg:'This folder is empty.' }
+  sessions: {
+    rootLabel:'📅 Sessions', gridId:'sessions-explorer-grid', breadcrumbId:'sessions-breadcrumb', toolbarId:'sessions-toolbar-btns',
+    addFolderFn:'openExplorerFolderModal', addFileFn:'openExplorerFileModal', addFileLabel:'🎬 Add recording',
+    emptyRootMsg:'No folders yet. Create one to get started.', emptyFolderMsg:'This folder is empty.',
+  },
+  books: {
+    rootLabel:'📚 PDFs', gridId:'books-explorer-grid', breadcrumbId:'books-breadcrumb', toolbarId:'books-toolbar-btns',
+    addFolderFn:'openPdfFolderModal', addFileFn:'openPdfFileModal', addFileLabel:'📄 Add PDF',
+    emptyRootMsg:'No folders yet. Create one to get started.', emptyFolderMsg:'This folder is empty.',
+  }
 };
 
-async function loadExplorer(section) { /* same */ }
-async function searchExplorer(section, query) { /* same */ }
-function renderExplorerBreadcrumb(section) { /* same */ }
-function renderExplorerToolbar(section) { /* same */ }
-function renderExplorerGrid(section, nodes) { /* same */ }
+async function loadExplorer(section) {
+  activeExplorerSection = section;
+  const cfg = EXPLORER_CONFIG[section];
+  const path = explorerPaths[section];
+  const parentId = path.length === 0 ? null : path[path.length-1].id;
+  renderExplorerBreadcrumb(section);
+  renderExplorerToolbar(section);
+  const grid = document.getElementById(cfg.gridId);
+  grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
+  let query = sb.from('explorer_nodes').select('*').eq('section',section).order('type',{ascending:true}).order('name',{ascending:true});
+  if (parentId === null) query = query.filter('parent_id','is','null');
+  else query = query.eq('parent_id', parentId);
+  const { data, error } = await query;
+  if (error) { grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>Error: ${error.message}</div>`; return; }
+  renderExplorerGrid(section, data || []);
+}
+
+async function searchExplorer(section, query) {
+  const cfg = EXPLORER_CONFIG[section];
+  const grid = document.getElementById(cfg.gridId);
+  if (!query.trim()) { loadExplorer(section); return; }
+  const { data } = await sb.from('explorer_nodes').select('*').eq('section',section).ilike('name', `%${query}%`);
+  renderExplorerGrid(section, data || []);
+}
+
+function renderExplorerBreadcrumb(section) {
+  const cfg = EXPLORER_CONFIG[section];
+  const path = explorerPaths[section];
+  const bc = document.getElementById(cfg.breadcrumbId);
+  const items = [{ id: null, name: cfg.rootLabel }, ...path];
+  bc.innerHTML = items.map((item, idx) => {
+    const isLast = idx === items.length - 1;
+    const sep = idx < items.length-1 ? `<span class="breadcrumb-sep">›</span>` : '';
+    return `<span class="breadcrumb-item${isLast?' current':''}" onclick="${isLast?'':` navToDepth('${section}',${idx})`}">${item.name}</span>${sep}`;
+  }).join('');
+}
+
+function renderExplorerToolbar(section) {
+  const cfg = EXPLORER_CONFIG[section];
+  const path = explorerPaths[section];
+  const btns = document.getElementById(cfg.toolbarId);
+  if (currentRole !== 'teacher') { btns.innerHTML=''; return; }
+  if (path.length > 0) {
+    btns.innerHTML = `<button class="btn-add-outline" onclick="${cfg.addFolderFn}()">📁 Add folder</button><button class="btn-add" onclick="${cfg.addFileFn}()">${cfg.addFileLabel}</button>`;
+  } else {
+    btns.innerHTML = `<button class="btn-add" onclick="${cfg.addFolderFn}()">📁 Add folder</button>`;
+  }
+}
+
+function renderExplorerGrid(section, nodes) {
+  const cfg = EXPLORER_CONFIG[section];
+  const path = explorerPaths[section];
+  const grid = document.getElementById(cfg.gridId);
+  if (!nodes || nodes.length === 0) {
+    const isRoot = path.length === 0;
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">${isRoot?'📁':'📄'}</div>${isRoot?cfg.emptyRootMsg:cfg.emptyFolderMsg}</div>`;
+    return;
+  }
+  grid.innerHTML = nodes.map(node => {
+    if (node.type === 'folder') return renderFolderCard(node, section);
+    if (section === 'books') return renderPdfCard(node);
+    return renderFileCard(node);
+  }).join('');
+}
+
 function visLabel(vis) { if(vis==='all') return 'Everyone'; if(vis==='student') return 'Specific student'; return vis; }
 function escHtml(str) { return (str||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;'); }
-function renderFolderCard(node, section) { /* same */ }
-function renderFileCard(node) { /* same */ }
-function renderPdfCard(node) { /* same */ }
+
+function renderFolderCard(node, section) {
+  const isRoot = node.parent_id === null;
+  const badge = isRoot ? `<div class="vis-badge">${visLabel(node.visibility)}</div>` : '';
+  const editBtn = currentRole==='teacher' ? `<button class="explorer-card-btn" onclick="event.stopPropagation();openEditNodeModal('${node.id}','${escHtml(node.name)}','folder','${section}')" title="Edit">✏️</button>` : '';
+  const delBtn = currentRole==='teacher' ? `<button class="explorer-card-btn del" onclick="event.stopPropagation();deleteExplorerNode('${node.id}','${section}')" title="Delete">🗑</button>` : '';
+  const actions = currentRole==='teacher' ? `<div class="explorer-card-actions">${editBtn}${delBtn}</div>` : '';
+  return `<div class="explorer-card" onclick="openFolder('${section}','${node.id}','${escHtml(node.name)}')">${actions}<div class="explorer-card-icon">📁</div><div class="explorer-card-name">${node.name}</div>${badge}</div>`;
+}
+
+function renderFileCard(node) {
+  const editBtn = currentRole==='teacher' ? `<button class="explorer-card-btn" onclick="openEditNodeModal('${node.id}','${escHtml(node.name)}','file','sessions','${escHtml(node.description||'')}','${escHtml(node.drive_link||'')}')" title="Edit">✏️</button>` : '';
+  const delBtn = currentRole==='teacher' ? `<button class="explorer-card-btn del" onclick="deleteExplorerNode('${node.id}','sessions')" title="Delete">🗑</button>` : '';
+  const actions = currentRole==='teacher' ? `<div class="explorer-card-actions">${editBtn}${delBtn}</div>` : '';
+  const desc = node.description ? `<div class="explorer-card-meta">${node.description}</div>` : '';
+  const link = node.drive_link ? `<a class="file-watch-btn" href="${node.drive_link}" target="_blank" rel="noopener">▶ Watch</a>` : '';
+  return `<div class="explorer-card file-card">${actions}<div class="explorer-card-icon">🎞️</div><div class="explorer-card-name">${node.name}</div>${desc}${link}</div>`;
+}
+
+function renderPdfCard(node) {
+  const editBtn = currentRole==='teacher' ? `<button class="explorer-card-btn" onclick="openEditNodeModal('${node.id}','${escHtml(node.name)}','file','books','${escHtml(node.description||'')}','')" title="Edit">✏️</button>` : '';
+  const delBtn = currentRole==='teacher' ? `<button class="explorer-card-btn del" onclick="deletePdfNode('${node.id}')" title="Delete">🗑</button>` : '';
+  const actions = currentRole==='teacher' ? `<div class="explorer-card-actions">${editBtn}${delBtn}</div>` : '';
+  const desc = node.description ? `<div class="explorer-card-meta">${node.description}</div>` : '';
+  const link = node.drive_link ? `<a class="file-watch-btn" href="${node.drive_link}" target="_blank" rel="noopener">📖 Open PDF</a>` : '';
+  return `<div class="explorer-card file-card">${actions}<div class="explorer-card-icon">📄</div><div class="explorer-card-name">${node.name}</div>${desc}${link}</div>`;
+}
+
 function openFolder(section, id, name) { explorerPaths[section].push({id,name}); loadExplorer(section); }
-function navToDepth(section, idx) { explorerPaths[section] = idx===0 ? [] : explorerPaths[section].slice(0, idx); loadExplorer(section); }
-async function deleteExplorerNode(id, section) { /* same */ }
-async function deletePdfNode(id) { /* same */ }
-function openExplorerFolderModal() { /* same */ }
-function closeExplorerFolderModal() { /* same */ }
-function selectExplorerFolderVis(vis) { /* same */ }
-async function loadStudentsForEFPicker() { /* same */ }
-function renderEFStudentPicker(students) { /* same */ }
-function filterEFStudentPicker(query) { /* same */ }
-function pickEFStudent(id) { /* same */ }
-async function saveExplorerFolder() { /* same */ }
-function openExplorerFileModal() { /* same */ }
-function closeExplorerFileModal() { /* same */ }
-async function saveExplorerFile() { /* same */ }
-function openPdfFolderModal() { /* same */ }
-function closePdfFolderModal() { /* same */ }
-function selectPdfFolderVis(vis) { /* same */ }
-async function loadStudentsForPFPicker() { /* same */ }
-function renderPFStudentPicker(students) { /* same */ }
-function filterPFStudentPicker(query) { /* same */ }
-function pickPFStudent(id) { /* same */ }
-async function savePdfFolder() { /* same */ }
-function openPdfFileModal() { /* same */ }
-function closePdfFileModal() { /* same */ }
-async function savePdfFile() { /* same */ }
 
-// ── STUDENTS ──
-function switchStudentTab(tab, event) { currentStudentTab=tab; document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active')); if (event&&event.target) event.target.classList.add('active'); loadStudents(); }
+function navToDepth(section, idx) {
+  explorerPaths[section] = idx===0 ? [] : explorerPaths[section].slice(0, idx);
+  loadExplorer(section);
+}
 
-async function loadStudents() { /* same as before */ }
-function updateFilterCount(count) { const countEl = document.getElementById('filter-count'); if (countEl) { countEl.textContent = `(${count} ${count === 1 ? 'person' : 'people'})`; } }
+async function deleteExplorerNode(id, section) {
+  if (!confirm('Delete this item and everything inside it?')) return;
+  const { error } = await sb.from('explorer_nodes').delete().eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('Deleted.');
+  loadExplorer(section || activeExplorerSection);
+}
+
+async function deletePdfNode(id) {
+  if (!confirm('Delete this PDF?')) return;
+  const { data: node } = await sb.from('explorer_nodes').select('storage_path').eq('id', id).single();
+  if (node && node.storage_path) await sb.storage.from('astar-files').remove([node.storage_path]);
+  const { error } = await sb.from('explorer_nodes').delete().eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('PDF deleted.');
+  loadExplorer('books');
+}
+
+function openExplorerFolderModal() {
+  selectedExplorerFolderVis = 'all'; selectedEFStudentId = '';
+  document.getElementById('explorer-folder-name').value = '';
+  document.getElementById('ef-student-search').value = '';
+  document.getElementById('ef-student-id').value = '';
+  document.getElementById('explorer-folder-student-picker').style.display = 'none';
+  const isRoot = explorerPaths['sessions'].length === 0;
+  document.getElementById('explorer-folder-vis-group').style.display = isRoot ? 'block' : 'none';
+  document.getElementById('explorer-folder-modal-title').textContent = isRoot ? '📁 New folder' : '📁 New subfolder';
+  document.querySelectorAll('#explorer-folder-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === 'all'));
+  if (isRoot) loadStudentsForEFPicker();
+  document.getElementById('explorer-folder-modal').classList.add('open');
+}
+function closeExplorerFolderModal() { document.getElementById('explorer-folder-modal').classList.remove('open'); }
+
+function selectExplorerFolderVis(vis) {
+  selectedExplorerFolderVis = vis;
+  document.querySelectorAll('#explorer-folder-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === vis));
+  document.getElementById('explorer-folder-student-picker').style.display = vis === 'student' ? 'block' : 'none';
+}
+
+async function loadStudentsForEFPicker() {
+  const { data } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name');
+  efPickerStudents = data || [];
+  renderEFStudentPicker(efPickerStudents);
+}
+
+function renderEFStudentPicker(students) {
+  const list = document.getElementById('ef-student-list');
+  if (!students||students.length===0) { list.innerHTML='<div class="student-picker-empty">No approved students found</div>'; return; }
+  list.innerHTML = students.map(s => {
+    const label = `${s.full_name||s.email}${s.year_group?' ('+s.year_group+')':''}`;
+    return `<div class="student-picker-row${s.id===selectedEFStudentId?' selected':''}" onclick="pickEFStudent('${s.id}')">${label}</div>`;
+  }).join('');
+}
+
+function filterEFStudentPicker(query) {
+  const q=query.toLowerCase();
+  renderEFStudentPicker(efPickerStudents.filter(s=>(s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q)));
+}
+
+function pickEFStudent(id) { selectedEFStudentId=id; document.getElementById('ef-student-id').value=id; renderEFStudentPicker(efPickerStudents); }
+
+async function saveExplorerFolder() {
+  const name = document.getElementById('explorer-folder-name').value.trim();
+  if (!name) { toast('Please enter a folder name.'); return; }
+  const path = explorerPaths['sessions'];
+  const isRoot = path.length === 0;
+  if (isRoot && selectedExplorerFolderVis==='student' && !selectedEFStudentId) { toast('Please choose a student.'); return; }
+  const parentId = isRoot ? null : path[path.length-1].id;
+  const { error } = await sb.from('explorer_nodes').insert({
+    section:'sessions', parent_id:parentId, type:'folder', name,
+    visibility: isRoot ? selectedExplorerFolderVis : null,
+    student_id: (isRoot && selectedExplorerFolderVis==='student') ? selectedEFStudentId : null,
+    created_by: currentUser.id
+  });
+  if (error) { toast('Error: ' + error.message); return; }
+  closeExplorerFolderModal();
+  toast('Folder created! 📁');
+  loadExplorer('sessions');
+  checkNotificationDots();
+}
+
+function openExplorerFileModal() {
+  document.getElementById('explorer-file-name').value='';
+  document.getElementById('explorer-file-desc').value='';
+  document.getElementById('explorer-file-link').value='';
+  document.getElementById('explorer-file-modal').classList.add('open');
+}
+function closeExplorerFileModal() { document.getElementById('explorer-file-modal').classList.remove('open'); }
+
+async function saveExplorerFile() {
+  const name = document.getElementById('explorer-file-name').value.trim();
+  const desc = document.getElementById('explorer-file-desc').value.trim();
+  let link = document.getElementById('explorer-file-link').value.trim();
+  if (!name) { toast('Please enter a lesson name.'); return; }
+  if (!link) { toast('Please enter a Google Drive link.'); return; }
+  if (!/^https?:\/\//i.test(link)) link = 'https://' + link;
+  const path = explorerPaths['sessions'];
+  if (path.length === 0) { toast('Please open a folder first.'); return; }
+  const parentId = path[path.length-1].id;
+  const { error } = await sb.from('explorer_nodes').insert({
+    section:'sessions', parent_id:parentId, type:'file', name,
+    description:desc||null, drive_link:link, created_by:currentUser.id
+  });
+  if (error) { toast('Error: ' + error.message); return; }
+  closeExplorerFileModal();
+  toast('Recording added! 🎬');
+  loadExplorer('sessions');
+  checkNotificationDots();
+}
+
+function openPdfFolderModal() {
+  selectedPdfFolderVis='all'; selectedPFStudentId='';
+  document.getElementById('pdf-folder-name').value='';
+  document.getElementById('pf-student-search').value='';
+  document.getElementById('pf-student-id').value='';
+  document.getElementById('pdf-folder-student-picker').style.display='none';
+  const isRoot = explorerPaths['books'].length === 0;
+  document.getElementById('pdf-folder-vis-group').style.display = isRoot ? 'block' : 'none';
+  document.getElementById('pdf-folder-modal-title').textContent = isRoot ? '📁 New folder' : '📁 New subfolder';
+  document.querySelectorAll('#pdf-folder-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis==='all'));
+  if (isRoot) loadStudentsForPFPicker();
+  document.getElementById('pdf-folder-modal').classList.add('open');
+}
+function closePdfFolderModal() { document.getElementById('pdf-folder-modal').classList.remove('open'); }
+
+function selectPdfFolderVis(vis) {
+  selectedPdfFolderVis=vis;
+  document.querySelectorAll('#pdf-folder-modal .vis-btn').forEach(b=>b.classList.toggle('selected',b.dataset.vis===vis));
+  document.getElementById('pdf-folder-student-picker').style.display=vis==='student'?'block':'none';
+}
+
+async function loadStudentsForPFPicker() {
+  const { data } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name');
+  pfPickerStudents=data||[];
+  renderPFStudentPicker(pfPickerStudents);
+}
+
+function renderPFStudentPicker(students) {
+  const list=document.getElementById('pf-student-list');
+  if (!students||students.length===0) { list.innerHTML='<div class="student-picker-empty">No approved students found</div>'; return; }
+  list.innerHTML=students.map(s=>{
+    const label=`${s.full_name||s.email}${s.year_group?' ('+s.year_group+')':''}`;
+    return `<div class="student-picker-row${s.id===selectedPFStudentId?' selected':''}" onclick="pickPFStudent('${s.id}')">${label}</div>`;
+  }).join('');
+}
+
+function filterPFStudentPicker(query) {
+  const q=query.toLowerCase();
+  renderPFStudentPicker(pfPickerStudents.filter(s=>(s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q)));
+}
+
+function pickPFStudent(id) { selectedPFStudentId=id; document.getElementById('pf-student-id').value=id; renderPFStudentPicker(pfPickerStudents); }
+
+async function savePdfFolder() {
+  const name=document.getElementById('pdf-folder-name').value.trim();
+  if (!name) { toast('Please enter a folder name.'); return; }
+  const path=explorerPaths['books'];
+  const isRoot=path.length===0;
+  if (isRoot&&selectedPdfFolderVis==='student'&&!selectedPFStudentId) { toast('Please choose a student.'); return; }
+  const parentId=isRoot?null:path[path.length-1].id;
+  const { error }=await sb.from('explorer_nodes').insert({
+    section:'books', parent_id:parentId, type:'folder', name,
+    visibility:isRoot?selectedPdfFolderVis:null,
+    student_id:(isRoot&&selectedPdfFolderVis==='student')?selectedPFStudentId:null,
+    created_by:currentUser.id
+  });
+  if (error) { toast('Error: '+error.message); return; }
+  closePdfFolderModal();
+  toast('Folder created! 📁');
+  loadExplorer('books');
+  checkNotificationDots();
+}
+
+function openPdfFileModal() {
+  document.getElementById('pdf-file-name').value='';
+  document.getElementById('pdf-file-desc').value='';
+  document.getElementById('pdf-file-input').value='';
+  document.getElementById('pdf-upload-progress').style.display='none';
+  document.getElementById('pdf-progress-bar').style.width='0%';
+  document.getElementById('pdf-save-btn').disabled=false;
+  document.getElementById('pdf-save-btn').textContent='Upload PDF';
+  document.getElementById('pdf-file-modal').classList.add('open');
+}
+function closePdfFileModal() { document.getElementById('pdf-file-modal').classList.remove('open'); }
+
+async function savePdfFile() {
+  const name=document.getElementById('pdf-file-name').value.trim();
+  const desc=document.getElementById('pdf-file-desc').value.trim();
+  const fileInput=document.getElementById('pdf-file-input');
+  const file=fileInput.files[0];
+  if (!name) { toast('Please enter a title.'); return; }
+  if (!file) { toast('Please choose a PDF file.'); return; }
+  const path=explorerPaths['books'];
+  if (path.length===0) { toast('Please open a folder first.'); return; }
+  const parentId=path[path.length-1].id;
+  const btn=document.getElementById('pdf-save-btn');
+  btn.disabled=true; btn.textContent='Uploading...';
+  document.getElementById('pdf-upload-progress').style.display='block';
+  document.getElementById('pdf-progress-bar').style.width='30%';
+  const ext=file.name.split('.').pop();
+  const storagePath=`pdfs/${currentUser.id}/${Date.now()}.${ext}`;
+  const { error:uploadError }=await sb.storage.from('astar-files').upload(storagePath,file,{contentType:'application/pdf'});
+  if (uploadError) { toast('Upload failed: '+uploadError.message); btn.disabled=false; btn.textContent='Upload PDF'; document.getElementById('pdf-upload-progress').style.display='none'; return; }
+  document.getElementById('pdf-progress-bar').style.width='80%';
+  const { data:urlData }=sb.storage.from('astar-files').getPublicUrl(storagePath);
+  document.getElementById('pdf-progress-bar').style.width='100%';
+  document.getElementById('pdf-progress-label').textContent='Saving...';
+  const { error:dbError }=await sb.from('explorer_nodes').insert({
+    section:'books', parent_id:parentId, type:'file', name,
+    description:desc||null, drive_link:urlData.publicUrl,
+    storage_path:storagePath, created_by:currentUser.id
+  });
+  if (dbError) { toast('Error saving: '+dbError.message); btn.disabled=false; btn.textContent='Upload PDF'; document.getElementById('pdf-upload-progress').style.display='none'; return; }
+  closePdfFileModal();
+  toast('PDF uploaded! 📄');
+  loadExplorer('books');
+  checkNotificationDots();
+}
+
+/* ─── STUDENTS ─── */
+
+function switchStudentTab(tab, event) {
+  currentStudentTab=tab;
+  document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));
+  if (event&&event.target) event.target.classList.add('active');
+  loadStudents();
+}
+
+async function loadStudents() {
+  if (currentRole!=='teacher') return;
+  
+  let query = sb.from('profiles').select('*').order('full_name');
+  
+  if (currentRoleFilter === 'students') {
+    query = query.eq('role', 'student').eq('status', currentStudentTab);
+  } else if (currentRoleFilter === 'teachers') {
+    query = query.eq('role', 'teacher');
+  }
+  
+  const { data } = await query;
+  allStudentsRows = data || [];
+  
+  let filtered = allStudentsRows;
+  if (currentYearFilter !== 'all' && currentRoleFilter === 'students') {
+    filtered = allStudentsRows.filter(s => s.year_group === currentYearFilter);
+  }
+  
+  renderStudents(filtered);
+  updateFilterCount(filtered.length);
+}
+
+function updateFilterCount(count) {
+  const countEl = document.getElementById('filter-count');
+  if (countEl) {
+    countEl.textContent = `(${count} ${count === 1 ? 'person' : 'people'})`;
+  }
+}
 
 function renderStudents(students) {
   const tbody=document.getElementById('students-tbody');
+  
+  // Update table header based on filter
   const thead = document.querySelector('.students-table thead tr');
-  if (currentRoleFilter === 'teachers') { thead.innerHTML = '<th>Name</th><th>Email</th>'; }
-  else { thead.innerHTML = '<th>Name</th><th>Email</th><th>Year</th><th>Status</th><th>Actions</th>'; }
+  if (currentRoleFilter === 'teachers') {
+    thead.innerHTML = '<th>Name</th><th>Email</th>';
+  } else {
+    thead.innerHTML = '<th>Name</th><th>Email</th><th>Year</th><th>Status</th><th>Actions</th>';
+  }
+  
   if (!students||students.length===0) {
     let msg = 'No users found';
     if (currentRoleFilter === 'teachers') msg = 'No teachers found';
     else if (currentStudentTab === 'pending') msg = 'No students waiting for approval';
     else if (currentStudentTab === 'approved') msg = 'No approved students yet';
     const colspan = currentRoleFilter === 'teachers' ? '2' : '5';
-    tbody.innerHTML=`<tr><td colspan="${colspan}" style="color:var(--text-muted);text-align:center;padding:20px">${msg}</td></tr>`; return;
+    tbody.innerHTML=`<tr><td colspan="${colspan}" style="color:var(--text-muted);text-align:center;padding:20px">${msg}</td></tr>`;
+    return;
   }
+  
   if (currentRoleFilter === 'teachers') {
-    tbody.innerHTML=students.map(s=>`<tr><td><strong>${s.full_name||'—'}</strong></td><td>${s.email}</td></tr>`).join('');
+    tbody.innerHTML=students.map(s=>{
+      return `<tr>
+        <td><strong>${s.full_name||'—'}</strong></td>
+        <td>${s.email}</td>
+      </tr>`;
+    }).join('');
   } else {
     tbody.innerHTML=students.map(s=>{
       const yearBadge=s.year_group?`<span class="year-badge year-${s.year_group}">${s.year_group}</span>`:'—';
-      let actions = currentStudentTab === 'pending' ? `<button class="btn-approve" onclick="approveStudent('${s.id}')">✅ Approve</button><button class="btn-reject" onclick="rejectStudent('${s.id}')">❌ Reject</button><button class="btn-promote" onclick="approveAsTeacher('${s.id}')">👨‍🏫 Approve as Teacher</button>` : `<button class="btn-small" onclick="rejectStudent('${s.id}')">Remove</button>`;
-      return `<tr><td><strong>${s.full_name||'—'}</strong></td><td>${s.email}</td><td>${yearBadge}</td><td><span class="status-badge status-${s.status||'approved'}">${s.status}</span></td><td>${actions}</td></tr>`;
+      
+      let actions = '';
+      if (currentStudentTab === 'pending') {
+        actions = `<button class="btn-approve" onclick="approveStudent('${s.id}')">✅ Approve</button>
+                   <button class="btn-reject" onclick="rejectStudent('${s.id}')">❌ Reject</button>
+                   <button class="btn-promote" onclick="approveAsTeacher('${s.id}')">👨‍🏫 Approve as Teacher</button>`;
+      } else {
+        actions = `<button class="btn-small" onclick="rejectStudent('${s.id}')">Remove</button>`;
+      }
+      
+      return `<tr>
+        <td><strong>${s.full_name||'—'}</strong></td>
+        <td>${s.email}</td>
+        <td>${yearBadge}</td>
+        <td><span class="status-badge status-${s.status||'approved'}">${s.status}</span></td>
+        <td>${actions}</td>
+      </tr>`;
     }).join('');
   }
 }
-function filterStudents(query) { /* same */ }
-function filterByYear(year) { /* same */ }
-function filterByRole(role) { /* same */ }
-async function approveStudent(id) { /* same */ }
-async function approveAsTeacher(id) { /* same */ }
-async function rejectStudent(id) { /* same */ }
 
-// ══════════════════════════════════════════
-// ─── ASSIGNMENTS / HOMEWORK ───
-// ══════════════════════════════════════════
-
-async function loadAssignments() {
-  if (viewingStudentId) return;
-  const list = document.getElementById('hw-assignments-list');
-  list.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
-  let query = sb.from('assignments').select('*').order('created_at', { ascending: false });
-  if (currentRole === 'student') {
-    query = query.or(`visibility.eq.all,visibility.eq.${currentYearGroup},and(visibility.eq.student,student_id.eq.${currentUser.id})`);
+function filterStudents(query) {
+  const q=query.toLowerCase();
+  let filtered = allStudentsRows;
+  if (currentYearFilter !== 'all' && currentRoleFilter === 'students') {
+    filtered = filtered.filter(s => s.year_group === currentYearFilter);
   }
-  const { data, error } = await query;
-  if (error) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div>Error loading assignments.</div>'; return; }
-  allAssignments = data || [];
-  if (currentRole === 'student' && allAssignments.length > 0) {
-    const assignmentIds = allAssignments.map(a => a.id);
-    const { data: subs } = await sb.from('submissions').select('*').eq('student_id', currentUser.id).in('assignment_id', assignmentIds);
-    const subMap = {}; (subs || []).forEach(s => subMap[s.assignment_id] = s);
-    renderStudentAssignments(allAssignments, subMap);
-  } else if (currentRole === 'teacher') { renderTeacherAssignments(allAssignments); }
-  else { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div>No assignments yet.</div>'; }
+  filtered = filtered.filter(s=>(s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q));
+  renderStudents(filtered);
+  updateFilterCount(filtered.length);
 }
 
-function renderTeacherAssignments(assignments) {
-  const list = document.getElementById('hw-assignments-list');
-  if (!assignments || assignments.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div>No assignments yet. Create one!</div>'; return; }
-  list.innerHTML = assignments.map(a => {
-    const vl = a.visibility === 'all' ? 'Everyone' : a.visibility === 'student' ? 'Specific student' : a.visibility;
-    const due = a.due_date ? `📅 ${a.due_date}${a.due_time ? ' at ' + a.due_time : ''}` : '';
-    return `<div class="session-card"><div class="session-card-main"><div class="session-card-name">${a.name}</div><div class="session-card-meta">${a.description ? '<span>📋 ' + a.description + '</span>' : ''}${due ? '<span>' + due + '</span>' : ''}<span class="session-vis-tag">${vl}</span></div></div><div class="session-actions"><button class="session-delete" onclick="deleteAssignment('${a.id}')">🗑 Delete</button></div></div>`;
-  }).join('');
+function filterByYear(year) {
+  currentYearFilter = year;
+  document.querySelectorAll('[id^="filter-year-"]').forEach(b => {
+    b.style.background = '';
+    b.style.color = '';
+    b.style.borderColor = '';
+  });
+  const activeBtn = document.getElementById('filter-year-' + year);
+  if (activeBtn) {
+    activeBtn.style.background = 'var(--blue)';
+    activeBtn.style.color = '#fff';
+    activeBtn.style.borderColor = 'var(--blue)';
+  }
+  loadStudents();
 }
 
-function renderStudentAssignments(assignments, subMap) {
-  const list = document.getElementById('hw-assignments-list');
-  if (!assignments || assignments.length === 0) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div>No assignments yet.</div>'; return; }
-  list.innerHTML = assignments.map(a => {
-    const submission = subMap[a.id];
-    let statusHTML = '', actionBtn = '';
-    if (!submission) { statusHTML = '<span class="hw-status hw-not-done">Not submitted</span>'; actionBtn = `<button class="file-watch-btn" onclick="openSubmitModal('${a.id}','${escHtml(a.name)}')">📤 Submit</button>`; }
-    else if (submission.status === 'submitted') { statusHTML = '<span class="hw-status hw-done-not-corrected">Submitted · Pending</span>'; actionBtn = `<span style="font-size:11px;color:var(--text-muted);">✅ Submitted</span>`; }
-    else { statusHTML = '<span class="hw-status hw-corrected">Corrected ✓</span>'; actionBtn = submission.teacher_notes ? `<button class="btn-small" onclick="alert('Teacher notes: ${escHtml(submission.teacher_notes)}')">📝 Notes</button>` : ''; }
-    const due = a.due_date ? `📅 ${a.due_date}${a.due_time ? ' at ' + a.due_time : ''}` : '';
-    return `<div class="session-card"><div class="session-card-main"><div class="session-card-name">${a.name}</div><div class="session-card-meta">${a.description ? '<span>📋 ' + a.description + '</span>' : ''}${due ? '<span>' + due + '</span>' : ''}${statusHTML}</div></div><div style="display:flex;align-items:center;gap:8px;">${actionBtn}</div></div>`;
-  }).join('');
+function filterByRole(role) {
+  currentRoleFilter = role;
+  ['students', 'teachers'].forEach(r => {
+    const btn = document.getElementById('filter-btn-' + r);
+    if (btn) {
+      btn.style.background = r === role ? 'var(--blue)' : '';
+      btn.style.color = r === role ? '#fff' : '';
+      btn.style.borderColor = r === role ? 'var(--blue)' : '';
+    }
+  });
+  
+  const yearFilterRow = document.getElementById('year-filter-row');
+  if (yearFilterRow) {
+    yearFilterRow.style.display = role === 'students' ? 'flex' : 'none';
+  }
+  
+  const panelTabs = document.querySelector('.panel-tabs');
+  if (panelTabs) {
+    panelTabs.style.display = role === 'students' ? 'flex' : 'none';
+  }
+  if (role === 'students') {
+    currentStudentTab = 'approved';
+    document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+    const approvedTab = document.querySelector('.panel-tab');
+    if (approvedTab) approvedTab.classList.add('active');
+  }
+  loadStudents();
 }
 
-function openSubmitModal(assignmentId, name) { hwCurrentAssignment = assignmentId; document.getElementById('hw-submit-title').textContent = 'Assignment: ' + name; document.getElementById('hw-submit-file').value = ''; document.getElementById('hw-submit-progress').style.display = 'none'; document.getElementById('hw-submit-btn').disabled = false; document.getElementById('hw-submit-btn').textContent = 'Upload'; document.getElementById('hw-submit-modal').classList.add('open'); }
-function closeHWSubmitModal() { document.getElementById('hw-submit-modal').classList.remove('open'); }
-
-async function submitAssignment() {
-  const fileInput = document.getElementById('hw-submit-file'); const file = fileInput.files[0];
-  if (!file) { toast('Please choose a PDF file.'); return; }
-  const btn = document.getElementById('hw-submit-btn'); btn.disabled = true; btn.textContent = 'Uploading...';
-  document.getElementById('hw-submit-progress').style.display = 'block'; document.getElementById('hw-submit-progress-bar').style.width = '30%';
-  const storagePath = `submissions/${hwCurrentAssignment}/${currentUser.id}/${Date.now()}.pdf`;
-  const { error: uploadError } = await sb.storage.from('astar-files').upload(storagePath, file, { contentType: 'application/pdf' });
-  if (uploadError) { toast('Upload failed: ' + uploadError.message); btn.disabled = false; btn.textContent = 'Upload'; return; }
-  document.getElementById('hw-submit-progress-bar').style.width = '80%';
-  const { error: dbError } = await sb.from('submissions').upsert({ assignment_id: hwCurrentAssignment, student_id: currentUser.id, storage_path: storagePath, file_name: file.name, status: 'submitted' }, { onConflict: 'assignment_id,student_id' });
-  if (dbError) { toast('Error saving: ' + dbError.message); btn.disabled = false; btn.textContent = 'Upload'; return; }
-  closeHWSubmitModal(); toast('Assignment submitted! ✅'); loadAssignments();
+async function approveStudent(id) {
+  const { error }=await sb.from('profiles').update({status:'approved'}).eq('id',id);
+  if (error) { toast('Error: '+error.message); return; }
+  toast('Student approved! ✅');
+  loadStudents();
+  if (currentRole==='teacher') loadTeacherDash();
 }
 
-function openAssignmentModal() {
-  selectedAssignmentVisibility = 'all'; selectedAssignmentStudentId = '';
-  document.getElementById('assignment-name').value = ''; document.getElementById('assignment-desc').value = '';
-  document.getElementById('assignment-due-date').value = ''; document.getElementById('assignment-due-time').value = '';
-  document.getElementById('assignment-student-search').value = ''; document.getElementById('assignment-student-id').value = '';
-  document.getElementById('assignment-student-picker').style.display = 'none';
-  document.querySelectorAll('#assignment-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === 'all'));
-  loadStudentsForAssignmentPicker(); document.getElementById('assignment-modal').classList.add('open');
-}
-function closeAssignmentModal() { document.getElementById('assignment-modal').classList.remove('open'); }
-
-function selectAssignmentVisibility(vis) { selectedAssignmentVisibility = vis; document.querySelectorAll('#assignment-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === vis)); document.getElementById('assignment-student-picker').style.display = vis === 'student' ? 'block' : 'none'; }
-
-async function loadStudentsForAssignmentPicker() { const { data } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name'); assignmentPickerStudents = data || []; renderAssignmentStudentPicker(assignmentPickerStudents); }
-function renderAssignmentStudentPicker(students) { const list = document.getElementById('assignment-student-list'); if (!students || students.length === 0) { list.innerHTML = '<div class="student-picker-empty">No students</div>'; return; } list.innerHTML = students.map(s => `<div class="student-picker-row${s.id===selectedAssignmentStudentId?' selected':''}" onclick="pickAssignmentStudent('${s.id}')">${s.full_name||s.email}${s.year_group?' ('+s.year_group+')':''}</div>`).join(''); }
-function filterAssignmentStudentPicker(query) { const q = query.toLowerCase(); renderAssignmentStudentPicker(assignmentPickerStudents.filter(s => (s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q))); }
-function pickAssignmentStudent(id) { selectedAssignmentStudentId = id; document.getElementById('assignment-student-id').value = id; renderAssignmentStudentPicker(assignmentPickerStudents); }
-
-async function saveAssignment() {
-  const name = document.getElementById('assignment-name').value.trim(); const desc = document.getElementById('assignment-desc').value.trim();
-  const dueDate = document.getElementById('assignment-due-date').value; const dueTime = document.getElementById('assignment-due-time').value;
-  if (!name) { toast('Please enter an assignment name.'); return; }
-  if (selectedAssignmentVisibility === 'student' && !selectedAssignmentStudentId) { toast('Please choose a student.'); return; }
-  const { error } = await sb.from('assignments').insert({ name, description: desc || null, due_date: dueDate || null, due_time: dueTime || null, visibility: selectedAssignmentVisibility, student_id: selectedAssignmentVisibility === 'student' ? selectedAssignmentStudentId : null, created_by: currentUser.id });
+async function approveAsTeacher(id) {
+  if (!confirm('Approve this user as a teacher? They will have full teacher access.')) return;
+  const { error } = await sb.from('profiles').update({ status: 'approved', role: 'teacher' }).eq('id', id);
   if (error) { toast('Error: ' + error.message); return; }
-  closeAssignmentModal(); toast('Assignment created! 📝'); loadAssignments();
+  toast('Approved as teacher! 👨‍🏫');
+  loadStudents();
+  if (currentRole === 'teacher') loadTeacherDash();
 }
 
-async function deleteAssignment(id) { if (!confirm('Delete this assignment?')) return; const { error } = await sb.from('assignments').delete().eq('id', id); if (error) { toast('Error: ' + error.message); return; } toast('Assignment deleted.'); loadAssignments(); }
-
-async function toggleHWStudentList() {
-  const sidebar = document.getElementById('hw-student-list-sidebar');
-  if (sidebar.classList.contains('open')) { sidebar.classList.remove('open'); return; }
-  sidebar.classList.add('open');
-  const { data } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name');
-  hwStudentList = data || []; renderHWStudentList(hwStudentList);
-}
-function renderHWStudentList(students) { const content = document.getElementById('hw-student-list-content'); if (!students || students.length === 0) { content.innerHTML = '<div class="student-picker-empty">No students</div>'; return; } content.innerHTML = students.map(s => `<div class="student-picker-row" onclick="viewStudentAssignments('${s.id}','${escHtml(s.full_name||s.email)}')">${s.full_name||s.email} <span class="year-badge year-${s.year_group}">${s.year_group}</span></div>`).join(''); }
-function filterHWStudents(query) { const q = query.toLowerCase(); renderHWStudentList(hwStudentList.filter(s => (s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q))); }
-
-async function viewStudentAssignments(studentId, studentName) {
-  viewingStudentId = studentId;
-  document.getElementById('hw-student-list-sidebar').classList.remove('open');
-  document.getElementById('hw-assignments-list').style.display = 'none';
-  document.getElementById('hw-teacher-controls').style.display = 'none';
-  document.getElementById('hw-student-detail').style.display = 'block';
-  const content = document.getElementById('hw-student-detail-content');
-  content.innerHTML = `<h3 style="margin-bottom:16px;">📋 ${studentName}'s Assignments</h3><div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>`;
-  const { data: profile } = await sb.from('profiles').select('year_group').eq('id', studentId).single();
-  const yearGroup = profile?.year_group || '';
-  let query = sb.from('assignments').select('*').order('created_at', { ascending: false });
-  query = query.or(`visibility.eq.all,visibility.eq.${yearGroup},and(visibility.eq.student,student_id.eq.${studentId})`);
-  const { data: assignments } = await query;
-  if (assignments && assignments.length > 0) {
-    const assignmentIds = assignments.map(a => a.id);
-    const { data: subs } = await sb.from('submissions').select('*').eq('student_id', studentId).in('assignment_id', assignmentIds);
-    const subMap = {}; (subs || []).forEach(s => subMap[s.assignment_id] = s);
-    const sorted = assignments.sort((a, b) => { const sa = subMap[a.id], sb = subMap[b.id]; const getPriority = (s) => !s ? 0 : s.status === 'submitted' ? 1 : 2; return getPriority(sa) - getPriority(sb); });
-    content.innerHTML = sorted.map(a => {
-      const sub = subMap[a.id]; let statusClass, statusText, actionBtn;
-      if (!sub) { statusClass = 'hw-not-done'; statusText = 'Not submitted'; actionBtn = ''; }
-      else if (sub.status === 'submitted') { statusClass = 'hw-done-not-corrected'; statusText = 'Submitted · Not corrected'; actionBtn = `<button class="btn-small" onclick="openHWReview('${sub.id}','${escHtml(sub.file_name||'PDF')}','${sub.storage_path||''}','${escHtml(sub.teacher_notes||'')}')">🔍 Review</button>`; }
-      else { statusClass = 'hw-corrected'; statusText = 'Corrected ✓'; actionBtn = sub.teacher_notes ? `<button class="btn-small" onclick="alert('Notes: ${escHtml(sub.teacher_notes)}')">📝 Notes</button>` : ''; }
-      const pdfLink = sub ? sb.storage.from('astar-files').getPublicUrl(sub.storage_path).data.publicUrl : '';
-      return `<div class="session-card"><div class="session-card-main"><div class="session-card-name">${a.name}</div><div class="session-card-meta"><span class="hw-status ${statusClass}">${statusText}</span></div></div><div style="display:flex;align-items:center;gap:8px;">${actionBtn}${sub ? `<a href="${pdfLink}" target="_blank" class="file-watch-btn">📄 View PDF</a>` : ''}</div></div>`;
-    }).join('');
-  } else { content.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div>No assignments for this student.</div>'; }
+async function rejectStudent(id) {
+  if (!confirm('Remove this user?')) return;
+  const { error }=await sb.from('profiles').delete().eq('id',id);
+  if (error) { toast('Error: '+error.message); return; }
+  toast('User removed.');
+  loadStudents();
+  if (currentRole==='teacher') loadTeacherDash();
 }
 
-function backToHWAssignments() { viewingStudentId = null; document.getElementById('hw-student-detail').style.display = 'none'; document.getElementById('hw-assignments-list').style.display = 'block'; document.getElementById('hw-teacher-controls').style.display = 'flex'; loadAssignments(); }
-
-function openHWReview(submissionId, fileName, storagePath, existingNotes) {
-  hwReviewSubmissionId = submissionId;
-  document.getElementById('hw-review-content').innerHTML = `<p style="font-size:13px;margin-bottom:12px;"><strong>File:</strong> ${fileName}</p><a href="${sb.storage.from('astar-files').getPublicUrl(storagePath).data.publicUrl}" target="_blank" class="file-watch-btn" style="margin-bottom:16px;">📄 Open PDF</a>`;
-  document.getElementById('hw-review-notes').value = existingNotes || '';
-  document.getElementById('hw-review-modal').classList.add('open');
+function openEditNodeModal(id, name, type, section, desc='', link='') {
+  document.getElementById('edit-node-id').value = id;
+  document.getElementById('edit-node-type').value = type;
+  document.getElementById('edit-node-section').value = section;
+  document.getElementById('edit-node-name').value = name;
+  document.getElementById('edit-node-title').textContent = type==='folder' ? '✏️ Rename folder' : '✏️ Edit item';
+  const extra = document.getElementById('edit-node-extra');
+  if (type === 'file') {
+    extra.style.display = 'block';
+    document.getElementById('edit-node-desc').value = desc;
+    document.getElementById('edit-node-link').value = link;
+    document.getElementById('edit-node-link-group').style.display = section==='books' ? 'none' : 'block';
+  } else {
+    extra.style.display = 'none';
+  }
+  document.getElementById('edit-node-modal').classList.add('open');
 }
-function closeHWReviewModal() { document.getElementById('hw-review-modal').classList.remove('open'); }
+function closeEditNodeModal() { document.getElementById('edit-node-modal').classList.remove('open'); }
 
-async function saveHWReview() {
-  const notes = document.getElementById('hw-review-notes').value.trim();
-  const { error } = await sb.from('submissions').update({ teacher_notes: notes || null, status: 'corrected' }).eq('id', hwReviewSubmissionId);
+async function saveEditNode() {
+  const id = document.getElementById('edit-node-id').value;
+  const type = document.getElementById('edit-node-type').value;
+  const section = document.getElementById('edit-node-section').value;
+  const name = document.getElementById('edit-node-name').value.trim();
+  if (!name) { toast('Please enter a name.'); return; }
+  const updates = { name };
+  if (type === 'file') {
+    updates.description = document.getElementById('edit-node-desc').value.trim() || null;
+    if (section === 'sessions') {
+      let link = document.getElementById('edit-node-link').value.trim();
+      if (link && !/^https?:\/\//i.test(link)) link = 'https://' + link;
+      updates.drive_link = link || null;
+    }
+  }
+  const { error } = await sb.from('explorer_nodes').update(updates).eq('id', id);
   if (error) { toast('Error: ' + error.message); return; }
-  closeHWReviewModal(); toast('Marked as corrected! ✅');
-  if (viewingStudentId) { const { data: profile } = await sb.from('profiles').select('full_name').eq('id', viewingStudentId).single(); viewStudentAssignments(viewingStudentId, profile?.full_name || 'Student'); }
+  closeEditNodeModal();
+  toast('Updated! ✅');
+  loadExplorer(section);
 }
 
-function openEditNodeModal(id, name, type, section, desc='', link='') { /* same as before */ }
-function closeEditNodeModal() { /* same */ }
-async function saveEditNode() { /* same */ }
-
-function toast(msg) { const t = document.getElementById('toast'); document.getElementById('toast-msg').textContent = msg; t.style.display = 'flex'; setTimeout(() => t.style.display = 'none', 3500); }
+function toast(msg) {
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.style.display='flex';
+  setTimeout(()=>t.style.display='none',3500);
+}
 </script>
 </body>
-</html> 
+</html>
