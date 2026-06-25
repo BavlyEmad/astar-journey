@@ -317,13 +317,11 @@
     <div id="students" class="page">
       <div class="page-header"><h1>👩‍🎓 Students</h1><p>Manage and approve your students. <span id="filter-count"></span></p></div>
       
-      <!-- Role Filter -->
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
         <button class="btn-small" id="filter-btn-students" style="background:var(--blue);color:#fff;border-color:var(--blue);" onclick="filterByRole('students')">👨‍🎓 Students</button>
         <button class="btn-small" id="filter-btn-teachers" onclick="filterByRole('teachers')">👨‍🏫 Teachers</button>
       </div>
       
-      <!-- Year Filter (visible only for Students) -->
       <div id="year-filter-row" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
         <span style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;">Year:</span>
         <button class="btn-small" id="filter-year-all" style="background:var(--blue);color:#fff;border-color:var(--blue);" onclick="filterByYear('all')">All</button>
@@ -698,39 +696,35 @@ async function loadSessions() {
   renderSessions(allSessionsRows);
 }
 
-function renderStudents(students) {
-  const tbody=document.getElementById('students-tbody');
-  if (!students||students.length===0) {
-    let msg = 'No users found';
-    if (currentRoleFilter === 'teachers') msg = 'No teachers found';
-    else if (currentStudentTab === 'pending') msg = 'No students waiting for approval';
-    else if (currentStudentTab === 'approved') msg = 'No approved students yet';
-    tbody.innerHTML=`<tr><td colspan="5" style="color:var(--text-muted);text-align:center;padding:20px">${msg}</td></tr>`;
+function renderSessions(rows) {
+  const list = document.getElementById('session-list');
+  if (!rows || rows.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📅</div>No upcoming sessions right now.</div>';
     return;
   }
-  
-  tbody.innerHTML=students.map(s=>{
-    const yearBadge=s.year_group?`<span class="year-badge year-${s.year_group}">${s.year_group}</span>`:'—';
-    const isTeacher = s.role === 'teacher';
-    
-    let actions = '';
-    if (isTeacher) {
-      actions = `<span style="font-size:11px;color:var(--text-muted);">—</span>`;
-    } else if (currentStudentTab === 'pending') {
-      actions = `<button class="btn-approve" onclick="approveStudent('${s.id}')">✅ Approve</button>
-                 <button class="btn-reject" onclick="rejectStudent('${s.id}')">❌ Reject</button>
-                 <button class="btn-promote" onclick="approveAsTeacher('${s.id}')">👨‍🏫 Approve as Teacher</button>`;
-    } else {
-      actions = `<button class="btn-small" onclick="rejectStudent('${s.id}')">Remove</button>`;
-    }
-    
-    return `<tr>
-      <td><strong>${s.full_name||'—'}</strong></td>
-      <td>${s.email}</td>
-      <td>${yearBadge}</td>
-      <td><span class="status-badge status-${s.status||'approved'}">${isTeacher ? 'teacher' : s.status}</span></td>
-      <td>${actions}</td></tr>`;
+  list.innerHTML = rows.map(s => {
+    const vl = s.visibility === 'all' ? 'Everyone' : s.visibility === 'student' ? 'Specific student' : s.visibility;
+    const linkHtml = s.link ? `<a href="${s.link}" target="_blank" rel="noopener">🔗 Join link</a>` : '';
+    const timeHtml = s.time_text ? `<span>🕒 ${s.time_text}</span>` : '';
+    const teacherBtns = currentRole === 'teacher'
+      ? `<div class="session-actions">
+           <button class="session-edit" onclick="openEditSessionModal('${s.id}','${escHtml(s.name)}','${escHtml(s.link||'')}','${escHtml(s.time_text||'')}')">✏️ Edit</button>
+           <button class="session-delete" onclick="deleteSession('${s.id}')">🗑 Delete</button>
+         </div>` : '';
+    return `<div class="session-card">
+      <div class="session-card-main">
+        <div class="session-card-name">${s.name}</div>
+        <div class="session-card-meta">${timeHtml}${linkHtml}<span class="session-vis-tag">${vl}</span></div>
+      </div>${teacherBtns}</div>`;
   }).join('');
+}
+
+async function deleteSession(id) {
+  if (!confirm('Delete this session?')) return;
+  const { error } = await sb.from('sessions').delete().eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('Session deleted.');
+  loadSessions();
 }
 
 function openEditSessionModal(id, name, link, time) {
@@ -1215,7 +1209,7 @@ function renderStudents(students) {
     
     let actions = '';
     if (isTeacher) {
-      actions = `<button class="btn-small" onclick="demoteTeacher('${s.id}')">⬇ Demote</button>`;
+      actions = `<span style="font-size:11px;color:var(--text-muted);">—</span>`;
     } else if (currentStudentTab === 'pending') {
       actions = `<button class="btn-approve" onclick="approveStudent('${s.id}')">✅ Approve</button>
                  <button class="btn-reject" onclick="rejectStudent('${s.id}')">❌ Reject</button>
@@ -1271,7 +1265,6 @@ function filterByRole(role) {
     }
   });
   
-  // Show/hide year filter row (only for students)
   const yearFilterRow = document.getElementById('year-filter-row');
   if (yearFilterRow) {
     yearFilterRow.style.display = role === 'students' ? 'flex' : 'none';
@@ -1303,15 +1296,6 @@ async function approveAsTeacher(id) {
   const { error } = await sb.from('profiles').update({ status: 'approved', role: 'teacher' }).eq('id', id);
   if (error) { toast('Error: ' + error.message); return; }
   toast('Approved as teacher! 👨‍🏫');
-  loadStudents();
-  if (currentRole === 'teacher') loadTeacherDash();
-}
-
-async function demoteTeacher(id) {
-  if (!confirm('Demote this teacher back to a student?')) return;
-  const { error } = await sb.from('profiles').update({ role: 'student', status: 'approved' }).eq('id', id);
-  if (error) { toast('Error: ' + error.message); return; }
-  toast('Teacher demoted to student.');
   loadStudents();
   if (currentRole === 'teacher') loadTeacherDash();
 }
