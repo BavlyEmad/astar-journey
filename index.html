@@ -16,7 +16,6 @@
     --orange:#f59e0b;--orange-light:#fffbeb;
     --sidebar-width:220px;
   }
-  /* DARK MODE */
   body.dark{
     --text:#f1f5f9;--text-muted:#94a3b8;--border:#334155;
     --bg:#0f172a;--white:#1e293b;--blue-light:#1e3a5f;--green-light:#0d3325;
@@ -56,10 +55,8 @@
   .nav-item:hover{background:var(--bg);color:var(--text);}
   .nav-item.active{background:var(--blue-light);color:var(--blue);font-weight:600;}
   .nav-icon{font-size:16px;width:20px;text-align:center;}
-  /* NOTIFICATION DOT */
   .nav-dot{width:8px;height:8px;background:var(--red);border-radius:50%;position:absolute;top:8px;right:10px;display:none;}
   .nav-dot.visible{display:block;}
-  /* DARK MODE TOGGLE */
   .dark-toggle{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:8px;font-size:12px;color:var(--text-muted);margin-bottom:4px;}
   .toggle-switch{position:relative;width:32px;height:18px;cursor:pointer;}
   .toggle-switch input{opacity:0;width:0;height:0;}
@@ -87,13 +84,11 @@
   .year-OL{background:#ede9fe;color:#5b21b6;}
   .year-AS{background:#fef3c7;color:#92400e;}
   .year-A2{background:#dcfce7;color:#166534;}
-  /* TEACHER DASHBOARD STATS */
   .dash-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:28px;}
   .dash-stat{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;}
   .dash-stat .num{font-size:30px;font-weight:800;color:var(--blue);}
   .dash-stat .lbl{font-size:12px;color:var(--text-muted);margin-top:2px;}
   .dash-stat.warn .num{color:var(--orange);}
-  /* PROFILE PAGE */
   .profile-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:28px;max-width:460px;}
   .profile-avatar-big{width:64px;height:64px;background:var(--blue-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:var(--blue);margin-bottom:16px;}
   .profile-row{display:flex;flex-direction:column;gap:4px;margin-bottom:16px;}
@@ -269,7 +264,6 @@
         <h1>Welcome back 👋</h1>
         <p id="home-subtitle">Your maths learning hub.</p>
       </div>
-      <!-- Teacher dashboard stats -->
       <div id="teacher-dash" style="display:none">
         <div class="dash-stats">
           <div class="dash-stat"><div class="num" id="dash-total">—</div><div class="lbl">Total students</div></div>
@@ -477,7 +471,7 @@
   </div>
 </div>
 
-<!-- EDIT NODE MODAL (folder name / file name+desc+link) -->
+<!-- EDIT NODE MODAL -->
 <div class="modal-overlay" id="edit-node-modal">
   <div class="modal">
     <h3 id="edit-node-title">✏️ Edit</h3>
@@ -514,6 +508,8 @@ let selectedEFStudentId = '', selectedPFStudentId = '';
 let selectedExplorerFolderVis = 'all', selectedPdfFolderVis = 'all';
 let editingSessionId = null;
 let currentProfile = null;
+let currentYearFilter = 'all'; // 'all', 'OL', 'AS', 'A2'
+let currentRoleFilter = 'students'; // 'students', 'teachers', 'everyone'
 
 // ── DARK MODE ──
 function toggleDark(on) {
@@ -1166,35 +1162,92 @@ function switchStudentTab(tab, event) {
 
 async function loadStudents() {
   if (currentRole!=='teacher') return;
-  const { data }=await sb.from('profiles').select('*').eq('role','student').eq('status',currentStudentTab).order('full_name');
-  allStudentsRows=data||[];
-  renderStudents(allStudentsRows);
+  let query = sb.from('profiles').select('*').order('full_name');
+  
+  // Role filter
+  if (currentRoleFilter === 'students') {
+    query = query.eq('role', 'student').eq('status', currentStudentTab);
+  } else if (currentRoleFilter === 'teachers') {
+    query = query.eq('role', 'teacher');
+  } else if (currentRoleFilter === 'everyone') {
+    query = query.neq('role', 'teacher');
+  }
+  
+  const { data } = await query;
+  allStudentsRows = data || [];
+  
+  // Apply year filter on the results
+  let filtered = allStudentsRows;
+  if (currentYearFilter !== 'all') {
+    filtered = allStudentsRows.filter(s => s.year_group === currentYearFilter);
+  }
+  
+  renderStudents(filtered);
+  
+  // Update filter count
+  updateFilterCount(filtered.length);
+}
+
+function updateFilterCount(count) {
+  let countEl = document.getElementById('filter-count');
+  if (!countEl) {
+    countEl = document.createElement('span');
+    countEl.id = 'filter-count';
+    countEl.style.cssText = 'font-size:12px;color:var(--text-muted);margin-left:8px;';
+    const headerP = document.querySelector('#students .page-header p');
+    if (headerP) headerP.appendChild(countEl);
+  }
+  countEl.textContent = `(${count} ${count === 1 ? 'person' : 'people'})`;
 }
 
 function renderStudents(students) {
   const tbody=document.getElementById('students-tbody');
   if (!students||students.length===0) {
-    const msg=currentStudentTab==='pending'?'No students waiting for approval':'No approved students yet';
+    const msg=currentRoleFilter === 'teachers' ? 'No teachers found' : 
+              currentStudentTab==='pending'?'No students waiting for approval':'No approved students yet';
     tbody.innerHTML=`<tr><td colspan="5" style="color:var(--text-muted);text-align:center;padding:20px">${msg}</td></tr>`;
     return;
   }
   tbody.innerHTML=students.map(s=>{
     const yearBadge=s.year_group?`<span class="year-badge year-${s.year_group}">${s.year_group}</span>`:'—';
+    
+    let actions = '';
+    if (currentRoleFilter === 'teachers') {
+      // Teachers view
+      actions = `<button class="btn-small" onclick="demoteTeacher('${s.id}')">⬇ Demote</button>`;
+    } else if (currentStudentTab === 'pending') {
+      // Pending tab - show Approve and Promote to Teacher buttons
+      actions = `<button class="btn-approve" onclick="approveStudent('${s.id}')">✅ Approve</button>
+                 <button class="btn-reject" onclick="rejectStudent('${s.id}')">❌ Reject</button>
+                 <button class="btn-small" onclick="approveAsTeacher('${s.id}')" style="margin-left:4px;color:var(--blue);border-color:var(--blue);">👨‍🏫 Approve as Teacher</button>`;
+    } else {
+      // Approved tab
+      actions = `<button class="btn-small" onclick="rejectStudent('${s.id}')">Remove</button>`;
+    }
+    
     return `<tr>
       <td><strong>${s.full_name||'—'}</strong></td>
       <td>${s.email}</td>
       <td>${yearBadge}</td>
-      <td><span class="status-badge status-${s.status}">${s.status}</span></td>
-      <td>${s.status==='pending'
-        ?`<button class="btn-approve" onclick="approveStudent('${s.id}')">✅ Approve</button><button class="btn-reject" onclick="rejectStudent('${s.id}')">❌ Reject</button>`
-        :`<button class="btn-small" onclick="rejectStudent('${s.id}')">Remove</button>`}
-      </td></tr>`;
+      <td><span class="status-badge status-${s.status||'approved'}">${s.status||s.role}</span></td>
+      <td>${actions}</td></tr>`;
   }).join('');
 }
 
 function filterStudents(query) {
   const q=query.toLowerCase();
-  renderStudents(allStudentsRows.filter(s=>(s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q)));
+  let filtered = allStudentsRows;
+  
+  // Apply year filter
+  if (currentYearFilter !== 'all') {
+    filtered = filtered.filter(s => s.year_group === currentYearFilter);
+  }
+  
+  // Apply search
+  filtered = filtered.filter(s=>(s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q));
+  
+  renderStudents(filtered);
+  updateFilterCount(filtered.length);
 }
 
 async function approveStudent(id) {
@@ -1205,10 +1258,31 @@ async function approveStudent(id) {
   if (currentRole==='teacher') loadTeacherDash();
 }
 
+// NEW: Approve as teacher
+async function approveAsTeacher(id) {
+  if (!confirm('Approve this user as a teacher? They will have full teacher access.')) return;
+  const { error } = await sb.from('profiles').update({ status: 'approved', role: 'teacher' }).eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('Approved as teacher! 👨‍🏫');
+  loadStudents();
+  if (currentRole === 'teacher') loadTeacherDash();
+}
+
+// NEW: Demote teacher
+async function demoteTeacher(id) {
+  if (!confirm('Demote this teacher back to a student?')) return;
+  const { error } = await sb.from('profiles').update({ role: 'student', status: 'approved' }).eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('Teacher demoted to student.');
+  loadStudents();
+  if (currentRole === 'teacher') loadTeacherDash();
+}
+
 async function rejectStudent(id) {
+  if (!confirm('Remove this user?')) return;
   const { error }=await sb.from('profiles').delete().eq('id',id);
   if (error) { toast('Error: '+error.message); return; }
-  toast('Student removed.');
+  toast('User removed.');
   loadStudents();
   if (currentRole==='teacher') loadTeacherDash();
 }
@@ -1225,7 +1299,6 @@ function openEditNodeModal(id, name, type, section, desc='', link='') {
     extra.style.display = 'block';
     document.getElementById('edit-node-desc').value = desc;
     document.getElementById('edit-node-link').value = link;
-    // hide link field for PDFs (link is auto from storage)
     document.getElementById('edit-node-link-group').style.display = section==='books' ? 'none' : 'block';
   } else {
     extra.style.display = 'none';
