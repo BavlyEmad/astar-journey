@@ -32,8 +32,9 @@
   .auth-tab.active{background:var(--blue);color:#fff;}
   .form-group{margin-bottom:16px;}
   .form-group label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}
-  .form-group input,.form-group select{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;color:var(--text);font-family:inherit;background:var(--white);transition:border-color 0.15s;}
-  .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--blue);}
+  .form-group input,.form-group select,.form-group textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;color:var(--text);font-family:inherit;background:var(--white);transition:border-color 0.15s;}
+  .form-group textarea{resize:vertical;min-height:80px;}
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--blue);}
   .btn-primary{width:100%;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity 0.15s;}
   .btn-primary:hover{opacity:0.9;}
   .btn-primary:disabled{opacity:0.6;cursor:not-allowed;}
@@ -124,7 +125,7 @@
   .btn-add-outline:hover{background:var(--blue-light);}
   .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:none;align-items:center;justify-content:center;}
   .modal-overlay.open{display:flex;}
-  .modal{background:var(--white);border-radius:16px;padding:32px;width:100%;max-width:440px;box-shadow:0 8px 32px rgba(0,0,0,0.15);max-height:90vh;overflow-y:auto;}
+  .modal{background:var(--white);border-radius:16px;padding:32px;width:100%;max-width:480px;box-shadow:0 8px 32px rgba(0,0,0,0.15);max-height:90vh;overflow-y:auto;}
   .modal h3{font-size:17px;font-weight:800;margin-bottom:20px;}
   .modal-actions{display:flex;gap:10px;margin-top:20px;}
   .btn-cancel{flex:1;background:none;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--text-muted);}
@@ -134,10 +135,11 @@
   .vis-btn{border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;background:var(--white);color:var(--text-muted);transition:all 0.15s;}
   .vis-btn.selected{background:var(--blue);color:#fff;border-color:var(--blue);}
   .student-picker-list{max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;}
-  .student-picker-row{padding:9px 14px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.1s;}
+  .student-picker-row{padding:9px 14px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.1s;display:flex;align-items:center;gap:8px;}
   .student-picker-row:last-child{border-bottom:none;}
   .student-picker-row:hover{background:var(--bg);}
   .student-picker-row.selected{background:var(--blue-light);color:var(--blue);font-weight:600;}
+  .student-picker-row input[type=checkbox]{accent-color:var(--blue);}
   .student-picker-empty{padding:14px;font-size:13px;color:var(--text-muted);text-align:center;}
   .sessions-toolbar-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:28px;margin-bottom:14px;flex-wrap:wrap;}
   .sessions-toolbar-row h2{font-size:16px;font-weight:800;}
@@ -176,6 +178,95 @@
   @keyframes spin{to{transform:rotate(360deg);}}
   .empty-state{text-align:center;padding:48px 20px;color:var(--text-muted);font-size:14px;}
   .empty-state .empty-icon{font-size:40px;margin-bottom:12px;}
+
+  /* ── ASSIGNMENTS ── */
+  .hw-toolbar-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+  .hw-toolbar-row h2{font-size:16px;font-weight:800;}
+  .hw-list{display:flex;flex-direction:column;gap:12px;}
+  .hw-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:18px 20px;transition:all 0.15s;}
+  .hw-card:hover{box-shadow:0 2px 12px rgba(24,95,165,0.08);}
+  .hw-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
+  .hw-card-title{font-size:15px;font-weight:700;}
+  .hw-card-badges{display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap;}
+  .hw-card-desc{font-size:13px;color:var(--text-muted);margin-bottom:12px;line-height:1.6;}
+  .hw-card-meta{display:flex;gap:14px;font-size:12px;color:var(--text-muted);flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+  .hw-card-meta span{display:flex;align-items:center;gap:4px;}
+  .hw-due-soon{color:var(--orange);font-weight:600;}
+  .hw-overdue{color:var(--red);font-weight:600;}
+  .hw-status-dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0;}
+  .hw-status-dot.not-done{background:var(--red);}
+  .hw-status-dot.submitted{background:var(--orange);}
+  .hw-status-dot.reviewed{background:var(--green);}
+  .hw-submit-area{border-top:1px solid var(--border);padding-top:12px;margin-top:4px;display:flex;flex-direction:column;gap:8px;}
+  .hw-submit-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .hw-submit-row input[type=text]{flex:1;min-width:180px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--text);}
+  .hw-submit-row input[type=text]:focus{outline:none;border-color:var(--blue);}
+  .btn-submit-hw{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .btn-submit-hw:hover{opacity:0.9;}
+  .btn-submit-hw:disabled{opacity:0.6;cursor:not-allowed;}
+  .hw-submission-info{background:var(--green-light);border-radius:8px;padding:10px 14px;font-size:13px;display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;}
+  .hw-submission-info a{color:var(--blue);font-weight:600;text-decoration:none;}
+  .hw-submission-info a:hover{text-decoration:underline;}
+  .hw-teacher-note{background:var(--blue-light);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--blue-dark);margin-top:8px;border-left:3px solid var(--blue);}
+  .hw-teacher-note strong{display:block;margin-bottom:2px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;}
+  .hw-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+  .hw-badge-red{background:var(--red-light);color:var(--red);}
+  .hw-badge-yellow{background:var(--orange-light);color:var(--orange);}
+  .hw-badge-green{background:var(--green-light);color:#085041;}
+  .hw-badge-blue{background:var(--blue-light);color:var(--blue);}
+  .hw-actions-teacher{display:flex;gap:6px;flex-shrink:0;}
+  .hw-del-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit;color:var(--text-muted);transition:all 0.15s;}
+  .hw-del-btn:hover{border-color:var(--red);color:var(--red);background:var(--red-light);}
+
+  /* ── ASSIGNMENT REVIEW PANEL (Teacher) ── */
+  .review-panel{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px;}
+  .review-student-list{display:flex;flex-direction:column;gap:8px;}
+  .review-student-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border:1px solid var(--border);border-radius:10px;background:var(--bg);transition:all 0.15s;}
+  .review-student-row:hover{border-color:var(--blue);}
+  .review-student-info{display:flex;align-items:center;gap:10px;}
+  .review-avatar{width:34px;height:34px;background:var(--blue-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--blue);flex-shrink:0;}
+  .review-student-name{font-size:14px;font-weight:600;}
+  .review-student-meta{font-size:11px;color:var(--text-muted);}
+  .review-counts{display:flex;gap:6px;}
+  .review-count-pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+  .review-count-red{background:var(--red-light);color:var(--red);}
+  .review-count-yellow{background:var(--orange-light);color:var(--orange);}
+  .review-count-green{background:var(--green-light);color:#085041;}
+  .btn-view-hw{background:none;border:1px solid var(--blue);border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--blue);transition:all 0.15s;}
+  .btn-view-hw:hover{background:var(--blue);color:#fff;}
+
+  /* Teacher assignment review detail */
+  .review-detail-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+  .back-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--text-muted);display:flex;align-items:center;gap:6px;}
+  .back-btn:hover{border-color:var(--blue);color:var(--blue);}
+  .review-hw-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:10px;transition:border-color 0.15s;}
+  .review-hw-card.status-not-done{border-left:4px solid var(--red);}
+  .review-hw-card.status-submitted{border-left:4px solid var(--orange);}
+  .review-hw-card.status-reviewed{border-left:4px solid var(--green);}
+  .review-hw-title{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .review-hw-meta{font-size:12px;color:var(--text-muted);margin-bottom:10px;display:flex;gap:10px;flex-wrap:wrap;}
+  .review-hw-submission{background:var(--green-light);border-radius:8px;padding:9px 13px;font-size:13px;margin-bottom:10px;}
+  .review-hw-submission a{color:var(--blue);font-weight:600;text-decoration:none;}
+  .review-hw-notes-area{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--text);resize:vertical;min-height:60px;margin-bottom:8px;}
+  .review-hw-notes-area:focus{outline:none;border-color:var(--blue);}
+  .review-hw-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .btn-mark-reviewed{background:var(--green);color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+  .btn-mark-reviewed:hover{opacity:0.9;}
+  .btn-save-note{background:none;border:1px solid var(--blue);border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--blue);}
+  .btn-save-note:hover{background:var(--blue-light);}
+  .reviewed-check{color:var(--green);font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px;}
+
+  /* Sort tabs for review */
+  .sort-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+  .sort-tab{background:none;border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text-muted);transition:all 0.15s;}
+  .sort-tab.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+  .sort-tab.red.active{background:var(--red);border-color:var(--red);}
+  .sort-tab.yellow.active{background:var(--orange);border-color:var(--orange);}
+  .sort-tab.green.active{background:var(--green);border-color:var(--green);}
+
+  /* date-time inline */
+  .date-time-row{display:flex;gap:10px;}
+  .date-time-row .form-group{flex:1;}
 </style>
 </head>
 <body>
@@ -308,20 +399,42 @@
       <div class="explorer-grid" id="books-explorer-grid"></div>
     </div>
 
-    <!-- HOMEWORK -->
+    <!-- HOMEWORK / ASSIGNMENTS -->
     <div id="homework" class="page">
-      <div class="page-header"><h1>📝 Assignments</h1><p>Your homework and assignments.</p></div>
+      <div class="page-header">
+        <h1>📝 Assignments</h1>
+        <p id="hw-page-subtitle">Your homework and assignments.</p>
+      </div>
+      <!-- Teacher: toolbar + list -->
+      <div id="hw-teacher-view" style="display:none">
+        <div class="hw-toolbar-row">
+          <h2>All Assignments</h2>
+          <button class="btn-add" onclick="openAssignmentModal()">+ New assignment</button>
+        </div>
+        <div class="hw-list" id="hw-teacher-list"></div>
+      </div>
+      <!-- Student: their assignments -->
+      <div id="hw-student-view" style="display:none">
+        <div class="sort-tabs" id="hw-student-sort-tabs">
+          <button class="sort-tab active" onclick="filterStudentHw('all',this)">All</button>
+          <button class="sort-tab red" onclick="filterStudentHw('not-done',this)">🔴 Not submitted</button>
+          <button class="sort-tab yellow" onclick="filterStudentHw('submitted',this)">🟡 Awaiting review</button>
+          <button class="sort-tab green" onclick="filterStudentHw('reviewed',this)">🟢 Reviewed</button>
+        </div>
+        <div class="hw-list" id="hw-student-list"></div>
+      </div>
     </div>
 
     <!-- STUDENTS -->
     <div id="students" class="page">
       <div class="page-header"><h1>👩‍🎓 Students</h1><p>Manage and approve your students. <span id="filter-count"></span></p></div>
-      
+
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
         <button class="btn-small" id="filter-btn-students" style="background:var(--blue);color:#fff;border-color:var(--blue);" onclick="filterByRole('students')">👨‍🎓 Students</button>
         <button class="btn-small" id="filter-btn-teachers" onclick="filterByRole('teachers')">👨‍🏫 Teachers</button>
+        <button class="btn-small" id="filter-btn-assignments" onclick="filterByRole('assignments')">📋 Assignments</button>
       </div>
-      
+
       <div id="year-filter-row" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
         <span style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;">Year:</span>
         <button class="btn-small" id="filter-year-all" style="background:var(--blue);color:#fff;border-color:var(--blue);" onclick="filterByYear('all')">All</button>
@@ -329,17 +442,56 @@
         <button class="btn-small" id="filter-year-AS" onclick="filterByYear('AS')">AS</button>
         <button class="btn-small" id="filter-year-A2" onclick="filterByYear('A2')">A2</button>
       </div>
-      
-      <input class="search-bar" placeholder="🔍 Search students..." oninput="filterStudents(this.value)"/>
-      <div class="teacher-panel">
-        <div class="panel-tabs">
-          <button class="panel-tab active" onclick="switchStudentTab('approved',event)">✅ Approved</button>
-          <button class="panel-tab" onclick="switchStudentTab('pending',event)">⏳ Pending</button>
+
+      <input class="search-bar" id="students-search" placeholder="🔍 Search students..." oninput="filterStudents(this.value)"/>
+
+      <!-- Normal student/teacher panel -->
+      <div id="students-normal-panel">
+        <div class="teacher-panel">
+          <div class="panel-tabs">
+            <button class="panel-tab active" onclick="switchStudentTab('approved',event)">✅ Approved</button>
+            <button class="panel-tab" onclick="switchStudentTab('pending',event)">⏳ Pending</button>
+          </div>
+          <table class="students-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Year</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="students-tbody"></tbody>
+          </table>
         </div>
-        <table class="students-table">
-          <thead><tr><th>Name</th><th>Email</th><th>Year</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody id="students-tbody"></tbody>
-        </table>
+      </div>
+
+      <!-- Assignment review panel -->
+      <div id="assignments-review-panel" style="display:none">
+        <!-- Student list view -->
+        <div id="review-student-list-view">
+          <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;" id="review-sort-row">
+            <span style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;">Year:</span>
+            <button class="sort-tab active" onclick="filterReviewStudentsByYear('all',this)">All</button>
+            <button class="sort-tab" onclick="filterReviewStudentsByYear('OL',this)">OL</button>
+            <button class="sort-tab" onclick="filterReviewStudentsByYear('AS',this)">AS</button>
+            <button class="sort-tab" onclick="filterReviewStudentsByYear('A2',this)">A2</button>
+          </div>
+          <input class="search-bar" id="review-search" placeholder="🔍 Search students..." oninput="filterReviewStudents(this.value)" style="margin-bottom:16px"/>
+          <div class="review-panel">
+            <div class="review-student-list" id="review-student-list"></div>
+          </div>
+        </div>
+        <!-- Individual student detail view -->
+        <div id="review-student-detail-view" style="display:none">
+          <div class="review-detail-header">
+            <button class="back-btn" onclick="closeReviewDetail()">← Back to students</button>
+            <div>
+              <div style="font-size:16px;font-weight:800;" id="review-detail-name"></div>
+              <div style="font-size:12px;color:var(--text-muted);" id="review-detail-meta"></div>
+            </div>
+          </div>
+          <div class="sort-tabs" id="review-detail-sort-tabs">
+            <button class="sort-tab active" onclick="filterReviewDetail('all',this)">All</button>
+            <button class="sort-tab red" onclick="filterReviewDetail('not-done',this)">🔴 Not submitted</button>
+            <button class="sort-tab yellow" onclick="filterReviewDetail('submitted',this)">🟡 Needs review</button>
+            <button class="sort-tab green" onclick="filterReviewDetail('reviewed',this)">🟢 Reviewed</button>
+          </div>
+          <div id="review-hw-list"></div>
+        </div>
       </div>
     </div>
 
@@ -372,6 +524,50 @@
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeSessionModal()">Cancel</button>
       <button class="btn-save" id="session-save-btn" onclick="saveSession()">Create session</button>
+    </div>
+  </div>
+</div>
+
+<!-- ASSIGNMENT MODAL -->
+<div class="modal-overlay" id="assignment-modal">
+  <div class="modal">
+    <h3 id="assignment-modal-title">📝 New assignment</h3>
+    <div class="form-group">
+      <label>Assignment name</label>
+      <input type="text" id="hw-name" placeholder="e.g. Chapter 5 — Differentiation"/>
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="hw-desc" placeholder="Describe what students need to do, page numbers, etc."></textarea>
+    </div>
+    <div class="date-time-row">
+      <div class="form-group">
+        <label>Due date</label>
+        <input type="date" id="hw-due-date"/>
+      </div>
+      <div class="form-group">
+        <label>Due time</label>
+        <input type="time" id="hw-due-time"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Visible to</label>
+      <div class="visibility-options">
+        <button class="vis-btn selected" data-vis="all" onclick="selectHwVisibility('all')">Everyone</button>
+        <button class="vis-btn" data-vis="OL" onclick="selectHwVisibility('OL')">OL only</button>
+        <button class="vis-btn" data-vis="AS" onclick="selectHwVisibility('AS')">AS only</button>
+        <button class="vis-btn" data-vis="A2" onclick="selectHwVisibility('A2')">A2 only</button>
+        <button class="vis-btn" data-vis="students" onclick="selectHwVisibility('students')">Specific students</button>
+      </div>
+    </div>
+    <div class="form-group" id="hw-student-picker" style="display:none">
+      <label>Choose students (select multiple)</label>
+      <input type="text" class="search-bar" id="hw-student-search" placeholder="🔍 Search..." style="margin-bottom:8px" oninput="filterHwStudentPicker(this.value)"/>
+      <div id="hw-student-list" class="student-picker-list"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAssignmentModal()">Cancel</button>
+      <button class="btn-save" id="hw-save-btn" onclick="saveAssignment()">Create assignment</button>
     </div>
   </div>
 </div>
@@ -524,6 +720,20 @@ let currentProfile = null;
 let currentYearFilter = 'all';
 let currentRoleFilter = 'students';
 
+// Assignment state
+let selectedHwVisibility = 'all';
+let hwPickerStudents = [];
+let selectedHwStudentIds = new Set();
+let allStudentHwData = [];
+let currentStudentHwFilter = 'all';
+let reviewStudentsData = [];
+let reviewStudentsAllData = [];
+let reviewStudentYearFilter = 'all';
+let currentReviewStudentId = null;
+let currentReviewStudentName = '';
+let reviewDetailAllData = [];
+let currentReviewDetailFilter = 'all';
+
 function toggleDark(on) {
   document.body.classList.toggle('dark', on);
   localStorage.setItem('darkMode', on ? '1' : '0');
@@ -580,7 +790,11 @@ function showApp(profile) {
     document.getElementById('add-session-btn').style.display = 'inline-flex';
     document.getElementById('teacher-dash').style.display = 'block';
     document.getElementById('home-subtitle').textContent = 'Manage sessions, upload materials, and approve students.';
+    document.getElementById('hw-teacher-view').style.display = 'block';
+    document.getElementById('hw-page-subtitle').textContent = 'Create and manage assignments for your students.';
     loadTeacherDash();
+  } else {
+    document.getElementById('hw-student-view').style.display = 'block';
   }
   loadSessions();
   loadExplorer('sessions');
@@ -648,6 +862,8 @@ async function logout() {
   document.getElementById('teacher-nav').style.display = 'none';
   document.getElementById('add-session-btn').style.display = 'none';
   document.getElementById('teacher-dash').style.display = 'none';
+  document.getElementById('hw-teacher-view').style.display = 'none';
+  document.getElementById('hw-student-view').style.display = 'none';
   document.getElementById('home-subtitle').textContent = 'Your maths learning hub.';
   showPage('home');
 }
@@ -660,7 +876,7 @@ function showPage(id) {
   const navItems = document.querySelectorAll('.nav-item');
   const idx = pages.indexOf(id);
   if (navItems[idx]) navItems[idx].classList.add('active');
-  if (id === 'students') loadStudents();
+  if (id === 'students') { loadStudents(); }
   if (id === 'home') { loadSessions(); if(currentRole==='teacher') loadTeacherDash(); }
   if (id === 'sessions') {
     localStorage.setItem(VISIT_KEY_S, new Date().toISOString());
@@ -671,6 +887,10 @@ function showPage(id) {
     localStorage.setItem(VISIT_KEY_B, new Date().toISOString());
     document.getElementById('dot-books').classList.remove('visible');
     loadExplorer('books');
+  }
+  if (id === 'homework') {
+    if (currentRole === 'teacher') loadTeacherAssignments();
+    else loadStudentAssignments();
   }
 }
 
@@ -819,6 +1039,646 @@ async function saveSession() {
   checkNotificationDots();
 }
 
+/* ─── ASSIGNMENTS (Teacher) ─── */
+
+function openAssignmentModal() {
+  selectedHwVisibility = 'all';
+  selectedHwStudentIds = new Set();
+  document.getElementById('hw-name').value = '';
+  document.getElementById('hw-desc').value = '';
+  document.getElementById('hw-due-date').value = '';
+  document.getElementById('hw-due-time').value = '';
+  document.getElementById('hw-student-picker').style.display = 'none';
+  document.getElementById('hw-student-search').value = '';
+  document.getElementById('assignment-modal-title').textContent = '📝 New assignment';
+  document.getElementById('hw-save-btn').textContent = 'Create assignment';
+  document.querySelectorAll('#assignment-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === 'all'));
+  loadStudentsForHwPicker();
+  document.getElementById('assignment-modal').classList.add('open');
+}
+function closeAssignmentModal() { document.getElementById('assignment-modal').classList.remove('open'); }
+
+function selectHwVisibility(vis) {
+  selectedHwVisibility = vis;
+  document.querySelectorAll('#assignment-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis === vis));
+  document.getElementById('hw-student-picker').style.display = vis === 'students' ? 'block' : 'none';
+}
+
+async function loadStudentsForHwPicker() {
+  const { data } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name');
+  hwPickerStudents = data || [];
+  renderHwStudentPicker(hwPickerStudents);
+}
+
+function renderHwStudentPicker(students) {
+  const list = document.getElementById('hw-student-list');
+  if (!students || students.length === 0) { list.innerHTML = '<div class="student-picker-empty">No approved students found</div>'; return; }
+  list.innerHTML = students.map(s => {
+    const label = `${s.full_name || s.email}${s.year_group ? ' (' + s.year_group + ')' : ''}`;
+    const checked = selectedHwStudentIds.has(s.id);
+    return `<div class="student-picker-row${checked?' selected':''}" onclick="toggleHwStudent('${s.id}')">
+      <input type="checkbox" ${checked?'checked':''} style="pointer-events:none"/> ${label}
+    </div>`;
+  }).join('');
+}
+
+function filterHwStudentPicker(query) {
+  const q = query.toLowerCase();
+  renderHwStudentPicker(hwPickerStudents.filter(s =>
+    (s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q)));
+}
+
+function toggleHwStudent(id) {
+  if (selectedHwStudentIds.has(id)) selectedHwStudentIds.delete(id);
+  else selectedHwStudentIds.add(id);
+  renderHwStudentPicker(hwPickerStudents.filter(s => {
+    const q = document.getElementById('hw-student-search').value.toLowerCase();
+    return !q || (s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q);
+  }));
+}
+
+async function saveAssignment() {
+  const name = document.getElementById('hw-name').value.trim();
+  const desc = document.getElementById('hw-desc').value.trim();
+  const dueDate = document.getElementById('hw-due-date').value;
+  const dueTime = document.getElementById('hw-due-time').value;
+  if (!name) { toast('Please enter an assignment name.'); return; }
+  if (selectedHwVisibility === 'students' && selectedHwStudentIds.size === 0) { toast('Please select at least one student.'); return; }
+  const btn = document.getElementById('hw-save-btn');
+  btn.disabled = true; btn.textContent = 'Creating...';
+
+  const dueAt = dueDate ? (dueTime ? `${dueDate}T${dueTime}` : `${dueDate}T23:59`) : null;
+
+  const { data: hw, error } = await sb.from('assignments').insert({
+    title: name, description: desc || null, due_at: dueAt,
+    visibility: selectedHwVisibility, created_by: currentUser.id
+  }).select().single();
+
+  if (error) { toast('Error: ' + error.message); btn.disabled = false; btn.textContent = 'Create assignment'; return; }
+
+  // If specific students, insert targets
+  if (selectedHwVisibility === 'students' && selectedHwStudentIds.size > 0) {
+    const targets = [...selectedHwStudentIds].map(sid => ({ assignment_id: hw.id, student_id: sid }));
+    const { error: te } = await sb.from('assignment_targets').insert(targets);
+    if (te) { toast('Warning: assignment created but targets failed: ' + te.message); }
+  }
+
+  btn.disabled = false; btn.textContent = 'Create assignment';
+  closeAssignmentModal();
+  toast('Assignment created! 📝');
+  loadTeacherAssignments();
+}
+
+async function loadTeacherAssignments() {
+  const list = document.getElementById('hw-teacher-list');
+  list.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading assignments...</div>';
+  const { data, error } = await sb.from('assignments').select('*').order('created_at', { ascending: false });
+  if (error) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load assignments.</div>'; return; }
+  if (!data || data.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div>No assignments yet. Create one to get started.</div>';
+    return;
+  }
+  list.innerHTML = data.map(hw => renderTeacherHwCard(hw)).join('');
+}
+
+function renderTeacherHwCard(hw) {
+  const visLabel = hw.visibility === 'all' ? 'Everyone' : hw.visibility === 'students' ? 'Specific students' : hw.visibility;
+  const dueStr = hw.due_at ? formatDue(hw.due_at) : '';
+  const dueHtml = dueStr ? `<span>📅 Due: ${dueStr}</span>` : '';
+  const descHtml = hw.description ? `<div class="hw-card-desc">${escText(hw.description)}</div>` : '';
+  return `<div class="hw-card">
+    <div class="hw-card-header">
+      <div class="hw-card-title">📝 ${escText(hw.title)}</div>
+      <div class="hw-card-badges">
+        <span class="hw-badge hw-badge-blue">${visLabel}</span>
+        <button class="hw-del-btn" onclick="deleteAssignment('${hw.id}')">🗑 Delete</button>
+      </div>
+    </div>
+    ${descHtml}
+    <div class="hw-card-meta">${dueHtml}<span>Created ${formatDate(hw.created_at)}</span></div>
+  </div>`;
+}
+
+async function deleteAssignment(id) {
+  if (!confirm('Delete this assignment and all submissions? This cannot be undone.')) return;
+  await sb.from('assignment_submissions').delete().eq('assignment_id', id);
+  await sb.from('assignment_targets').delete().eq('assignment_id', id);
+  const { error } = await sb.from('assignments').delete().eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('Assignment deleted.');
+  loadTeacherAssignments();
+}
+
+/* ─── ASSIGNMENTS (Student) ─── */
+
+async function loadStudentAssignments() {
+  const list = document.getElementById('hw-student-list');
+  list.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading assignments...</div>';
+
+  // Fetch all assignments visible to this student
+  const { data: allHw } = await sb.from('assignments').select('*').order('created_at', { ascending: false });
+  if (!allHw) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load assignments.</div>'; return; }
+
+  // Filter by visibility
+  const myYear = currentYearGroup;
+  const visibleHwIds = [];
+  const targetChecks = [];
+  for (const hw of allHw) {
+    if (hw.visibility === 'all') visibleHwIds.push(hw.id);
+    else if (hw.visibility === myYear) visibleHwIds.push(hw.id);
+    else if (hw.visibility === 'students') targetChecks.push(hw.id);
+  }
+  // Check specific targets
+  if (targetChecks.length > 0) {
+    const { data: targets } = await sb.from('assignment_targets').select('assignment_id').eq('student_id', currentUser.id).in('assignment_id', targetChecks);
+    if (targets) targets.forEach(t => visibleHwIds.push(t.assignment_id));
+  }
+
+  const visibleHw = allHw.filter(h => visibleHwIds.includes(h.id));
+  if (visibleHw.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div>No assignments yet. Check back soon!</div>';
+    return;
+  }
+
+  // Fetch my submissions
+  const { data: subs } = await sb.from('assignment_submissions').select('*').eq('student_id', currentUser.id).in('assignment_id', visibleHwIds);
+  const subMap = {};
+  (subs || []).forEach(s => subMap[s.assignment_id] = s);
+
+  allStudentHwData = visibleHw.map(hw => ({
+    hw, sub: subMap[hw.id] || null,
+    status: subMap[hw.id] ? (subMap[hw.id].is_reviewed ? 'reviewed' : 'submitted') : 'not-done'
+  }));
+
+  renderStudentHwList(allStudentHwData);
+}
+
+function filterStudentHw(filter, btn) {
+  currentStudentHwFilter = filter;
+  document.querySelectorAll('#hw-student-sort-tabs .sort-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  let data = allStudentHwData;
+  if (filter !== 'all') data = data.filter(d => d.status === filter);
+  renderStudentHwList(data);
+}
+
+function renderStudentHwList(items) {
+  const list = document.getElementById('hw-student-list');
+  if (!items || items.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div>Nothing here!</div>';
+    return;
+  }
+  list.innerHTML = items.map(({ hw, sub, status }) => renderStudentHwCard(hw, sub, status)).join('');
+}
+
+function renderStudentHwCard(hw, sub, status) {
+  const dueStr = hw.due_at ? formatDue(hw.due_at) : '';
+  let dueCls = '', dueEmoji = '📅';
+  if (hw.due_at) {
+    const diff = new Date(hw.due_at) - new Date();
+    if (diff < 0 && status !== 'reviewed') { dueCls = 'hw-overdue'; dueEmoji = '⚠️'; }
+    else if (diff < 86400000 * 2) { dueCls = 'hw-due-soon'; dueEmoji = '⏰'; }
+  }
+  const dueHtml = dueStr ? `<span class="${dueCls}">${dueEmoji} Due: ${dueStr}</span>` : '';
+  const descHtml = hw.description ? `<div class="hw-card-desc">${escText(hw.description)}</div>` : '';
+
+  let statusBadge = '';
+  if (status === 'not-done') statusBadge = '<span class="hw-badge hw-badge-red">🔴 Not submitted</span>';
+  else if (status === 'submitted') statusBadge = '<span class="hw-badge hw-badge-yellow">🟡 Awaiting review</span>';
+  else if (status === 'reviewed') statusBadge = '<span class="hw-badge hw-badge-green">🟢 Reviewed</span>';
+
+  let submitArea = '';
+  if (status === 'not-done') {
+    submitArea = `<div class="hw-submit-area">
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Submit your work — paste a link (Google Drive, etc.) or type a note:</div>
+      <div class="hw-submit-row">
+        <input type="text" id="hw-submit-input-${hw.id}" placeholder="https://drive.google.com/... or write a note"/>
+        <button class="btn-submit-hw" onclick="submitAssignment('${hw.id}')">Submit ↑</button>
+      </div>
+    </div>`;
+  } else if (status === 'submitted' || status === 'reviewed') {
+    const subLink = sub.submission_url
+      ? `<a href="${sub.submission_url}" target="_blank" rel="noopener">📎 View submission</a>`
+      : `<span>${escText(sub.submission_text || '')}</span>`;
+    submitArea = `<div class="hw-submit-area">
+      <div class="hw-submission-info">✅ Submitted ${formatDate(sub.submitted_at)} — ${subLink}</div>
+      ${sub.teacher_notes ? `<div class="hw-teacher-note"><strong>Teacher's note</strong>${escText(sub.teacher_notes)}</div>` : ''}
+    </div>`;
+  }
+
+  return `<div class="hw-card">
+    <div class="hw-card-header">
+      <div class="hw-card-title">📝 ${escText(hw.title)}</div>
+      <div class="hw-card-badges">${statusBadge}</div>
+    </div>
+    ${descHtml}
+    <div class="hw-card-meta">${dueHtml}</div>
+    ${submitArea}
+  </div>`;
+}
+
+async function submitAssignment(hwId) {
+  const input = document.getElementById(`hw-submit-input-${hwId}`);
+  const val = input ? input.value.trim() : '';
+  if (!val) { toast('Please enter a link or note before submitting.'); return; }
+  const isUrl = /^https?:\/\//i.test(val);
+  const { error } = await sb.from('assignment_submissions').insert({
+    assignment_id: hwId,
+    student_id: currentUser.id,
+    submission_url: isUrl ? val : null,
+    submission_text: isUrl ? null : val,
+    submitted_at: new Date().toISOString(),
+    is_reviewed: false
+  });
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('Assignment submitted! ✅');
+  loadStudentAssignments();
+}
+
+/* ─── ASSIGNMENT REVIEW PANEL (Teacher → Students tab) ─── */
+
+async function loadAssignmentReviewPanel() {
+  document.getElementById('students-normal-panel').style.display = 'none';
+  document.getElementById('assignments-review-panel').style.display = 'block';
+  document.getElementById('year-filter-row').style.display = 'none';
+  document.getElementById('students-search').style.display = 'none';
+
+  const listEl = document.getElementById('review-student-list');
+  listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
+
+  // Get all approved students
+  const { data: students } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name');
+  if (!students || students.length === 0) {
+    listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">👨‍🎓</div>No approved students.</div>';
+    return;
+  }
+
+  // Get all submissions
+  const { data: subs } = await sb.from('assignment_submissions').select('student_id,is_reviewed');
+  const subCounts = {};
+  (subs || []).forEach(s => {
+    if (!subCounts[s.student_id]) subCounts[s.student_id] = { submitted: 0, reviewed: 0 };
+    if (s.is_reviewed) subCounts[s.student_id].reviewed++;
+    else subCounts[s.student_id].submitted++;
+  });
+
+  // Get all assignments count for each student (visible to them)
+  const { data: allHw } = await sb.from('assignments').select('id,visibility');
+  const { data: allTargets } = await sb.from('assignment_targets').select('assignment_id,student_id');
+  const targetMap = {}; // student_id -> [assignment_ids]
+  (allTargets || []).forEach(t => {
+    if (!targetMap[t.student_id]) targetMap[t.student_id] = [];
+    targetMap[t.student_id].push(t.assignment_id);
+  });
+
+  reviewStudentsAllData = students.map(s => {
+    const visibleHwCount = (allHw || []).filter(hw =>
+      hw.visibility === 'all' || hw.visibility === s.year_group ||
+      (hw.visibility === 'students' && (targetMap[s.id]||[]).includes(hw.id))
+    ).length;
+    const counts = subCounts[s.id] || { submitted: 0, reviewed: 0 };
+    const notDone = Math.max(0, visibleHwCount - counts.submitted - counts.reviewed);
+    return { ...s, notDone, submitted: counts.submitted, reviewed: counts.reviewed };
+  });
+  reviewStudentsData = [...reviewStudentsAllData];
+  renderReviewStudentList(reviewStudentsData);
+}
+
+function renderReviewStudentList(students) {
+  const listEl = document.getElementById('review-student-list');
+  if (!students || students.length === 0) {
+    listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div>No students found.</div>';
+    return;
+  }
+  listEl.innerHTML = students.map(s => {
+    const initials = (s.full_name || s.email || '?').charAt(0).toUpperCase();
+    const yearBadge = s.year_group ? `<span class="year-badge year-${s.year_group}">${s.year_group}</span>` : '';
+    const pills = `
+      ${s.notDone > 0 ? `<span class="review-count-pill review-count-red">🔴 ${s.notDone} missing</span>` : ''}
+      ${s.submitted > 0 ? `<span class="review-count-pill review-count-yellow">🟡 ${s.submitted} to review</span>` : ''}
+      ${s.reviewed > 0 ? `<span class="review-count-pill review-count-green">🟢 ${s.reviewed} done</span>` : ''}
+    `;
+    return `<div class="review-student-row">
+      <div class="review-student-info">
+        <div class="review-avatar">${initials}</div>
+        <div>
+          <div class="review-student-name">${escText(s.full_name || s.email)}</div>
+          <div class="review-student-meta">${s.email} ${yearBadge ? '· ' : ''}${yearBadge}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div class="review-counts">${pills}</div>
+        <button class="btn-view-hw" onclick="openReviewDetail('${s.id}','${escHtml(s.full_name||s.email)}','${s.year_group||''}')">View assignments →</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterReviewStudentsByYear(year, btn) {
+  reviewStudentYearFilter = year;
+  document.querySelectorAll('#review-sort-row .sort-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  applyReviewStudentFilters();
+}
+
+function filterReviewStudents(query) {
+  applyReviewStudentFilters(query);
+}
+
+function applyReviewStudentFilters(query) {
+  if (query === undefined) query = document.getElementById('review-search').value;
+  const q = (query || '').toLowerCase();
+  let data = reviewStudentsAllData;
+  if (reviewStudentYearFilter !== 'all') data = data.filter(s => s.year_group === reviewStudentYearFilter);
+  if (q) data = data.filter(s => (s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q));
+  renderReviewStudentList(data);
+}
+
+async function openReviewDetail(studentId, studentName, yearGroup) {
+  currentReviewStudentId = studentId;
+  currentReviewStudentName = studentName;
+  currentReviewDetailFilter = 'all';
+  document.getElementById('review-student-list-view').style.display = 'none';
+  document.getElementById('review-student-detail-view').style.display = 'block';
+  document.getElementById('review-detail-name').textContent = studentName;
+  document.getElementById('review-detail-meta').textContent = yearGroup ? `Year ${yearGroup}` : '';
+  document.querySelectorAll('#review-detail-sort-tabs .sort-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('#review-detail-sort-tabs .sort-tab').classList.add('active');
+
+  const hwList = document.getElementById('review-hw-list');
+  hwList.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
+
+  // Get all assignments
+  const { data: allHw } = await sb.from('assignments').select('*').order('created_at', { ascending: false });
+  const { data: targets } = await sb.from('assignment_targets').select('assignment_id').eq('student_id', studentId);
+  const targetIds = (targets || []).map(t => t.assignment_id);
+
+  // Filter visible
+  const { data: profile } = await sb.from('profiles').select('year_group').eq('id', studentId).single();
+  const studentYear = profile ? profile.year_group : null;
+  const visibleHw = (allHw || []).filter(hw =>
+    hw.visibility === 'all' || hw.visibility === studentYear ||
+    (hw.visibility === 'students' && targetIds.includes(hw.id))
+  );
+
+  // Get submissions for this student
+  const { data: subs } = await sb.from('assignment_submissions').select('*').eq('student_id', studentId);
+  const subMap = {};
+  (subs || []).forEach(s => subMap[s.assignment_id] = s);
+
+  reviewDetailAllData = visibleHw.map(hw => ({
+    hw, sub: subMap[hw.id] || null,
+    status: subMap[hw.id] ? (subMap[hw.id].is_reviewed ? 'reviewed' : 'submitted') : 'not-done'
+  }));
+
+  renderReviewDetail(reviewDetailAllData);
+}
+
+function filterReviewDetail(filter, btn) {
+  currentReviewDetailFilter = filter;
+  document.querySelectorAll('#review-detail-sort-tabs .sort-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  let data = reviewDetailAllData;
+  if (filter !== 'all') data = data.filter(d => d.status === filter);
+  renderReviewDetail(data);
+}
+
+function renderReviewDetail(items) {
+  const hwList = document.getElementById('review-hw-list');
+  if (!items || items.length === 0) {
+    hwList.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div>Nothing here.</div>';
+    return;
+  }
+  hwList.innerHTML = items.map(({ hw, sub, status }) => {
+    const dueStr = hw.due_at ? formatDue(hw.due_at) : '';
+    const dueHtml = dueStr ? `<span>📅 Due: ${dueStr}</span>` : '';
+    const statusLabels = { 'not-done': '🔴 Not submitted', 'submitted': '🟡 Submitted — needs review', 'reviewed': '🟢 Reviewed' };
+    const statusBadge = { 'not-done': 'hw-badge-red', 'submitted': 'hw-badge-yellow', 'reviewed': 'hw-badge-green' };
+
+    let subSection = '';
+    if (sub) {
+      const subLink = sub.submission_url
+        ? `<a href="${sub.submission_url}" target="_blank" rel="noopener">📎 View submission</a>`
+        : `<em>${escText(sub.submission_text || '')}</em>`;
+      subSection = `<div class="review-hw-submission">📤 ${subLink} <span style="font-size:11px;color:var(--text-muted);">· Submitted ${formatDate(sub.submitted_at)}</span></div>`;
+    } else {
+      subSection = `<div style="font-size:13px;color:var(--text-muted);margin-bottom:10px;font-style:italic;">Student hasn't submitted yet.</div>`;
+    }
+
+    const notesVal = sub ? (sub.teacher_notes || '') : '';
+    const reviewedSection = sub ? `
+      <textarea class="review-hw-notes-area" id="notes-${hw.id}" placeholder="Add a note for the student...">${escText(notesVal)}</textarea>
+      <div class="review-hw-actions">
+        <button class="btn-save-note" onclick="saveTeacherNote('${hw.id}','${sub.id}')">💾 Save note</button>
+        ${!sub.is_reviewed
+          ? `<button class="btn-mark-reviewed" onclick="markReviewed('${hw.id}','${sub.id}')">✅ Mark as reviewed</button>`
+          : `<div class="reviewed-check">✅ Marked as reviewed on ${formatDate(sub.reviewed_at)}</div>`}
+      </div>` : '';
+
+    return `<div class="review-hw-card status-${status}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px;">
+        <div class="review-hw-title">📝 ${escText(hw.title)}</div>
+        <span class="hw-badge ${statusBadge[status]}">${statusLabels[status]}</span>
+      </div>
+      ${hw.description ? `<div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">${escText(hw.description)}</div>` : ''}
+      <div class="review-hw-meta">${dueHtml}</div>
+      ${subSection}
+      ${reviewedSection}
+    </div>`;
+  }).join('');
+}
+
+async function saveTeacherNote(hwId, subId) {
+  const notes = document.getElementById(`notes-${hwId}`).value.trim();
+  const { error } = await sb.from('assignment_submissions').update({ teacher_notes: notes || null }).eq('id', subId);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('Note saved! 💾');
+}
+
+async function markReviewed(hwId, subId) {
+  const notes = document.getElementById(`notes-${hwId}`).value.trim();
+  const { error } = await sb.from('assignment_submissions').update({
+    is_reviewed: true, reviewed_at: new Date().toISOString(),
+    teacher_notes: notes || null
+  }).eq('id', subId);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('Marked as reviewed! ✅');
+  // Refresh
+  openReviewDetail(currentReviewStudentId, currentReviewStudentName, '');
+}
+
+function closeReviewDetail() {
+  document.getElementById('review-student-list-view').style.display = 'block';
+  document.getElementById('review-student-detail-view').style.display = 'none';
+  currentReviewStudentId = null;
+  // Refresh counts
+  loadAssignmentReviewPanel();
+}
+
+/* ─── STUDENTS TAB ─── */
+
+function switchStudentTab(tab, event) {
+  currentStudentTab = tab;
+  document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+  if (event && event.target) event.target.classList.add('active');
+  loadStudents();
+}
+
+async function loadStudents() {
+  if (currentRole !== 'teacher') return;
+  if (currentRoleFilter === 'assignments') { return; } // handled separately
+
+  let query = sb.from('profiles').select('*').order('full_name');
+  if (currentRoleFilter === 'students') {
+    query = query.eq('role', 'student').eq('status', currentStudentTab);
+  } else if (currentRoleFilter === 'teachers') {
+    query = query.eq('role', 'teacher');
+  }
+  const { data } = await query;
+  allStudentsRows = data || [];
+  let filtered = allStudentsRows;
+  if (currentYearFilter !== 'all' && currentRoleFilter === 'students') {
+    filtered = allStudentsRows.filter(s => s.year_group === currentYearFilter);
+  }
+  renderStudents(filtered);
+  updateFilterCount(filtered.length);
+}
+
+function updateFilterCount(count) {
+  const countEl = document.getElementById('filter-count');
+  if (countEl) countEl.textContent = `(${count} ${count === 1 ? 'person' : 'people'})`;
+}
+
+function renderStudents(students) {
+  const tbody = document.getElementById('students-tbody');
+  const thead = document.querySelector('.students-table thead tr');
+  if (currentRoleFilter === 'teachers') {
+    thead.innerHTML = '<th>Name</th><th>Email</th>';
+  } else {
+    thead.innerHTML = '<th>Name</th><th>Email</th><th>Year</th><th>Status</th><th>Actions</th>';
+  }
+  if (!students || students.length === 0) {
+    let msg = currentRoleFilter === 'teachers' ? 'No teachers found' :
+      currentStudentTab === 'pending' ? 'No students waiting for approval' : 'No approved students yet';
+    const colspan = currentRoleFilter === 'teachers' ? '2' : '5';
+    tbody.innerHTML = `<tr><td colspan="${colspan}" style="color:var(--text-muted);text-align:center;padding:20px">${msg}</td></tr>`;
+    return;
+  }
+  if (currentRoleFilter === 'teachers') {
+    tbody.innerHTML = students.map(s =>
+      `<tr><td><strong>${s.full_name || '—'}</strong></td><td>${s.email}</td></tr>`
+    ).join('');
+  } else {
+    tbody.innerHTML = students.map(s => {
+      const yearBadge = s.year_group ? `<span class="year-badge year-${s.year_group}">${s.year_group}</span>` : '—';
+      let actions = currentStudentTab === 'pending'
+        ? `<button class="btn-approve" onclick="approveStudent('${s.id}')">✅ Approve</button>
+           <button class="btn-reject" onclick="rejectStudent('${s.id}')">❌ Reject</button>
+           <button class="btn-promote" onclick="approveAsTeacher('${s.id}')">👨‍🏫 As Teacher</button>`
+        : `<button class="btn-small" onclick="rejectStudent('${s.id}')">Remove</button>`;
+      return `<tr>
+        <td><strong>${s.full_name || '—'}</strong></td>
+        <td>${s.email}</td>
+        <td>${yearBadge}</td>
+        <td><span class="status-badge status-${s.status||'approved'}">${s.status}</span></td>
+        <td>${actions}</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+function filterStudents(query) {
+  const q = query.toLowerCase();
+  let filtered = allStudentsRows;
+  if (currentYearFilter !== 'all' && currentRoleFilter === 'students') {
+    filtered = filtered.filter(s => s.year_group === currentYearFilter);
+  }
+  filtered = filtered.filter(s =>
+    (s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q));
+  renderStudents(filtered);
+  updateFilterCount(filtered.length);
+}
+
+function filterByYear(year) {
+  currentYearFilter = year;
+  document.querySelectorAll('[id^="filter-year-"]').forEach(b => {
+    b.style.background = ''; b.style.color = ''; b.style.borderColor = '';
+  });
+  const activeBtn = document.getElementById('filter-year-' + year);
+  if (activeBtn) { activeBtn.style.background = 'var(--blue)'; activeBtn.style.color = '#fff'; activeBtn.style.borderColor = 'var(--blue)'; }
+  loadStudents();
+}
+
+function filterByRole(role) {
+  currentRoleFilter = role;
+  ['students', 'teachers', 'assignments'].forEach(r => {
+    const btn = document.getElementById('filter-btn-' + r);
+    if (btn) {
+      btn.style.background = r === role ? 'var(--blue)' : '';
+      btn.style.color = r === role ? '#fff' : '';
+      btn.style.borderColor = r === role ? 'var(--blue)' : '';
+    }
+  });
+
+  const yearFilterRow = document.getElementById('year-filter-row');
+  const panelTabs = document.querySelector('.panel-tabs');
+  const studentsSearch = document.getElementById('students-search');
+  const normalPanel = document.getElementById('students-normal-panel');
+  const reviewPanel = document.getElementById('assignments-review-panel');
+
+  if (role === 'assignments') {
+    yearFilterRow.style.display = 'none';
+    if (panelTabs) panelTabs.style.display = 'none';
+    studentsSearch.style.display = 'none';
+    normalPanel.style.display = 'none';
+    reviewPanel.style.display = 'block';
+    document.getElementById('review-student-list-view').style.display = 'block';
+    document.getElementById('review-student-detail-view').style.display = 'none';
+    loadAssignmentReviewPanel();
+  } else {
+    yearFilterRow.style.display = role === 'students' ? 'flex' : 'none';
+    if (panelTabs) panelTabs.style.display = role === 'students' ? 'flex' : 'none';
+    studentsSearch.style.display = 'block';
+    normalPanel.style.display = 'block';
+    reviewPanel.style.display = 'none';
+    if (role === 'students') {
+      currentStudentTab = 'approved';
+      document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+      const approvedTab = document.querySelector('.panel-tab');
+      if (approvedTab) approvedTab.classList.add('active');
+    }
+    loadStudents();
+  }
+}
+
+async function approveStudent(id) {
+  const { error } = await sb.from('profiles').update({ status: 'approved' }).eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('Student approved! ✅');
+  loadStudents();
+  if (currentRole === 'teacher') loadTeacherDash();
+}
+
+async function approveAsTeacher(id) {
+  if (!confirm('Approve this user as a teacher? They will have full teacher access.')) return;
+  const { error } = await sb.from('profiles').update({ status: 'approved', role: 'teacher' }).eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('Approved as teacher! 👨‍🏫');
+  loadStudents();
+  if (currentRole === 'teacher') loadTeacherDash();
+}
+
+async function rejectStudent(id) {
+  if (!confirm('Remove this user?')) return;
+  const { error } = await sb.from('profiles').delete().eq('id', id);
+  if (error) { toast('Error: ' + error.message); return; }
+  toast('User removed.');
+  loadStudents();
+  if (currentRole === 'teacher') loadTeacherDash();
+}
+
+/* ─── EXPLORER (sessions + books) ─── */
+
 const EXPLORER_CONFIG = {
   sessions: {
     rootLabel:'📅 Sessions', gridId:'sessions-explorer-grid', breadcrumbId:'sessions-breadcrumb', toolbarId:'sessions-toolbar-btns',
@@ -841,8 +1701,8 @@ async function loadExplorer(section) {
   renderExplorerToolbar(section);
   const grid = document.getElementById(cfg.gridId);
   grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
-  let query = sb.from('explorer_nodes').select('*').eq('section',section).order('type',{ascending:true}).order('name',{ascending:true});
-  if (parentId === null) query = query.filter('parent_id','is','null');
+  let query = sb.from('explorer_nodes').select('*').eq('section', section).order('type', { ascending: true }).order('name', { ascending: true });
+  if (parentId === null) query = query.filter('parent_id', 'is', 'null');
   else query = query.eq('parent_id', parentId);
   const { data, error } = await query;
   if (error) { grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>Error: ${error.message}</div>`; return; }
@@ -853,7 +1713,7 @@ async function searchExplorer(section, query) {
   const cfg = EXPLORER_CONFIG[section];
   const grid = document.getElementById(cfg.gridId);
   if (!query.trim()) { loadExplorer(section); return; }
-  const { data } = await sb.from('explorer_nodes').select('*').eq('section',section).ilike('name', `%${query}%`);
+  const { data } = await sb.from('explorer_nodes').select('*').eq('section', section).ilike('name', `%${query}%`);
   renderExplorerGrid(section, data || []);
 }
 
@@ -899,6 +1759,7 @@ function renderExplorerGrid(section, nodes) {
 
 function visLabel(vis) { if(vis==='all') return 'Everyone'; if(vis==='student') return 'Specific student'; return vis; }
 function escHtml(str) { return (str||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;'); }
+function escText(str) { const d=document.createElement('div'); d.textContent=str||''; return d.innerHTML; }
 
 function renderFolderCard(node, section) {
   const isRoot = node.parent_id === null;
@@ -1153,179 +2014,6 @@ async function savePdfFile() {
   checkNotificationDots();
 }
 
-/* ─── STUDENTS ─── */
-
-function switchStudentTab(tab, event) {
-  currentStudentTab=tab;
-  document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));
-  if (event&&event.target) event.target.classList.add('active');
-  loadStudents();
-}
-
-async function loadStudents() {
-  if (currentRole!=='teacher') return;
-  
-  let query = sb.from('profiles').select('*').order('full_name');
-  
-  if (currentRoleFilter === 'students') {
-    query = query.eq('role', 'student').eq('status', currentStudentTab);
-  } else if (currentRoleFilter === 'teachers') {
-    query = query.eq('role', 'teacher');
-  }
-  
-  const { data } = await query;
-  allStudentsRows = data || [];
-  
-  let filtered = allStudentsRows;
-  if (currentYearFilter !== 'all' && currentRoleFilter === 'students') {
-    filtered = allStudentsRows.filter(s => s.year_group === currentYearFilter);
-  }
-  
-  renderStudents(filtered);
-  updateFilterCount(filtered.length);
-}
-
-function updateFilterCount(count) {
-  const countEl = document.getElementById('filter-count');
-  if (countEl) {
-    countEl.textContent = `(${count} ${count === 1 ? 'person' : 'people'})`;
-  }
-}
-
-function renderStudents(students) {
-  const tbody=document.getElementById('students-tbody');
-  
-  // Update table header based on filter
-  const thead = document.querySelector('.students-table thead tr');
-  if (currentRoleFilter === 'teachers') {
-    thead.innerHTML = '<th>Name</th><th>Email</th>';
-  } else {
-    thead.innerHTML = '<th>Name</th><th>Email</th><th>Year</th><th>Status</th><th>Actions</th>';
-  }
-  
-  if (!students||students.length===0) {
-    let msg = 'No users found';
-    if (currentRoleFilter === 'teachers') msg = 'No teachers found';
-    else if (currentStudentTab === 'pending') msg = 'No students waiting for approval';
-    else if (currentStudentTab === 'approved') msg = 'No approved students yet';
-    const colspan = currentRoleFilter === 'teachers' ? '2' : '5';
-    tbody.innerHTML=`<tr><td colspan="${colspan}" style="color:var(--text-muted);text-align:center;padding:20px">${msg}</td></tr>`;
-    return;
-  }
-  
-  if (currentRoleFilter === 'teachers') {
-    tbody.innerHTML=students.map(s=>{
-      return `<tr>
-        <td><strong>${s.full_name||'—'}</strong></td>
-        <td>${s.email}</td>
-      </tr>`;
-    }).join('');
-  } else {
-    tbody.innerHTML=students.map(s=>{
-      const yearBadge=s.year_group?`<span class="year-badge year-${s.year_group}">${s.year_group}</span>`:'—';
-      
-      let actions = '';
-      if (currentStudentTab === 'pending') {
-        actions = `<button class="btn-approve" onclick="approveStudent('${s.id}')">✅ Approve</button>
-                   <button class="btn-reject" onclick="rejectStudent('${s.id}')">❌ Reject</button>
-                   <button class="btn-promote" onclick="approveAsTeacher('${s.id}')">👨‍🏫 Approve as Teacher</button>`;
-      } else {
-        actions = `<button class="btn-small" onclick="rejectStudent('${s.id}')">Remove</button>`;
-      }
-      
-      return `<tr>
-        <td><strong>${s.full_name||'—'}</strong></td>
-        <td>${s.email}</td>
-        <td>${yearBadge}</td>
-        <td><span class="status-badge status-${s.status||'approved'}">${s.status}</span></td>
-        <td>${actions}</td>
-      </tr>`;
-    }).join('');
-  }
-}
-
-function filterStudents(query) {
-  const q=query.toLowerCase();
-  let filtered = allStudentsRows;
-  if (currentYearFilter !== 'all' && currentRoleFilter === 'students') {
-    filtered = filtered.filter(s => s.year_group === currentYearFilter);
-  }
-  filtered = filtered.filter(s=>(s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q));
-  renderStudents(filtered);
-  updateFilterCount(filtered.length);
-}
-
-function filterByYear(year) {
-  currentYearFilter = year;
-  document.querySelectorAll('[id^="filter-year-"]').forEach(b => {
-    b.style.background = '';
-    b.style.color = '';
-    b.style.borderColor = '';
-  });
-  const activeBtn = document.getElementById('filter-year-' + year);
-  if (activeBtn) {
-    activeBtn.style.background = 'var(--blue)';
-    activeBtn.style.color = '#fff';
-    activeBtn.style.borderColor = 'var(--blue)';
-  }
-  loadStudents();
-}
-
-function filterByRole(role) {
-  currentRoleFilter = role;
-  ['students', 'teachers'].forEach(r => {
-    const btn = document.getElementById('filter-btn-' + r);
-    if (btn) {
-      btn.style.background = r === role ? 'var(--blue)' : '';
-      btn.style.color = r === role ? '#fff' : '';
-      btn.style.borderColor = r === role ? 'var(--blue)' : '';
-    }
-  });
-  
-  const yearFilterRow = document.getElementById('year-filter-row');
-  if (yearFilterRow) {
-    yearFilterRow.style.display = role === 'students' ? 'flex' : 'none';
-  }
-  
-  const panelTabs = document.querySelector('.panel-tabs');
-  if (panelTabs) {
-    panelTabs.style.display = role === 'students' ? 'flex' : 'none';
-  }
-  if (role === 'students') {
-    currentStudentTab = 'approved';
-    document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
-    const approvedTab = document.querySelector('.panel-tab');
-    if (approvedTab) approvedTab.classList.add('active');
-  }
-  loadStudents();
-}
-
-async function approveStudent(id) {
-  const { error }=await sb.from('profiles').update({status:'approved'}).eq('id',id);
-  if (error) { toast('Error: '+error.message); return; }
-  toast('Student approved! ✅');
-  loadStudents();
-  if (currentRole==='teacher') loadTeacherDash();
-}
-
-async function approveAsTeacher(id) {
-  if (!confirm('Approve this user as a teacher? They will have full teacher access.')) return;
-  const { error } = await sb.from('profiles').update({ status: 'approved', role: 'teacher' }).eq('id', id);
-  if (error) { toast('Error: ' + error.message); return; }
-  toast('Approved as teacher! 👨‍🏫');
-  loadStudents();
-  if (currentRole === 'teacher') loadTeacherDash();
-}
-
-async function rejectStudent(id) {
-  if (!confirm('Remove this user?')) return;
-  const { error }=await sb.from('profiles').delete().eq('id',id);
-  if (error) { toast('Error: '+error.message); return; }
-  toast('User removed.');
-  loadStudents();
-  if (currentRole==='teacher') loadTeacherDash();
-}
-
 function openEditNodeModal(id, name, type, section, desc='', link='') {
   document.getElementById('edit-node-id').value = id;
   document.getElementById('edit-node-type').value = type;
@@ -1367,11 +2055,27 @@ async function saveEditNode() {
   loadExplorer(section);
 }
 
+/* ─── HELPERS ─── */
+
+function formatDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+
+function formatDue(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const dateStr = d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  const timeStr = d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+  return `${dateStr} at ${timeStr}`;
+}
+
 function toast(msg) {
-  const t=document.getElementById('toast');
-  document.getElementById('toast-msg').textContent=msg;
-  t.style.display='flex';
-  setTimeout(()=>t.style.display='none',3500);
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.style.display = 'flex';
+  setTimeout(() => t.style.display = 'none', 3500);
 }
 </script>
 </body>
