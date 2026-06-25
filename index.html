@@ -170,14 +170,10 @@
   .students-table tr:last-child td{border-bottom:none;}
   .btn-approve{background:var(--green);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;margin-right:4px;}
   .btn-reject{background:var(--red);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;}
-  .btn-promote{background:var(--blue);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;margin-right:4px;}
   .btn-small{background:none;border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;color:var(--text-muted);}
   .status-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
   .status-pending{background:var(--orange-light);color:var(--orange);}
   .status-approved{background:var(--green-light);color:#085041;}
-  /* Filter dropdown styling */
-  .filter-select{width:auto;min-width:120px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;background:var(--white);color:var(--text);cursor:pointer;transition:border-color 0.15s;}
-  .filter-select:focus{outline:none;border-color:var(--blue);}
   .toast{position:fixed;bottom:24px;right:24px;background:#1a1a1a;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;display:none;align-items:center;gap:8px;z-index:1000;box-shadow:0 4px 16px rgba(0,0,0,0.2);}
   .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px;}
   @keyframes spin{to{transform:rotate(360deg);}}
@@ -295,17 +291,7 @@
         <h1>📅 Sessions</h1>
         <p>Recorded lessons, organized by chapter.</p>
       </div>
-      <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
-        <input class="search-bar" style="margin-bottom:0;flex:1;" placeholder="🔍 Search sessions and folders..." oninput="searchExplorer('sessions',this.value)" id="sessions-search"/>
-        <select class="filter-select" id="filter-visibility-sessions" onchange="applyFilter('sessions', this.value)">
-          <option value="">📋 All visibility</option>
-          <option value="all">Everyone</option>
-          <option value="OL">OL only</option>
-          <option value="AS">AS only</option>
-          <option value="A2">A2 only</option>
-          <option value="student">Specific student</option>
-        </select>
-      </div>
+      <input class="search-bar" placeholder="🔍 Search sessions and folders..." oninput="searchExplorer('sessions',this.value)" id="sessions-search"/>
       <div class="explorer-toolbar">
         <div class="explorer-toolbar-left"><div class="breadcrumb" id="sessions-breadcrumb"></div></div>
         <div class="explorer-toolbar-right" id="sessions-toolbar-btns"></div>
@@ -319,17 +305,7 @@
         <h1>📚 PDFs</h1>
         <p>Books and resources, organised by topic.</p>
       </div>
-      <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
-        <input class="search-bar" style="margin-bottom:0;flex:1;" placeholder="🔍 Search PDFs and folders..." oninput="searchExplorer('books',this.value)" id="books-search"/>
-        <select class="filter-select" id="filter-visibility-books" onchange="applyFilter('books', this.value)">
-          <option value="">📋 All visibility</option>
-          <option value="all">Everyone</option>
-          <option value="OL">OL only</option>
-          <option value="AS">AS only</option>
-          <option value="A2">A2 only</option>
-          <option value="student">Specific student</option>
-        </select>
-      </div>
+      <input class="search-bar" placeholder="🔍 Search PDFs and folders..." oninput="searchExplorer('books',this.value)" id="books-search"/>
       <div class="explorer-toolbar">
         <div class="explorer-toolbar-left"><div class="breadcrumb" id="books-breadcrumb"></div></div>
         <div class="explorer-toolbar-right" id="books-toolbar-btns"></div>
@@ -538,7 +514,6 @@ let selectedEFStudentId = '', selectedPFStudentId = '';
 let selectedExplorerFolderVis = 'all', selectedPdfFolderVis = 'all';
 let editingSessionId = null;
 let currentProfile = null;
-let currentFilterVis = { sessions: '', books: '' }; // Track current filter visibility
 
 // ── DARK MODE ──
 function toggleDark(on) {
@@ -659,7 +634,6 @@ async function logout() {
   await sb.auth.signOut();
   currentUser = null; currentRole = null; currentYearGroup = null; currentProfile = null;
   explorerPaths = { sessions: [], books: [] };
-  currentFilterVis = { sessions: '', books: '' };
   document.getElementById('app').style.display = 'none';
   document.getElementById('pending-page').style.display = 'none';
   document.getElementById('auth-page').style.display = 'flex';
@@ -868,15 +842,8 @@ async function loadExplorer(section) {
   const grid = document.getElementById(cfg.gridId);
   grid.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
   let query = sb.from('explorer_nodes').select('*').eq('section',section).order('type',{ascending:true}).order('name',{ascending:true});
-  if (parentId === null) {
-    query = query.filter('parent_id','is','null');
-    // Apply visibility filter for root folders
-    if (currentFilterVis[section]) {
-      query = query.eq('visibility', currentFilterVis[section]);
-    }
-  } else {
-    query = query.eq('parent_id', parentId);
-  }
+  if (parentId === null) query = query.filter('parent_id','is','null');
+  else query = query.eq('parent_id', parentId);
   const { data, error } = await query;
   if (error) { grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div>Error: ${error.message}</div>`; return; }
   renderExplorerGrid(section, data || []);
@@ -888,14 +855,6 @@ async function searchExplorer(section, query) {
   if (!query.trim()) { loadExplorer(section); return; }
   const { data } = await sb.from('explorer_nodes').select('*').eq('section',section).ilike('name', `%${query}%`);
   renderExplorerGrid(section, data || []);
-}
-
-// NEW: Apply visibility filter
-function applyFilter(section, vis) {
-  currentFilterVis[section] = vis;
-  explorerPaths[section] = []; // Reset to root when filter changes
-  document.getElementById(`filter-visibility-${section}`).value = vis;
-  loadExplorer(section);
 }
 
 function renderExplorerBreadcrumb(section) {
@@ -1221,34 +1180,21 @@ function renderStudents(students) {
   }
   tbody.innerHTML=students.map(s=>{
     const yearBadge=s.year_group?`<span class="year-badge year-${s.year_group}">${s.year_group}</span>`:'—';
-    const actions = s.status==='pending'
-      ? `<button class="btn-approve" onclick="approveStudent('${s.id}')">✅ Approve</button>
-         <button class="btn-reject" onclick="rejectStudent('${s.id}')">❌ Reject</button>`
-      : `<button class="btn-promote" onclick="promoteToTeacher('${s.id}')">👨‍🏫 Promote</button>
-         <button class="btn-reject" onclick="rejectStudent('${s.id}')">❌ Remove</button>`;
     return `<tr>
       <td><strong>${s.full_name||'—'}</strong></td>
       <td>${s.email}</td>
       <td>${yearBadge}</td>
       <td><span class="status-badge status-${s.status}">${s.status}</span></td>
-      <td>${actions}</td></tr>`;
+      <td>${s.status==='pending'
+        ?`<button class="btn-approve" onclick="approveStudent('${s.id}')">✅ Approve</button><button class="btn-reject" onclick="rejectStudent('${s.id}')">❌ Reject</button>`
+        :`<button class="btn-small" onclick="rejectStudent('${s.id}')">Remove</button>`}
+      </td></tr>`;
   }).join('');
 }
 
-// Enhanced filter with database query for better performance
 function filterStudents(query) {
-  if (!query.trim()) {
-    loadStudents();
-    return;
-  }
-  const q = query.toLowerCase();
-  // First filter locally for instant response, then could do DB query for larger datasets
-  const filtered = allStudentsRows.filter(s =>
-    (s.full_name||'').toLowerCase().includes(q) ||
-    (s.email||'').toLowerCase().includes(q) ||
-    (s.year_group||'').toLowerCase().includes(q)
-  );
-  renderStudents(filtered);
+  const q=query.toLowerCase();
+  renderStudents(allStudentsRows.filter(s=>(s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q)));
 }
 
 async function approveStudent(id) {
@@ -1259,21 +1205,7 @@ async function approveStudent(id) {
   if (currentRole==='teacher') loadTeacherDash();
 }
 
-// NEW: Promote student to teacher
-async function promoteToTeacher(id) {
-  if (!confirm('Promote this student to teacher? They will have full teacher access.')) return;
-  const { error } = await sb.from('profiles').update({ role: 'teacher' }).eq('id', id);
-  if (error) {
-    toast('Error promoting to teacher: ' + error.message);
-    return;
-  }
-  toast('Student promoted to teacher! 👨‍🏫');
-  loadStudents();
-  if (currentRole === 'teacher') loadTeacherDash();
-}
-
 async function rejectStudent(id) {
-  if (!confirm('Remove this student?')) return;
   const { error }=await sb.from('profiles').delete().eq('id',id);
   if (error) { toast('Error: '+error.message); return; }
   toast('Student removed.');
