@@ -321,11 +321,10 @@
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
         <button class="btn-small" id="filter-btn-students" style="background:var(--blue);color:#fff;border-color:var(--blue);" onclick="filterByRole('students')">👨‍🎓 Students</button>
         <button class="btn-small" id="filter-btn-teachers" onclick="filterByRole('teachers')">👨‍🏫 Teachers</button>
-        <button class="btn-small" id="filter-btn-everyone" onclick="filterByRole('everyone')">👥 Everyone</button>
       </div>
       
-      <!-- Year Filter -->
-      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+      <!-- Year Filter (visible only for Students) -->
+      <div id="year-filter-row" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
         <span style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;">Year:</span>
         <button class="btn-small" id="filter-year-all" style="background:var(--blue);color:#fff;border-color:var(--blue);" onclick="filterByYear('all')">All</button>
         <button class="btn-small" id="filter-year-OL" onclick="filterByYear('OL')">OL</button>
@@ -1156,7 +1155,7 @@ async function savePdfFile() {
   checkNotificationDots();
 }
 
-/* ─── STUDENTS (UPDATED) ─── */
+/* ─── STUDENTS ─── */
 
 function switchStudentTab(tab, event) {
   currentStudentTab=tab;
@@ -1174,15 +1173,13 @@ async function loadStudents() {
     query = query.eq('role', 'student').eq('status', currentStudentTab);
   } else if (currentRoleFilter === 'teachers') {
     query = query.eq('role', 'teacher');
-  } else if (currentRoleFilter === 'everyone') {
-    query = query.neq('role', 'teacher');
   }
   
   const { data } = await query;
   allStudentsRows = data || [];
   
   let filtered = allStudentsRows;
-  if (currentYearFilter !== 'all') {
+  if (currentYearFilter !== 'all' && currentRoleFilter === 'students') {
     filtered = allStudentsRows.filter(s => s.year_group === currentYearFilter);
   }
   
@@ -1235,7 +1232,7 @@ function renderStudents(students) {
 function filterStudents(query) {
   const q=query.toLowerCase();
   let filtered = allStudentsRows;
-  if (currentYearFilter !== 'all') {
+  if (currentYearFilter !== 'all' && currentRoleFilter === 'students') {
     filtered = filtered.filter(s => s.year_group === currentYearFilter);
   }
   filtered = filtered.filter(s=>(s.full_name||'').toLowerCase().includes(q)||(s.email||'').toLowerCase().includes(q)||(s.year_group||'').toLowerCase().includes(q));
@@ -1261,7 +1258,7 @@ function filterByYear(year) {
 
 function filterByRole(role) {
   currentRoleFilter = role;
-  ['students', 'teachers', 'everyone'].forEach(r => {
+  ['students', 'teachers'].forEach(r => {
     const btn = document.getElementById('filter-btn-' + r);
     if (btn) {
       btn.style.background = r === role ? 'var(--blue)' : '';
@@ -1269,6 +1266,13 @@ function filterByRole(role) {
       btn.style.borderColor = r === role ? 'var(--blue)' : '';
     }
   });
+  
+  // Show/hide year filter row (only for students)
+  const yearFilterRow = document.getElementById('year-filter-row');
+  if (yearFilterRow) {
+    yearFilterRow.style.display = role === 'students' ? 'flex' : 'none';
+  }
+  
   const panelTabs = document.querySelector('.panel-tabs');
   if (panelTabs) {
     panelTabs.style.display = role === 'students' ? 'flex' : 'none';
@@ -1316,8 +1320,6 @@ async function rejectStudent(id) {
   loadStudents();
   if (currentRole==='teacher') loadTeacherDash();
 }
-
-/* ─── EDIT NODE ─── */
 
 function openEditNodeModal(id, name, type, section, desc='', link='') {
   document.getElementById('edit-node-id').value = id;
