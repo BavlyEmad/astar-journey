@@ -814,6 +814,18 @@ let currentHwYearFilter = 'all';
 let currentAssignmentDetailId = null;
 let assignmentDetailStudentsData = [];
 
+// ─── TIMEZONE HELPER ───
+function buildLocalIsoString(dateStr, timeStr) {
+  if (!dateStr) return null;
+  const tzOffset = new Date().getTimezoneOffset();
+  const tzHours = Math.abs(Math.floor(tzOffset / 60));
+  const tzMinutes = Math.abs(tzOffset % 60);
+  const tzSign = tzOffset <= 0 ? '+' : '-';
+  const tzString = `${tzSign}${String(tzHours).padStart(2, '0')}:${String(tzMinutes).padStart(2, '0')}`;
+  const time = timeStr || '23:59';
+  return `${dateStr}T${time}${tzString}`;
+}
+
 function toggleDark(on) {
   document.body.classList.toggle('dark', on);
   localStorage.setItem('darkMode', on ? '1' : '0');
@@ -1214,7 +1226,8 @@ async function saveAssignment() {
   const btn = document.getElementById('hw-save-btn');
   btn.disabled = true; btn.textContent = 'Creating...';
 
-  const dueAt = dueDate ? (dueTime ? `${dueDate}T${dueTime}` : `${dueDate}T23:59`) : null;
+  // Use local timezone so the due time doesn't shift
+  const dueAt = buildLocalIsoString(dueDate, dueTime);
 
   const { data: hw, error } = await sb.from('assignments').insert({
     title: name, description: desc || null, due_at: dueAt,
@@ -1347,7 +1360,8 @@ async function saveEditAssignment() {
   
   if (!name) { toast('Please enter an assignment name.'); return; }
   
-  const dueAt = dueDate ? (dueTime ? `${dueDate}T${dueTime}` : `${dueDate}T23:59`) : null;
+  // Use local timezone so the due time doesn't shift
+  const dueAt = buildLocalIsoString(dueDate, dueTime);
   
   const { error } = await sb.from('assignments').update({
     title: name, description: desc || null, due_at: dueAt
@@ -1398,14 +1412,12 @@ async function loadAssignmentDetailStudents(hwId) {
   const listEl = document.getElementById('hw-detail-student-list');
   listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
   
-  // Get all students
   const { data: allStudents } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name');
   if (!allStudents) {
     listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">👨‍🎓</div>No students found.</div>';
     return;
   }
   
-  // Filter students based on visibility
   let visibleStudents = [];
   if (hw.visibility === 'all') {
     visibleStudents = allStudents;
@@ -1417,7 +1429,6 @@ async function loadAssignmentDetailStudents(hwId) {
     visibleStudents = allStudents.filter(s => targetIds.includes(s.id));
   }
   
-  // Get submissions for this assignment
   const { data: subs } = await sb.from('assignment_submissions').select('*').eq('assignment_id', hwId);
   const subMap = {};
   (subs || []).forEach(s => subMap[s.student_id] = s);
@@ -1636,7 +1647,6 @@ async function submitAssignment(hwId) {
 
   const storagePath = `assignments/${currentUser.id}/${hwId}/${Date.now()}.${ext}`;
   
-  // Simulate progress
   let progress = 0;
   const progressInterval = setInterval(() => {
     progress += Math.random() * 15;
