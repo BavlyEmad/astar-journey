@@ -407,11 +407,53 @@
       </div>
       <!-- Teacher: toolbar + list -->
       <div id="hw-teacher-view" style="display:none">
-        <div class="hw-toolbar-row">
-          <h2>All Assignments</h2>
-          <button class="btn-add" onclick="openAssignmentModal()">+ New assignment</button>
+        <!-- Teacher Tabs -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;" id="hw-teacher-tabs">
+          <button class="btn-small" id="hw-tab-manage" style="background:var(--blue);color:#fff;border-color:var(--blue);" onclick="switchHwTeacherTab('manage')">📝 Manage Assignments</button>
+          <button class="btn-small" id="hw-tab-review" onclick="switchHwTeacherTab('review')">📋 Review Submissions</button>
         </div>
-        <div class="hw-list" id="hw-teacher-list"></div>
+
+        <!-- Manage Assignments View -->
+        <div id="hw-manage-view">
+          <div class="hw-toolbar-row">
+            <h2>All Assignments</h2>
+            <button class="btn-add" onclick="openAssignmentModal()">+ New assignment</button>
+          </div>
+          <div class="hw-list" id="hw-teacher-list"></div>
+        </div>
+
+        <!-- Review Submissions View -->
+        <div id="hw-review-view" style="display:none">
+          <div id="review-student-list-view">
+            <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;" id="review-sort-row">
+              <span style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;">Year:</span>
+              <button class="sort-tab active" onclick="filterReviewStudentsByYear('all',this)">All</button>
+              <button class="sort-tab" onclick="filterReviewStudentsByYear('OL',this)">OL</button>
+              <button class="sort-tab" onclick="filterReviewStudentsByYear('AS',this)">AS</button>
+              <button class="sort-tab" onclick="filterReviewStudentsByYear('A2',this)">A2</button>
+            </div>
+            <input class="search-bar" id="review-search" placeholder="🔍 Search students..." oninput="filterReviewStudents(this.value)" style="margin-bottom:16px"/>
+            <div class="review-panel">
+              <div class="review-student-list" id="review-student-list"></div>
+            </div>
+          </div>
+          <div id="review-student-detail-view" style="display:none">
+            <div class="review-detail-header">
+              <button class="back-btn" onclick="closeReviewDetail()">← Back to students</button>
+              <div>
+                <div style="font-size:16px;font-weight:800;" id="review-detail-name"></div>
+                <div style="font-size:12px;color:var(--text-muted);" id="review-detail-meta"></div>
+              </div>
+            </div>
+            <div class="sort-tabs" id="review-detail-sort-tabs">
+              <button class="sort-tab active" onclick="filterReviewDetail('all',this)">All</button>
+              <button class="sort-tab red" onclick="filterReviewDetail('not-done',this)">🔴 Not submitted</button>
+              <button class="sort-tab yellow" onclick="filterReviewDetail('submitted',this)">🟡 Needs review</button>
+              <button class="sort-tab green" onclick="filterReviewDetail('reviewed',this)">🟢 Reviewed</button>
+            </div>
+            <div id="review-hw-list"></div>
+          </div>
+        </div>
       </div>
       <!-- Student: their assignments -->
       <div id="hw-student-view" style="display:none">
@@ -432,7 +474,6 @@
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
         <button class="btn-small" id="filter-btn-students" style="background:var(--blue);color:#fff;border-color:var(--blue);" onclick="filterByRole('students')">👨‍🎓 Students</button>
         <button class="btn-small" id="filter-btn-teachers" onclick="filterByRole('teachers')">👨‍🏫 Teachers</button>
-        <button class="btn-small" id="filter-btn-assignments" onclick="filterByRole('assignments')">📋 Assignments</button>
       </div>
 
       <div id="year-filter-row" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
@@ -456,41 +497,6 @@
             <thead><tr><th>Name</th><th>Email</th><th>Year</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="students-tbody"></tbody>
           </table>
-        </div>
-      </div>
-
-      <!-- Assignment review panel -->
-      <div id="assignments-review-panel" style="display:none">
-        <!-- Student list view -->
-        <div id="review-student-list-view">
-          <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;" id="review-sort-row">
-            <span style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;">Year:</span>
-            <button class="sort-tab active" onclick="filterReviewStudentsByYear('all',this)">All</button>
-            <button class="sort-tab" onclick="filterReviewStudentsByYear('OL',this)">OL</button>
-            <button class="sort-tab" onclick="filterReviewStudentsByYear('AS',this)">AS</button>
-            <button class="sort-tab" onclick="filterReviewStudentsByYear('A2',this)">A2</button>
-          </div>
-          <input class="search-bar" id="review-search" placeholder="🔍 Search students..." oninput="filterReviewStudents(this.value)" style="margin-bottom:16px"/>
-          <div class="review-panel">
-            <div class="review-student-list" id="review-student-list"></div>
-          </div>
-        </div>
-        <!-- Individual student detail view -->
-        <div id="review-student-detail-view" style="display:none">
-          <div class="review-detail-header">
-            <button class="back-btn" onclick="closeReviewDetail()">← Back to students</button>
-            <div>
-              <div style="font-size:16px;font-weight:800;" id="review-detail-name"></div>
-              <div style="font-size:12px;color:var(--text-muted);" id="review-detail-meta"></div>
-            </div>
-          </div>
-          <div class="sort-tabs" id="review-detail-sort-tabs">
-            <button class="sort-tab active" onclick="filterReviewDetail('all',this)">All</button>
-            <button class="sort-tab red" onclick="filterReviewDetail('not-done',this)">🔴 Not submitted</button>
-            <button class="sort-tab yellow" onclick="filterReviewDetail('submitted',this)">🟡 Needs review</button>
-            <button class="sort-tab green" onclick="filterReviewDetail('reviewed',this)">🟢 Reviewed</button>
-          </div>
-          <div id="review-hw-list"></div>
         </div>
       </div>
     </div>
@@ -889,8 +895,13 @@ function showPage(id) {
     loadExplorer('books');
   }
   if (id === 'homework') {
-    if (currentRole === 'teacher') loadTeacherAssignments();
-    else loadStudentAssignments();
+    if (currentRole === 'teacher') {
+      document.getElementById('hw-teacher-view').style.display = 'block';
+      switchHwTeacherTab('manage'); // Default to manage tab
+    } else {
+      document.getElementById('hw-student-view').style.display = 'block';
+      loadStudentAssignments();
+    }
   }
 }
 
@@ -1037,6 +1048,28 @@ async function saveSession() {
   toast('Session created! 📅');
   loadSessions();
   checkNotificationDots();
+}
+
+/* ─── TEACHER HOMEWORK TABS ─── */
+function switchHwTeacherTab(tab) {
+  const manageBtn = document.getElementById('hw-tab-manage');
+  const reviewBtn = document.getElementById('hw-tab-review');
+  const manageView = document.getElementById('hw-manage-view');
+  const reviewView = document.getElementById('hw-review-view');
+
+  if (tab === 'manage') {
+    manageBtn.style.background = 'var(--blue)'; manageBtn.style.color = '#fff'; manageBtn.style.borderColor = 'var(--blue)';
+    reviewBtn.style.background = ''; reviewBtn.style.color = ''; reviewBtn.style.borderColor = '';
+    manageView.style.display = 'block';
+    reviewView.style.display = 'none';
+    loadTeacherAssignments();
+  } else {
+    reviewBtn.style.background = 'var(--blue)'; reviewBtn.style.color = '#fff'; reviewBtn.style.borderColor = 'var(--blue)';
+    manageBtn.style.background = ''; manageBtn.style.color = ''; manageBtn.style.borderColor = '';
+    manageView.style.display = 'none';
+    reviewView.style.display = 'block';
+    loadAssignmentReviewPanel();
+  }
 }
 
 /* ─── ASSIGNMENTS (Teacher) ─── */
@@ -1250,10 +1283,13 @@ function renderStudentHwCard(hw, sub, status) {
   let submitArea = '';
   if (status === 'not-done') {
     submitArea = `<div class="hw-submit-area">
-      <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Submit your work — paste a link (Google Drive, etc.) or type a note:</div>
-      <div class="hw-submit-row">
-        <input type="text" id="hw-submit-input-${hw.id}" placeholder="https://drive.google.com/... or write a note"/>
-        <button class="btn-submit-hw" onclick="submitAssignment('${hw.id}')">Submit ↑</button>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Submit your work — upload a PDF or type a note/link:</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <input type="file" id="hw-submit-file-${hw.id}" accept=".pdf,application/pdf" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--text);"/>
+        <div class="hw-submit-row">
+          <input type="text" id="hw-submit-input-${hw.id}" placeholder="Or paste a link / write a note"/>
+          <button class="btn-submit-hw" onclick="submitAssignment('${hw.id}')">Submit ↑</button>
+        </div>
       </div>
     </div>`;
   } else if (status === 'submitted' || status === 'reviewed') {
@@ -1278,15 +1314,37 @@ function renderStudentHwCard(hw, sub, status) {
 }
 
 async function submitAssignment(hwId) {
-  const input = document.getElementById(`hw-submit-input-${hwId}`);
-  const val = input ? input.value.trim() : '';
-  if (!val) { toast('Please enter a link or note before submitting.'); return; }
-  const isUrl = /^https?:\/\//i.test(val);
+  const fileInput = document.getElementById(`hw-submit-file-${hwId}`);
+  const textInput = document.getElementById(`hw-submit-input-${hwId}`);
+  const file = fileInput ? fileInput.files[0] : null;
+  const textVal = textInput ? textInput.value.trim() : '';
+
+  if (!file && !textVal) { toast('Please upload a PDF or enter a link/note before submitting.'); return; }
+
+  let submissionUrl = null;
+  let submissionText = null;
+
+  // Handle PDF Upload
+  if (file) {
+    const ext = file.name.split('.').pop();
+    const storagePath = `assignments/${currentUser.id}/${hwId}/${Date.now()}.${ext}`;
+    const { error: uploadError } = await sb.storage.from('astar-files').upload(storagePath, file, { contentType: 'application/pdf' });
+    if (uploadError) { toast('Upload failed: ' + uploadError.message); return; }
+    const { data: urlData } = sb.storage.from('astar-files').getPublicUrl(storagePath);
+    submissionUrl = urlData.publicUrl;
+  } 
+  // Handle Text/Link
+  else if (/^https?:\/\//i.test(textVal)) {
+    submissionUrl = textVal;
+  } else {
+    submissionText = textVal;
+  }
+
   const { error } = await sb.from('assignment_submissions').insert({
     assignment_id: hwId,
     student_id: currentUser.id,
-    submission_url: isUrl ? val : null,
-    submission_text: isUrl ? null : val,
+    submission_url: submissionUrl,
+    submission_text: submissionText,
     submitted_at: new Date().toISOString(),
     is_reviewed: false
   });
@@ -1295,50 +1353,63 @@ async function submitAssignment(hwId) {
   loadStudentAssignments();
 }
 
-/* ─── ASSIGNMENT REVIEW PANEL (Teacher → Students tab) ─── */
+/* ─── ASSIGNMENT REVIEW PANEL (Teacher → Review Tab) ─── */
 
 async function loadAssignmentReviewPanel() {
-  document.getElementById('students-normal-panel').style.display = 'none';
-  document.getElementById('assignments-review-panel').style.display = 'block';
-  document.getElementById('year-filter-row').style.display = 'none';
-  document.getElementById('students-search').style.display = 'none';
-
   const listEl = document.getElementById('review-student-list');
   listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
 
-  // Get all approved students
   const { data: students } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name');
   if (!students || students.length === 0) {
     listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">👨‍🎓</div>No approved students.</div>';
     return;
   }
 
-  // Get all submissions
-  const { data: subs } = await sb.from('assignment_submissions').select('student_id,is_reviewed');
-  const subCounts = {};
+  const { data: subs } = await sb.from('assignment_submissions').select('student_id,assignment_id,is_reviewed');
+  const subMapByStudent = {};
   (subs || []).forEach(s => {
-    if (!subCounts[s.student_id]) subCounts[s.student_id] = { submitted: 0, reviewed: 0 };
-    if (s.is_reviewed) subCounts[s.student_id].reviewed++;
-    else subCounts[s.student_id].submitted++;
+    if (!subMapByStudent[s.student_id]) subMapByStudent[s.student_id] = {};
+    subMapByStudent[s.student_id][s.assignment_id] = s;
   });
 
-  // Get all assignments count for each student (visible to them)
-  const { data: allHw } = await sb.from('assignments').select('id,visibility');
+  // Fetch due_at to check if assignments are actually overdue
+  const { data: allHw } = await sb.from('assignments').select('id,visibility,due_at');
   const { data: allTargets } = await sb.from('assignment_targets').select('assignment_id,student_id');
-  const targetMap = {}; // student_id -> [assignment_ids]
+  const targetMap = {};
   (allTargets || []).forEach(t => {
     if (!targetMap[t.student_id]) targetMap[t.student_id] = [];
     targetMap[t.student_id].push(t.assignment_id);
   });
 
+  const now = new Date();
   reviewStudentsAllData = students.map(s => {
-    const visibleHwCount = (allHw || []).filter(hw =>
-      hw.visibility === 'all' || hw.visibility === s.year_group ||
-      (hw.visibility === 'students' && (targetMap[s.id]||[]).includes(hw.id))
-    ).length;
-    const counts = subCounts[s.id] || { submitted: 0, reviewed: 0 };
-    const notDone = Math.max(0, visibleHwCount - counts.submitted - counts.reviewed);
-    return { ...s, notDone, submitted: counts.submitted, reviewed: counts.reviewed };
+    let missing = 0;    // Overdue and not submitted
+    let upcoming = 0;   // Not submitted, but due date is in the future (or no due date)
+    let submitted = 0;  // Submitted, not reviewed
+    let reviewed = 0;   // Reviewed
+
+    const studentSubs = subMapByStudent[s.id] || {};
+
+    (allHw || []).forEach(hw => {
+      const isVisible = hw.visibility === 'all' || hw.visibility === s.year_group ||
+        (hw.visibility === 'students' && (targetMap[s.id]||[]).includes(hw.id));
+      if (!isVisible) return;
+
+      const sub = studentSubs[hw.id];
+      if (sub) {
+        if (sub.is_reviewed) reviewed++;
+        else submitted++;
+      } else {
+        // Not submitted: check if it's overdue
+        if (hw.due_at && new Date(hw.due_at) < now) {
+          missing++;
+        } else {
+          upcoming++;
+        }
+      }
+    });
+
+    return { ...s, notDone: missing, upcoming, submitted, reviewed };
   });
   reviewStudentsData = [...reviewStudentsAllData];
   renderReviewStudentList(reviewStudentsData);
@@ -1355,6 +1426,7 @@ function renderReviewStudentList(students) {
     const yearBadge = s.year_group ? `<span class="year-badge year-${s.year_group}">${s.year_group}</span>` : '';
     const pills = `
       ${s.notDone > 0 ? `<span class="review-count-pill review-count-red">🔴 ${s.notDone} missing</span>` : ''}
+      ${s.upcoming > 0 ? `<span class="review-count-pill" style="background:var(--blue-light);color:var(--blue);">⏳ ${s.upcoming} upcoming</span>` : ''}
       ${s.submitted > 0 ? `<span class="review-count-pill review-count-yellow">🟡 ${s.submitted} to review</span>` : ''}
       ${s.reviewed > 0 ? `<span class="review-count-pill review-count-green">🟢 ${s.reviewed} done</span>` : ''}
     `;
@@ -1526,7 +1598,6 @@ function switchStudentTab(tab, event) {
 
 async function loadStudents() {
   if (currentRole !== 'teacher') return;
-  if (currentRoleFilter === 'assignments') { return; } // handled separately
 
   let query = sb.from('profiles').select('*').order('full_name');
   if (currentRoleFilter === 'students') {
@@ -1611,7 +1682,7 @@ function filterByYear(year) {
 
 function filterByRole(role) {
   currentRoleFilter = role;
-  ['students', 'teachers', 'assignments'].forEach(r => {
+  ['students', 'teachers'].forEach(r => {
     const btn = document.getElementById('filter-btn-' + r);
     if (btn) {
       btn.style.background = r === role ? 'var(--blue)' : '';
@@ -1624,31 +1695,19 @@ function filterByRole(role) {
   const panelTabs = document.querySelector('.panel-tabs');
   const studentsSearch = document.getElementById('students-search');
   const normalPanel = document.getElementById('students-normal-panel');
-  const reviewPanel = document.getElementById('assignments-review-panel');
 
-  if (role === 'assignments') {
-    yearFilterRow.style.display = 'none';
-    if (panelTabs) panelTabs.style.display = 'none';
-    studentsSearch.style.display = 'none';
-    normalPanel.style.display = 'none';
-    reviewPanel.style.display = 'block';
-    document.getElementById('review-student-list-view').style.display = 'block';
-    document.getElementById('review-student-detail-view').style.display = 'none';
-    loadAssignmentReviewPanel();
-  } else {
-    yearFilterRow.style.display = role === 'students' ? 'flex' : 'none';
-    if (panelTabs) panelTabs.style.display = role === 'students' ? 'flex' : 'none';
-    studentsSearch.style.display = 'block';
-    normalPanel.style.display = 'block';
-    reviewPanel.style.display = 'none';
-    if (role === 'students') {
-      currentStudentTab = 'approved';
-      document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
-      const approvedTab = document.querySelector('.panel-tab');
-      if (approvedTab) approvedTab.classList.add('active');
-    }
-    loadStudents();
+  yearFilterRow.style.display = role === 'students' ? 'flex' : 'none';
+  if (panelTabs) panelTabs.style.display = role === 'students' ? 'flex' : 'none';
+  studentsSearch.style.display = 'block';
+  normalPanel.style.display = 'block';
+
+  if (role === 'students') {
+    currentStudentTab = 'approved';
+    document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+    const approvedTab = document.querySelector('.panel-tab');
+    if (approvedTab) approvedTab.classList.add('active');
   }
+  loadStudents();
 }
 
 async function approveStudent(id) {
@@ -1914,7 +1973,7 @@ function openPdfFolderModal() {
   const isRoot = explorerPaths['books'].length === 0;
   document.getElementById('pdf-folder-vis-group').style.display = isRoot ? 'block' : 'none';
   document.getElementById('pdf-folder-modal-title').textContent = isRoot ? '📁 New folder' : '📁 New subfolder';
-  document.querySelectorAll('#pdf-folder-modal .vis-btn').forEach(b => b.classList.toggle('selected', b.dataset.vis==='all'));
+  document.querySelectorAll('#pdf-folder-modal .vis-btn').forEach(b => b.classList.toggle('selected',b.dataset.vis==='all'));
   if (isRoot) loadStudentsForPFPicker();
   document.getElementById('pdf-folder-modal').classList.add('open');
 }
