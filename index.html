@@ -185,6 +185,8 @@
   .hw-list{display:flex;flex-direction:column;gap:12px;}
   .hw-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:18px 20px;transition:all 0.15s;}
   .hw-card:hover{box-shadow:0 2px 12px rgba(24,95,165,0.08);}
+  .hw-card.clickable{cursor:pointer;}
+  .hw-card.clickable:hover{border-color:var(--blue);}
   .hw-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
   .hw-card-title{font-size:15px;font-weight:700;}
   .hw-card-badges{display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap;}
@@ -199,8 +201,6 @@
   .hw-status-dot.reviewed{background:var(--green);}
   .hw-submit-area{border-top:1px solid var(--border);padding-top:12px;margin-top:4px;display:flex;flex-direction:column;gap:8px;}
   .hw-submit-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-  .hw-submit-row input[type=text]{flex:1;min-width:180px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--text);}
-  .hw-submit-row input[type=text]:focus{outline:none;border-color:var(--blue);}
   .btn-submit-hw{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
   .btn-submit-hw:hover{opacity:0.9;}
   .btn-submit-hw:disabled{opacity:0.6;cursor:not-allowed;}
@@ -217,6 +217,27 @@
   .hw-actions-teacher{display:flex;gap:6px;flex-shrink:0;}
   .hw-del-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit;color:var(--text-muted);transition:all 0.15s;}
   .hw-del-btn:hover{border-color:var(--red);color:var(--red);background:var(--red-light);}
+
+  /* ── ASSIGNMENT DETAIL VIEW ── */
+  .hw-detail-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+  .back-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--text-muted);display:flex;align-items:center;gap:6px;}
+  .back-btn:hover{border-color:var(--blue);color:var(--blue);}
+  .hw-detail-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px;}
+  .hw-detail-title{font-size:18px;font-weight:800;margin-bottom:8px;}
+  .hw-detail-meta{font-size:13px;color:var(--text-muted);margin-bottom:12px;}
+  .hw-student-list{display:flex;flex-direction:column;gap:10px;}
+  .hw-student-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border:1px solid var(--border);border-radius:10px;background:var(--bg);transition:all 0.15s;}
+  .hw-student-row:hover{border-color:var(--blue);}
+  .hw-student-info{display:flex;align-items:center;gap:12px;}
+  .hw-student-avatar{width:36px;height:36px;background:var(--blue-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--blue);flex-shrink:0;}
+  .hw-student-name{font-size:14px;font-weight:600;}
+  .hw-student-meta{font-size:11px;color:var(--text-muted);}
+  .hw-student-status{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .hw-upload-progress{display:none;margin-top:10px;background:var(--border);border-radius:99px;height:8px;overflow:hidden;position:relative;}
+  .hw-upload-progress.active{display:block;}
+  .hw-upload-progress-bar{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));width:0%;transition:width 0.3s ease;border-radius:99px;}
+  .hw-upload-progress-label{font-size:12px;color:var(--text-muted);margin-top:6px;display:flex;justify-content:space-between;align-items:center;}
+  .hw-upload-progress-label .spinner-sm{display:inline-block;width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 0.6s linear infinite;margin-right:6px;vertical-align:middle;}
 
   /* ── ASSIGNMENT REVIEW PANEL (Teacher) ── */
   .review-panel{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px;}
@@ -237,8 +258,6 @@
 
   /* Teacher assignment review detail */
   .review-detail-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
-  .back-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--text-muted);display:flex;align-items:center;gap:6px;}
-  .back-btn:hover{border-color:var(--blue);color:var(--blue);}
   .review-hw-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:10px;transition:border-color 0.15s;}
   .review-hw-card.status-not-done{border-left:4px solid var(--red);}
   .review-hw-card.status-submitted{border-left:4px solid var(--orange);}
@@ -415,11 +434,32 @@
 
         <!-- Manage Assignments View -->
         <div id="hw-manage-view">
-          <div class="hw-toolbar-row">
-            <h2>All Assignments</h2>
-            <button class="btn-add" onclick="openAssignmentModal()">+ New assignment</button>
+          <!-- Assignment List View -->
+          <div id="hw-list-view">
+            <div class="hw-toolbar-row">
+              <h2>All Assignments</h2>
+              <button class="btn-add" onclick="openAssignmentModal()">+ New assignment</button>
+            </div>
+            <input class="search-bar" id="hw-search" placeholder="🔍 Search assignments..." oninput="filterTeacherAssignments(this.value)" style="margin-bottom:16px"/>
+            <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;" id="hw-year-filter-row">
+              <span style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;">Filter by year:</span>
+              <button class="sort-tab active" onclick="filterTeacherAssignmentsByYear('all',this)">All</button>
+              <button class="sort-tab" onclick="filterTeacherAssignmentsByYear('OL',this)">OL</button>
+              <button class="sort-tab" onclick="filterTeacherAssignmentsByYear('AS',this)">AS</button>
+              <button class="sort-tab" onclick="filterTeacherAssignmentsByYear('A2',this)">A2</button>
+            </div>
+            <div class="hw-list" id="hw-teacher-list"></div>
           </div>
-          <div class="hw-list" id="hw-teacher-list"></div>
+
+          <!-- Assignment Detail View -->
+          <div id="hw-detail-view" style="display:none">
+            <div class="hw-detail-header">
+              <button class="back-btn" onclick="closeAssignmentDetail()">← Back to assignments</button>
+            </div>
+            <div class="hw-detail-card" id="hw-detail-info"></div>
+            <input class="search-bar" id="hw-detail-search" placeholder="🔍 Search students..." oninput="filterAssignmentDetailStudents(this.value)" style="margin-bottom:16px"/>
+            <div class="hw-student-list" id="hw-detail-student-list"></div>
+          </div>
         </div>
 
         <!-- Review Submissions View -->
@@ -574,6 +614,36 @@
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeAssignmentModal()">Cancel</button>
       <button class="btn-save" id="hw-save-btn" onclick="saveAssignment()">Create assignment</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT ASSIGNMENT MODAL -->
+<div class="modal-overlay" id="edit-assignment-modal">
+  <div class="modal">
+    <h3>✏️ Edit assignment</h3>
+    <input type="hidden" id="edit-hw-id"/>
+    <div class="form-group">
+      <label>Assignment name</label>
+      <input type="text" id="edit-hw-name"/>
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="edit-hw-desc"></textarea>
+    </div>
+    <div class="date-time-row">
+      <div class="form-group">
+        <label>Due date</label>
+        <input type="date" id="edit-hw-due-date"/>
+      </div>
+      <div class="form-group">
+        <label>Due time</label>
+        <input type="time" id="edit-hw-due-time"/>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEditAssignmentModal()">Cancel</button>
+      <button class="btn-save" onclick="saveEditAssignment()">Save changes</button>
     </div>
   </div>
 </div>
@@ -739,6 +809,10 @@ let currentReviewStudentId = null;
 let currentReviewStudentName = '';
 let reviewDetailAllData = [];
 let currentReviewDetailFilter = 'all';
+let allTeacherAssignments = [];
+let currentHwYearFilter = 'all';
+let currentAssignmentDetailId = null;
+let assignmentDetailStudentsData = [];
 
 function toggleDark(on) {
   document.body.classList.toggle('dark', on);
@@ -897,7 +971,7 @@ function showPage(id) {
   if (id === 'homework') {
     if (currentRole === 'teacher') {
       document.getElementById('hw-teacher-view').style.display = 'block';
-      switchHwTeacherTab('manage'); // Default to manage tab
+      switchHwTeacherTab('manage');
     } else {
       document.getElementById('hw-student-view').style.display = 'block';
       loadStudentAssignments();
@@ -1149,7 +1223,6 @@ async function saveAssignment() {
 
   if (error) { toast('Error: ' + error.message); btn.disabled = false; btn.textContent = 'Create assignment'; return; }
 
-  // If specific students, insert targets
   if (selectedHwVisibility === 'students' && selectedHwStudentIds.size > 0) {
     const targets = [...selectedHwStudentIds].map(sid => ({ assignment_id: hw.id, student_id: sid }));
     const { error: te } = await sb.from('assignment_targets').insert(targets);
@@ -1165,13 +1238,48 @@ async function saveAssignment() {
 async function loadTeacherAssignments() {
   const list = document.getElementById('hw-teacher-list');
   list.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading assignments...</div>';
+  document.getElementById('hw-list-view').style.display = 'block';
+  document.getElementById('hw-detail-view').style.display = 'none';
+  
   const { data, error } = await sb.from('assignments').select('*').order('created_at', { ascending: false });
   if (error) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load assignments.</div>'; return; }
-  if (!data || data.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div>No assignments yet. Create one to get started.</div>';
+  
+  allTeacherAssignments = data || [];
+  filterTeacherAssignments(document.getElementById('hw-search').value);
+}
+
+function filterTeacherAssignments(query) {
+  const q = (query || '').toLowerCase();
+  let filtered = allTeacherAssignments;
+  
+  if (currentHwYearFilter !== 'all') {
+    filtered = filtered.filter(hw => hw.visibility === currentHwYearFilter || hw.visibility === 'all');
+  }
+  
+  if (q) {
+    filtered = filtered.filter(hw => 
+      (hw.title||'').toLowerCase().includes(q) || 
+      (hw.description||'').toLowerCase().includes(q)
+    );
+  }
+  
+  renderTeacherHwList(filtered);
+}
+
+function filterTeacherAssignmentsByYear(year, btn) {
+  currentHwYearFilter = year;
+  document.querySelectorAll('#hw-year-filter-row .sort-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  filterTeacherAssignments(document.getElementById('hw-search').value);
+}
+
+function renderTeacherHwList(assignments) {
+  const list = document.getElementById('hw-teacher-list');
+  if (!assignments || assignments.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📝</div>No assignments found.</div>';
     return;
   }
-  list.innerHTML = data.map(hw => renderTeacherHwCard(hw)).join('');
+  list.innerHTML = assignments.map(hw => renderTeacherHwCard(hw)).join('');
 }
 
 function renderTeacherHwCard(hw) {
@@ -1179,12 +1287,16 @@ function renderTeacherHwCard(hw) {
   const dueStr = hw.due_at ? formatDue(hw.due_at) : '';
   const dueHtml = dueStr ? `<span>📅 Due: ${dueStr}</span>` : '';
   const descHtml = hw.description ? `<div class="hw-card-desc">${escText(hw.description)}</div>` : '';
-  return `<div class="hw-card">
+  const teacherBtns = `
+    <button class="hw-del-btn" onclick="event.stopPropagation();openEditAssignmentModal('${hw.id}')">✏️ Edit</button>
+    <button class="hw-del-btn" onclick="event.stopPropagation();deleteAssignment('${hw.id}')">🗑 Delete</button>
+  `;
+  return `<div class="hw-card clickable" onclick="openAssignmentDetail('${hw.id}')">
     <div class="hw-card-header">
       <div class="hw-card-title">📝 ${escText(hw.title)}</div>
       <div class="hw-card-badges">
         <span class="hw-badge hw-badge-blue">${visLabel}</span>
-        <button class="hw-del-btn" onclick="deleteAssignment('${hw.id}')">🗑 Delete</button>
+        ${teacherBtns}
       </div>
     </div>
     ${descHtml}
@@ -1202,17 +1314,199 @@ async function deleteAssignment(id) {
   loadTeacherAssignments();
 }
 
+function openEditAssignmentModal(id) {
+  const hw = allTeacherAssignments.find(a => a.id === id);
+  if (!hw) return;
+  
+  document.getElementById('edit-hw-id').value = id;
+  document.getElementById('edit-hw-name').value = hw.title || '';
+  document.getElementById('edit-hw-desc').value = hw.description || '';
+  
+  if (hw.due_at) {
+    const d = new Date(hw.due_at);
+    document.getElementById('edit-hw-due-date').value = d.toISOString().split('T')[0];
+    document.getElementById('edit-hw-due-time').value = d.toTimeString().slice(0,5);
+  } else {
+    document.getElementById('edit-hw-due-date').value = '';
+    document.getElementById('edit-hw-due-time').value = '';
+  }
+  
+  document.getElementById('edit-assignment-modal').classList.add('open');
+}
+
+function closeEditAssignmentModal() {
+  document.getElementById('edit-assignment-modal').classList.remove('open');
+}
+
+async function saveEditAssignment() {
+  const id = document.getElementById('edit-hw-id').value;
+  const name = document.getElementById('edit-hw-name').value.trim();
+  const desc = document.getElementById('edit-hw-desc').value.trim();
+  const dueDate = document.getElementById('edit-hw-due-date').value;
+  const dueTime = document.getElementById('edit-hw-due-time').value;
+  
+  if (!name) { toast('Please enter an assignment name.'); return; }
+  
+  const dueAt = dueDate ? (dueTime ? `${dueDate}T${dueTime}` : `${dueDate}T23:59`) : null;
+  
+  const { error } = await sb.from('assignments').update({
+    title: name, description: desc || null, due_at: dueAt
+  }).eq('id', id);
+  
+  if (error) { toast('Error: ' + error.message); return; }
+  
+  closeEditAssignmentModal();
+  toast('Assignment updated! ✅');
+  loadTeacherAssignments();
+}
+
+async function openAssignmentDetail(id) {
+  currentAssignmentDetailId = id;
+  const hw = allTeacherAssignments.find(a => a.id === id);
+  if (!hw) return;
+  
+  document.getElementById('hw-list-view').style.display = 'none';
+  document.getElementById('hw-detail-view').style.display = 'block';
+  
+  const visLabel = hw.visibility === 'all' ? 'Everyone' : hw.visibility === 'students' ? 'Specific students' : hw.visibility;
+  const dueStr = hw.due_at ? formatDue(hw.due_at) : 'No due date';
+  
+  document.getElementById('hw-detail-info').innerHTML = `
+    <div class="hw-detail-title">📝 ${escText(hw.title)}</div>
+    <div class="hw-detail-meta">
+      <span class="hw-badge hw-badge-blue">${visLabel}</span> · 
+      📅 Due: ${dueStr} · 
+      Created ${formatDate(hw.created_at)}
+    </div>
+    ${hw.description ? `<div style="font-size:13px;color:var(--text-muted);margin-top:8px;">${escText(hw.description)}</div>` : ''}
+  `;
+  
+  await loadAssignmentDetailStudents(id);
+}
+
+function closeAssignmentDetail() {
+  document.getElementById('hw-list-view').style.display = 'block';
+  document.getElementById('hw-detail-view').style.display = 'none';
+  currentAssignmentDetailId = null;
+  document.getElementById('hw-detail-search').value = '';
+}
+
+async function loadAssignmentDetailStudents(hwId) {
+  const hw = allTeacherAssignments.find(a => a.id === hwId);
+  if (!hw) return;
+  
+  const listEl = document.getElementById('hw-detail-student-list');
+  listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
+  
+  // Get all students
+  const { data: allStudents } = await sb.from('profiles').select('id,full_name,email,year_group').eq('role','student').eq('status','approved').order('full_name');
+  if (!allStudents) {
+    listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">👨‍🎓</div>No students found.</div>';
+    return;
+  }
+  
+  // Filter students based on visibility
+  let visibleStudents = [];
+  if (hw.visibility === 'all') {
+    visibleStudents = allStudents;
+  } else if (['OL', 'AS', 'A2'].includes(hw.visibility)) {
+    visibleStudents = allStudents.filter(s => s.year_group === hw.visibility);
+  } else if (hw.visibility === 'students') {
+    const { data: targets } = await sb.from('assignment_targets').select('student_id').eq('assignment_id', hwId);
+    const targetIds = (targets || []).map(t => t.student_id);
+    visibleStudents = allStudents.filter(s => targetIds.includes(s.id));
+  }
+  
+  // Get submissions for this assignment
+  const { data: subs } = await sb.from('assignment_submissions').select('*').eq('assignment_id', hwId);
+  const subMap = {};
+  (subs || []).forEach(s => subMap[s.student_id] = s);
+  
+  assignmentDetailStudentsData = visibleStudents.map(s => ({
+    student: s,
+    submission: subMap[s.id] || null
+  }));
+  
+  filterAssignmentDetailStudents(document.getElementById('hw-detail-search').value);
+}
+
+function filterAssignmentDetailStudents(query) {
+  const q = (query || '').toLowerCase();
+  let filtered = assignmentDetailStudentsData;
+  
+  if (q) {
+    filtered = filtered.filter(item =>
+      (item.student.full_name||'').toLowerCase().includes(q) ||
+      (item.student.email||'').toLowerCase().includes(q)
+    );
+  }
+  
+  renderAssignmentDetailStudents(filtered);
+}
+
+function renderAssignmentDetailStudents(items) {
+  const listEl = document.getElementById('hw-detail-student-list');
+  
+  if (!items || items.length === 0) {
+    listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div>No students found.</div>';
+    return;
+  }
+  
+  listEl.innerHTML = items.map(({ student, submission }) => {
+    const initials = (student.full_name || student.email || '?').charAt(0).toUpperCase();
+    const yearBadge = student.year_group ? `<span class="year-badge year-${student.year_group}">${student.year_group}</span>` : '';
+    
+    let statusHtml = '';
+    if (submission) {
+      if (submission.is_reviewed) {
+        statusHtml = `<span class="hw-badge hw-badge-green">🟢 Reviewed</span>`;
+      } else {
+        statusHtml = `<span class="hw-badge hw-badge-yellow">🟡 Submitted</span>`;
+      }
+      
+      const subLink = submission.submission_url
+        ? `<a href="${submission.submission_url}" target="_blank" rel="noopener" class="btn-view-hw">📎 View PDF</a>`
+        : '';
+      
+      return `<div class="hw-student-row">
+        <div class="hw-student-info">
+          <div class="hw-student-avatar">${initials}</div>
+          <div>
+            <div class="hw-student-name">${escText(student.full_name || student.email)}</div>
+            <div class="hw-student-meta">${student.email} ${yearBadge ? '· ' : ''}${yearBadge}</div>
+          </div>
+        </div>
+        <div class="hw-student-status">
+          ${statusHtml}
+          ${subLink}
+        </div>
+      </div>`;
+    } else {
+      return `<div class="hw-student-row">
+        <div class="hw-student-info">
+          <div class="hw-student-avatar">${initials}</div>
+          <div>
+            <div class="hw-student-name">${escText(student.full_name || student.email)}</div>
+            <div class="hw-student-meta">${student.email} ${yearBadge ? '· ' : ''}${yearBadge}</div>
+          </div>
+        </div>
+        <div class="hw-student-status">
+          <span class="hw-badge hw-badge-red">🔴 Not submitted</span>
+        </div>
+      </div>`;
+    }
+  }).join('');
+}
+
 /* ─── ASSIGNMENTS (Student) ─── */
 
 async function loadStudentAssignments() {
   const list = document.getElementById('hw-student-list');
   list.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading assignments...</div>';
 
-  // Fetch all assignments visible to this student
   const { data: allHw } = await sb.from('assignments').select('*').order('created_at', { ascending: false });
   if (!allHw) { list.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div>Could not load assignments.</div>'; return; }
 
-  // Filter by visibility
   const myYear = currentYearGroup;
   const visibleHwIds = [];
   const targetChecks = [];
@@ -1221,7 +1515,6 @@ async function loadStudentAssignments() {
     else if (hw.visibility === myYear) visibleHwIds.push(hw.id);
     else if (hw.visibility === 'students') targetChecks.push(hw.id);
   }
-  // Check specific targets
   if (targetChecks.length > 0) {
     const { data: targets } = await sb.from('assignment_targets').select('assignment_id').eq('student_id', currentUser.id).in('assignment_id', targetChecks);
     if (targets) targets.forEach(t => visibleHwIds.push(t.assignment_id));
@@ -1233,7 +1526,6 @@ async function loadStudentAssignments() {
     return;
   }
 
-  // Fetch my submissions
   const { data: subs } = await sb.from('assignment_submissions').select('*').eq('student_id', currentUser.id).in('assignment_id', visibleHwIds);
   const subMap = {};
   (subs || []).forEach(s => subMap[s.assignment_id] = s);
@@ -1283,12 +1575,16 @@ function renderStudentHwCard(hw, sub, status) {
   let submitArea = '';
   if (status === 'not-done') {
     submitArea = `<div class="hw-submit-area">
-      <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Submit your work — upload a PDF or type a note/link:</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Submit your work — upload a PDF:</div>
       <div style="display:flex;flex-direction:column;gap:8px;">
         <input type="file" id="hw-submit-file-${hw.id}" accept=".pdf,application/pdf" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--text);"/>
-        <div class="hw-submit-row">
-          <input type="text" id="hw-submit-input-${hw.id}" placeholder="Or paste a link / write a note"/>
-          <button class="btn-submit-hw" onclick="submitAssignment('${hw.id}')">Submit ↑</button>
+        <button class="btn-submit-hw" id="hw-submit-btn-${hw.id}" onclick="submitAssignment('${hw.id}')" style="align-self: flex-start;">Submit PDF ↑</button>
+        <div class="hw-upload-progress" id="hw-progress-${hw.id}">
+          <div class="hw-upload-progress-bar" id="hw-progress-bar-${hw.id}"></div>
+        </div>
+        <div class="hw-upload-progress-label" id="hw-progress-label-${hw.id}" style="display:none;">
+          <span><span class="spinner-sm"></span>Uploading...</span>
+          <span id="hw-progress-percent-${hw.id}">0%</span>
         </div>
       </div>
     </div>`;
@@ -1315,40 +1611,77 @@ function renderStudentHwCard(hw, sub, status) {
 
 async function submitAssignment(hwId) {
   const fileInput = document.getElementById(`hw-submit-file-${hwId}`);
-  const textInput = document.getElementById(`hw-submit-input-${hwId}`);
   const file = fileInput ? fileInput.files[0] : null;
-  const textVal = textInput ? textInput.value.trim() : '';
+  const btn = document.getElementById(`hw-submit-btn-${hwId}`);
+  const progressEl = document.getElementById(`hw-progress-${hwId}`);
+  const progressBar = document.getElementById(`hw-progress-bar-${hwId}`);
+  const progressLabel = document.getElementById(`hw-progress-label-${hwId}`);
+  const progressPercent = document.getElementById(`hw-progress-percent-${hwId}`);
 
-  if (!file && !textVal) { toast('Please upload a PDF or enter a link/note before submitting.'); return; }
-
-  let submissionUrl = null;
-  let submissionText = null;
-
-  // Handle PDF Upload
-  if (file) {
-    const ext = file.name.split('.').pop();
-    const storagePath = `assignments/${currentUser.id}/${hwId}/${Date.now()}.${ext}`;
-    const { error: uploadError } = await sb.storage.from('astar-files').upload(storagePath, file, { contentType: 'application/pdf' });
-    if (uploadError) { toast('Upload failed: ' + uploadError.message); return; }
-    const { data: urlData } = sb.storage.from('astar-files').getPublicUrl(storagePath);
-    submissionUrl = urlData.publicUrl;
-  } 
-  // Handle Text/Link
-  else if (/^https?:\/\//i.test(textVal)) {
-    submissionUrl = textVal;
-  } else {
-    submissionText = textVal;
+  if (!file) { 
+    toast('Please select a PDF file to submit.'); 
+    return; 
   }
+
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (ext !== 'pdf') {
+    toast('Only PDF files are allowed.');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Uploading...';
+  progressEl.classList.add('active');
+  progressLabel.style.display = 'flex';
+
+  const storagePath = `assignments/${currentUser.id}/${hwId}/${Date.now()}.${ext}`;
+  
+  // Simulate progress
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    progress += Math.random() * 15;
+    if (progress > 90) progress = 90;
+    progressBar.style.width = progress + '%';
+    progressPercent.textContent = Math.round(progress) + '%';
+  }, 200);
+
+  const { error: uploadError } = await sb.storage.from('astar-files').upload(storagePath, file, { contentType: 'application/pdf' });
+  
+  clearInterval(progressInterval);
+  
+  if (uploadError) { 
+    progressEl.classList.remove('active');
+    progressLabel.style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = 'Submit PDF ↑';
+    toast('Upload failed: ' + uploadError.message); 
+    return; 
+  }
+  
+  progressBar.style.width = '100%';
+  progressPercent.textContent = '100%';
+  progressLabel.innerHTML = '<span>✅ Upload complete! Saving...</span>';
+  
+  const { data: urlData } = sb.storage.from('astar-files').getPublicUrl(storagePath);
 
   const { error } = await sb.from('assignment_submissions').insert({
     assignment_id: hwId,
     student_id: currentUser.id,
-    submission_url: submissionUrl,
-    submission_text: submissionText,
+    submission_url: urlData.publicUrl,
+    submission_text: null,
     submitted_at: new Date().toISOString(),
     is_reviewed: false
   });
-  if (error) { toast('Error: ' + error.message); return; }
+  
+  if (error) { 
+    progressEl.classList.remove('active');
+    progressLabel.style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = 'Submit PDF ↑';
+    toast('Error submitting: ' + error.message); 
+    return; 
+  }
+  
   toast('Assignment submitted! ✅');
   loadStudentAssignments();
 }
@@ -1372,7 +1705,6 @@ async function loadAssignmentReviewPanel() {
     subMapByStudent[s.student_id][s.assignment_id] = s;
   });
 
-  // Fetch due_at to check if assignments are actually overdue
   const { data: allHw } = await sb.from('assignments').select('id,visibility,due_at');
   const { data: allTargets } = await sb.from('assignment_targets').select('assignment_id,student_id');
   const targetMap = {};
@@ -1383,10 +1715,9 @@ async function loadAssignmentReviewPanel() {
 
   const now = new Date();
   reviewStudentsAllData = students.map(s => {
-    let missing = 0;    // Overdue and not submitted
-    let upcoming = 0;   // Not submitted, but due date is in the future (or no due date)
-    let submitted = 0;  // Submitted, not reviewed
-    let reviewed = 0;   // Reviewed
+    let missing = 0;
+    let submitted = 0;
+    let reviewed = 0;
 
     const studentSubs = subMapByStudent[s.id] || {};
 
@@ -1400,16 +1731,13 @@ async function loadAssignmentReviewPanel() {
         if (sub.is_reviewed) reviewed++;
         else submitted++;
       } else {
-        // Not submitted: check if it's overdue
         if (hw.due_at && new Date(hw.due_at) < now) {
           missing++;
-        } else {
-          upcoming++;
         }
       }
     });
 
-    return { ...s, notDone: missing, upcoming, submitted, reviewed };
+    return { ...s, notDone: missing, submitted, reviewed };
   });
   reviewStudentsData = [...reviewStudentsAllData];
   renderReviewStudentList(reviewStudentsData);
@@ -1424,9 +1752,9 @@ function renderReviewStudentList(students) {
   listEl.innerHTML = students.map(s => {
     const initials = (s.full_name || s.email || '?').charAt(0).toUpperCase();
     const yearBadge = s.year_group ? `<span class="year-badge year-${s.year_group}">${s.year_group}</span>` : '';
+    
     const pills = `
       ${s.notDone > 0 ? `<span class="review-count-pill review-count-red">🔴 ${s.notDone} missing</span>` : ''}
-      ${s.upcoming > 0 ? `<span class="review-count-pill" style="background:var(--blue-light);color:var(--blue);">⏳ ${s.upcoming} upcoming</span>` : ''}
       ${s.submitted > 0 ? `<span class="review-count-pill review-count-yellow">🟡 ${s.submitted} to review</span>` : ''}
       ${s.reviewed > 0 ? `<span class="review-count-pill review-count-green">🟢 ${s.reviewed} done</span>` : ''}
     `;
@@ -1480,12 +1808,10 @@ async function openReviewDetail(studentId, studentName, yearGroup) {
   const hwList = document.getElementById('review-hw-list');
   hwList.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div>Loading...</div>';
 
-  // Get all assignments
   const { data: allHw } = await sb.from('assignments').select('*').order('created_at', { ascending: false });
   const { data: targets } = await sb.from('assignment_targets').select('assignment_id').eq('student_id', studentId);
   const targetIds = (targets || []).map(t => t.assignment_id);
 
-  // Filter visible
   const { data: profile } = await sb.from('profiles').select('year_group').eq('id', studentId).single();
   const studentYear = profile ? profile.year_group : null;
   const visibleHw = (allHw || []).filter(hw =>
@@ -1493,7 +1819,6 @@ async function openReviewDetail(studentId, studentName, yearGroup) {
     (hw.visibility === 'students' && targetIds.includes(hw.id))
   );
 
-  // Get submissions for this student
   const { data: subs } = await sb.from('assignment_submissions').select('*').eq('student_id', studentId);
   const subMap = {};
   (subs || []).forEach(s => subMap[s.assignment_id] = s);
@@ -1575,7 +1900,6 @@ async function markReviewed(hwId, subId) {
   }).eq('id', subId);
   if (error) { toast('Error: ' + error.message); return; }
   toast('Marked as reviewed! ✅');
-  // Refresh
   openReviewDetail(currentReviewStudentId, currentReviewStudentName, '');
 }
 
@@ -1583,7 +1907,6 @@ function closeReviewDetail() {
   document.getElementById('review-student-list-view').style.display = 'block';
   document.getElementById('review-student-detail-view').style.display = 'none';
   currentReviewStudentId = null;
-  // Refresh counts
   loadAssignmentReviewPanel();
 }
 
